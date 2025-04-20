@@ -13,7 +13,6 @@ const Navbar = () => {
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/chat', label: 'Chat' },
     { href: '/summarize', label: 'Summarize' },
-    { href: '/hire', label: 'Hire' },
     { href: '/contact', label: 'Contact' },
     { href: '/fun', label: 'Fun' },
   ];
