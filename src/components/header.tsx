@@ -4,10 +4,12 @@ import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import Link from 'next/link';
+import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const canvasRef = useRef(null);
+  const { isSignedIn } = useUser();
 
   const navLinks = [
     { href: '/dashboard', label: 'Dashboard' },

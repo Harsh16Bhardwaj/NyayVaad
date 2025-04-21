@@ -85,8 +85,11 @@ export async function POST(request: Request) {
             },
           });
           const html = await response.text();
-          const sections = extractSections(html);
-
+          const sections = extractSections(html);   
+          console.log("9️⃣ Backend - Extracted Sections:", sections);
+          //Send the document id to be appended to the user's case
+          //Add this with document id to database
+          
     }
 
     return NextResponse.json({ success: true }); // Placeholder response
