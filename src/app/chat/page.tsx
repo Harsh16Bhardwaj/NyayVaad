@@ -27,7 +27,6 @@ export default function ChatPage() {
   const [editingField, setEditingField] = useState<{ name: string; value: string | null } | null>(null);
   const [isAnalysisEnabled, setIsAnalysisEnabled] = useState(false);
 
-  // Add useEffect for description change
   useEffect(() => {
     const triggerPipeline = async () => {
       if (caseData.description) {
@@ -63,7 +62,7 @@ export default function ChatPage() {
     scrollToBottom();
   }, [messages]);
 
-  // Check if all fields are filled
+
   useEffect(() => {
     const allFieldsFilled = Object.values(caseData).every(value => value !== null);
     setIsAnalysisEnabled(allFieldsFilled);

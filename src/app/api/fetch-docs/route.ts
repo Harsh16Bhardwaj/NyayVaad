@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { extractSections } from './extractSections';
 
 const LANGFLOW_API_URL = 'https://api.langflow.astra.datastax.com/lf/043396b0-e82a-4e0f-aca3-ad6828b04b34/api/v1/run/2c978a87-7226-43c1-bccd-ca6082257444';
 const LANGFLOW_TOKEN = process.env.FETCHING_DOCS_LANGFLOW_TOKEN;
@@ -75,6 +76,18 @@ export async function POST(request: Request) {
     }));
     console.log("8️⃣ Backend - Extracted Docs (not returned to frontend):", extractedDocs.title);
 
+    const kanoonDoc = async (docID: string) => {
+        const response = await fetch(`https://api.indiankanoon.org/doc/${docID}/`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Token ${process.env.KANOON_API_KEY}`,
+              'Accept': 'text/html',
+            },
+          });
+          const html = await response.text();
+          const sections = extractSections(html);
+
+    }
 
     return NextResponse.json({ success: true }); // Placeholder response
 
