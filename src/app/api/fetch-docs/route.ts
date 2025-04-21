@@ -6,7 +6,7 @@ const LANGFLOW_TOKEN = process.env.FETCHING_DOCS_LANGFLOW_TOKEN;
 export async function POST(request: Request) {
   try {
     const { description } = await request.json();
-
+    console.log("Backend - Received description:", description);
     if (!description) {
       return NextResponse.json(
         { error: 'Description is required' },
@@ -15,11 +15,12 @@ export async function POST(request: Request) {
     }
 
     const payload = {
-      inputs: {
-        description: description
-      }
-    };
-
+        input_value: description, // what user entered
+        output_type: "chat",      // assuming you're using a ChatOutput component
+        input_type: "chat",       // assuming input type is plain text/chat
+        session_id: "user_1"      // you can generate or pass this dynamically
+      };
+      
     console.log("Backend - Sending document fetching payload to Langflow:", payload);
 
     const response = await fetch(LANGFLOW_API_URL, {
@@ -37,13 +38,9 @@ export async function POST(request: Request) {
     }
 
     const data = await response.json();
-    console.log("Backend - Full Langflow JSON response:\n", JSON.stringify(data, null, 2));
-
     const langflowMessage = data.outputs?.[0]?.outputs?.[0]?.results?.message?.text;
-    
     let parsedResponse;
     try {
-      // Remove the markdown code block syntax if present
       const cleanJson = langflowMessage.replace(/```json\n|\n```/g, '').trim();
       parsedResponse = JSON.parse(cleanJson);
     } catch (error) {

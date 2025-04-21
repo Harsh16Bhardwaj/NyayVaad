@@ -37,7 +37,6 @@ export async function POST(request: Request) {
     const data = await response.json();
     console.log("Backend - Full Langflow JSON response:\n", JSON.stringify(data, null, 2));
 
-    // Extract the message from the nested structure
     const langflowMessage = data.outputs?.[0]?.outputs?.[0]?.results?.message?.text;
     
     // Parse the JSON string from the message
