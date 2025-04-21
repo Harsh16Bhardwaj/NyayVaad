@@ -27,6 +27,34 @@ export default function ChatPage() {
   const [editingField, setEditingField] = useState<{ name: string; value: string | null } | null>(null);
   const [isAnalysisEnabled, setIsAnalysisEnabled] = useState(false);
 
+  // Add useEffect for description change
+  useEffect(() => {
+    const triggerPipeline = async () => {
+      if (caseData.description) {
+        try {
+          console.log("Frontend - Triggering pipeline with description:", caseData.description);
+          const response = await fetch('/api/fetch-docs', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ description: caseData.description }),
+          });
+
+          if (!response.ok) {
+            throw new Error('Pipeline request failed');
+          }
+
+
+        } catch (error) {
+          console.error("Frontend - Error in pipeline call:", error);
+        }
+      }
+    };
+
+    triggerPipeline();
+  }, [caseData.description]);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
