@@ -111,7 +111,7 @@ const ContactPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-white relative overflow-hidden">
+    <div className="min-h-screen mt-10  bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-white relative overflow-hidden">
       <Toaster position="top-right" toastOptions={{ className: 'bg-gray-900 text-white border border-purple-500' }} />
       {showConfetti && (
         <Confetti
@@ -158,7 +158,7 @@ const ContactPage = () => {
           className="text-5xl md:text-5xl decoration-2  underline-offset-4 font-extrabold text-center mb-12 bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-indigo-500 ]"
         >
           Got an Issue?
-          <h2 className='text-white text-lg'>We have you covered</h2>
+          <span className='text-white text-lg'>We have you covered</span>
         </motion.h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">

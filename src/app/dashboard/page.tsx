@@ -229,7 +229,7 @@ export default function DashboardPage() {
                             variant="destructive"
                             size="sm"
                             onClick={handleBulkDelete}
-                            className="bg-red-600/20 hover:bg-red-600/30 text-red-400"
+                            className="bg-red-600/20 hover:bg-red-600/30 cursor-pointer text-red-400"
                           >
                             <Trash2 className="w-4 h-4 mr-2" />
                             Delete Selected
@@ -239,7 +239,7 @@ export default function DashboardPage() {
                           variant="outline"
                           size="sm"
                           onClick={() => setIsBulkSelecting(!isBulkSelecting)}
-                          className="bg-transparent border-white/10 hover:bg-white/5"
+                          className="bg-transparent text-gray-300 border-white/60 hover:border-white duration-150 ease-in-out cursor-pointer hover:bg-white/5"
                         >
                           {isBulkSelecting ? 'Cancel' : 'Bulk Select'}
                         </Button>

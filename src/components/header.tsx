@@ -139,7 +139,7 @@ const Navbar = () => {
                 className="glass rounded-full px-5 py-2"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
+                transition={{ delay: index * 0.02, duration: 0.5 }}
                 whileHover={{
                   scale: 1.1,
                   boxShadow: "0 8px 25px rgba(214, 188, 250, 0.5)",
@@ -162,7 +162,7 @@ const Navbar = () => {
                 className="glass rounded-full px-5 py-2"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
+                transition={{ delay: index * 0.02, duration: 0.5 }}
                 whileHover={{
                   scale: 1.1,
                   boxShadow: "0 8px 25px rgba(214, 188, 250, 0.5)",
@@ -243,7 +243,7 @@ const Navbar = () => {
                 key={link.href}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.3 }}
+                transition={{ delay: index * 0.02, duration: 0.3 }}
                 className="mb-2"
               >
                 <Link
