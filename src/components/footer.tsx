@@ -4,8 +4,16 @@ import { motion } from 'framer-motion';
 import { FaTwitter, FaLinkedin, FaInstagram } from 'react-icons/fa';
 import Link from 'next/link';
 
+interface Particle {
+  x: number;
+  y: number;
+  radius: number;
+  vx: number;
+  vy: number;
+}
+
 const Footer = () => {
-  const canvasRef = useRef(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const quickLinks = [
     { href: '/dashboard', label: 'Dashboard' },
@@ -25,11 +33,15 @@ const Footer = () => {
   // Particle animation
   useEffect(() => {
     const canvas = canvasRef.current;
+    if (!canvas) return;
+    
     const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
     canvas.width = window.innerWidth;
     canvas.height = 400;
 
-    const particles = [];
+    const particles: Particle[] = [];
     for (let i = 0; i < 15; i++) {
       particles.push({
         x: Math.random() * canvas.width,
@@ -41,6 +53,7 @@ const Footer = () => {
     }
 
     const animate = () => {
+      if (!ctx || !canvas) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       particles.forEach((p) => {
         p.x += p.vx;
@@ -50,14 +63,14 @@ const Footer = () => {
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.fillStyle = 'rgba(214, 188, 250, 0.3)'; // Matching header's lavender color
         ctx.fill();
       });
       requestAnimationFrame(animate);
     };
     animate();
 
-    const handleMouseMove = (e) => {
+    const handleMouseMove = (e: MouseEvent) => {
       particles.forEach((p) => {
         const dx = e.clientX - p.x;
         const dy = e.clientY - p.y;
@@ -74,23 +87,22 @@ const Footer = () => {
 
   return (
     <motion.footer
-      className="glass relative py-12 px-6 mt-12"
+      className="bg-[#1b0020] relative py-12 px-6 mt-12"
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: 'easeOut' }}
-      style={{ boxShadow: '0 6px 30px rgba(0, 0, 0, 0.1)' }}
     >
       <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full opacity-20" />
-      <div className="max-w-7xl mx-auto text-center">
+      <div className="max-w-7xl mx-auto text-center relative z-10">
         {/* Branding */}
         <motion.div
           className="mb-8"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
+          transition={{ delay: 0, duration: 0.2 }}
         >
-          <h4 className="text-4xl text-deep-teal font-stylescript drop-shadow-sm">KourtSell</h4>
-          <p className="text-sm text-charcoal-gray font-inter mt-2">Your Legal Sidekick</p>
+          <h4 className="text-4xl text-white font-stylescript drop-shadow-sm">NyayVaad</h4>
+          <p className="text-sm text-gray-300 font-inter mt-2">Your Legal Sidekick</p>
         </motion.div>
 
         {/* Quick Links */}
@@ -98,15 +110,19 @@ const Footer = () => {
           {quickLinks.map((link, index) => (
             <motion.div
               key={link.href}
-              className="glass rounded-full px-4 py-2"
+              className="glass rounded-full px-4 py-2 bg-[#1b0020]/50"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1, duration: 0.5 }}
-              whileHover={{ scale: 1.04, boxShadow: '0 6px 20px rgba(255, 111, 97, 0.4)' }}
+              transition={{ delay: index * 0.01, duration: 0.3 }}
+              whileHover={{ 
+                scale: 1.1,
+                boxShadow: '0 8px 25px rgba(214, 188, 250, 0.5)',
+                backgroundColor: 'rgba(214, 188, 250, 0.2)'
+              }}
             >
               <Link
                 href={link.href}
-                className="text-charcoal-gray hover:text-lime-spark font-inter transition"
+                className="text-white hover:text-lavender-haze font-inter transition"
               >
                 {link.label}
               </Link>
@@ -121,10 +137,12 @@ const Footer = () => {
               key={index}
               href={social.href}
               aria-label={social.label}
-              className="text-deep-teal text-2xl"
-              whileHover={{ scale: 1.04, boxShadow: '0 6px 20px rgba(255, 111, 97, 0.4)' }}
+              className="text-white text-2xl hover:text-lavender-haze"
+              whileHover={{ 
+                scale: 1.1,
+                boxShadow: '0 8px 25px rgba(214, 188, 250, 0.5)'
+              }}
               whileTap={{ scale: 0.97 }}
-              animate={{ opacity: [1, 0.85, 1], transition: { repeat: Infinity, duration: 2 } }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: index * 0.1 + 0.3, duration: 0.5 }}
@@ -144,14 +162,16 @@ const Footer = () => {
           <input
             type="email"
             placeholder="Enter your email"
-            className="glass p-3 rounded-lg flex-1 focus:outline-none focus:ring-2 focus:ring-coral-glow font-inter"
+            className="glass p-3 rounded-lg flex-1 focus:outline-none focus:ring-2 focus:ring-lavender-haze bg-[#1b0020]/30 text-white placeholder-gray-400"
           />
           <motion.button
             type="submit"
-            className="bg-gradient-to-r from-deep-teal to-coral-glow text-soft-cream px-6 py-3 rounded-lg font-inter"
-            whileHover={{ opacity: 0.85, boxShadow: '0 6px 20px rgba(160, 231, 229, 0.5)' }}
+            className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-6 py-3 rounded-lg font-inter"
+            whileHover={{ 
+              scale: 1.05,
+              boxShadow: '0 8px 25px rgba(214, 188, 250, 0.5)'
+            }}
             whileTap={{ scale: 0.97 }}
-            animate={{ opacity: [1, 0.85, 1], transition: { repeat: Infinity, duration: 2 } }}
           >
             Subscribe
           </motion.button>
@@ -159,12 +179,12 @@ const Footer = () => {
 
         {/* Copyright */}
         <motion.p
-          className="text-sm text-charcoal-gray font-inter mt-8"
+          className="text-sm text-gray-400 font-inter mt-8"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.5 }}
         >
-          © 2025 KourtSell. All rights reserved.
+          © 2024 NyayVaad. All rights reserved.
         </motion.p>
       </div>
     </motion.footer>

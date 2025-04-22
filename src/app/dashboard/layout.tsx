@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import { inter, playfair, spaceGrotesk } from '../fonts';
+import Footer from '@/components/footer';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -7,30 +8,17 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
-    <div className={`${inter.variable} ${playfair.variable} ${spaceGrotesk.variable} min-h-screen bg-gray-950`}>
-      <div className="fixed top-0 left-0 right-0 h-16 bg-gray-900/80 backdrop-blur-sm border-b border-gray-800 z-50">
-        <div className="max-w-7xl mx-auto px-8 h-full flex items-center justify-between">
-          <h1 className="text-xl font-bold text-white font-[var(--font-playfair)]">NyaayVaad</h1>
-          <div className="flex items-center space-x-4">
-            <button className="text-gray-400 hover:text-white transition-colors">
-              Profile
-            </button>
-            <button className="text-gray-400 hover:text-white transition-colors">
-              Settings
-            </button>
-          </div>
-        </div>
-      </div>
-      <div className="pt-16">
-        {children}
-      </div>
-      <footer className="bg-gray-900/80 backdrop-blur-sm border-t border-gray-800">
-        <div className="max-w-7xl mx-auto px-8 py-4">
-          <p className="text-sm text-gray-400 text-center">
-            © 2024 NyaayVaad. All rights reserved.
-          </p>
-        </div>
-      </footer>
+    <div className={`${inter.variable} ${playfair.variable} ${spaceGrotesk.variable} min-h-screen bg-[#0A0118]`}>
+      {/* Subtle grid pattern overlay */}
+      <div 
+        className="fixed inset-0 opacity-[0.02] pointer-events-none" 
+        style={{ 
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          backgroundSize: '60px 60px'
+        }}
+        aria-hidden="true"
+      />
+      {children}
     </div>
   );
 } 

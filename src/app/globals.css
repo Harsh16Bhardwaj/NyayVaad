@@ -51,14 +51,14 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.6 0.2 50); /* Brighter, more vibrant primary color */
+  --primary-foreground: oklch(0.95 0 0); /* High-contrast foreground */
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --accent: oklch(0.6 0.15 60); /* Vibrant accent color */
+  --accent-foreground: oklch(0.95 0 0); /* Bright foreground for accent */
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
@@ -76,6 +76,15 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --gradient-glass: linear-gradient(135deg, rgba(43, 108, 176, 0.5), rgba(56, 194, 178, 0.5)); /* Enhanced glass gradient */
+}
+
+.glass {
+  background: var(--gradient-glass);
+  backdrop-filter: blur(15px); /* Stronger blur effect */
+  border: 1px solid rgba(255, 255, 255, 0.3); /* Slightly more visible border */
+  border-radius: 16px;
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.1);
 }
 
 .dark {
@@ -129,11 +138,7 @@
   --sky-blue: #38bdf8;
   --peach-glow: #ffab91;
   --gradient-primary: linear-gradient(135deg, #ff6b35, #ffd60a);
-  --gradient-glass: linear-gradient(
-    135deg,
-    rgba(255, 107, 53, 0.2),
-    rgba(255, 214, 10, 0.2)
-  );
+  --gradient-glass: linear-gradient(135deg, rgb(187, 0, 109), rgb(255, 10, 88));
 }
 body {
   font-family: "Inter", sans-serif;
@@ -145,12 +150,65 @@ h2,
 h3 {
   font-family: "StyleScript", cursive;
 }
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.buttton {
+  background: var(--gradient-primary);
+  color: var(--soft-white);
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  transition: transform 0.3s;
+}
+.buttton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+}
+
+/* @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=StyleScript&display=swap'); */
+:root {
+  --deep-teal: #1e88e5;
+  --coral-glow: #ff6f61;
+  --soft-cream: #fdfcfa;
+  --charcoal-gray: #2d3748;
+  --lime-spark: #a0e7e5;
+  --frost-white: rgba(255, 255, 255, 0.2);
+  --gradient-primary: linear-gradient(135deg, #1e88e5, #22002b);
+  --gradient-glass: linear-gradient(
+    135deg,
+    rgba(30, 136, 229, 0.2),
+    rgba(255, 111, 97, 0.2)
+  );
+}
+body {
+  font-family: "Inter", sans-serif;
+  background: var(--soft-cream);
+  color: var(--charcoal-gray);
+}
+h1,
+h2,
+h3 {
+  font-family: "StyleScript", cursive;
+}
 .glass {
   background: var(--gradient-glass);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--frost-white);
+  border-radius: 16px;
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.1);
 }
 @keyframes fadeIn {
   from {
@@ -165,64 +223,18 @@ h3 {
 .fade-in {
   animation: fadeIn 0.6s ease-out;
 }
-button {
+
+/* Add a specific class for gradient buttons */
+.gradient-button {
   background: var(--gradient-primary);
-  color: var(--soft-white);
+  color: var(--soft-ivory);
   padding: 10px 20px;
   border-radius: 8px;
   border: none;
-  transition: transform 0.3s;
-}
-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+  transition: opacity 0.3s;
 }
 
-:root {
-  --ocean-blue: #2B6CB0;
-  --mint-green: #38C2B2;
-  --soft-ivory: #F7FAF9;
-  --slate-gray: #4A5568;
-  --lavender-haze: #D6BCFA;
-  --frost-white: rgba(255, 255, 255, 0.2);
-  --gradient-primary: linear-gradient(135deg, #2B6CB0, #38C2B2);
-  --gradient-glass: linear-gradient(135deg, rgba(43, 108, 176, 0.2), rgba(56, 194, 178, 0.2));
+.gradient-button:hover {
+  opacity: 0.8;
+  box-shadow: 0 6px 20px rgba(43, 108, 176, 0.4);
 }
-body { font-family: 'Inter', sans-serif; background: var(--soft-ivory); color: var(--slate-gray); }
-h1, h2, h3 { font-family: 'StyleScript', cursive; }
-.glass {
-  background: var(--gradient-glass);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--frost-white);
-  border-radius: 16px;
-  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.1);
-}
-@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-.fade-in { animation: fadeIn 0.6s ease-out; }
-button { background: var(--gradient-primary); color: var(--soft-ivory); padding: 10px 20px; border-radius: 8px; border: none; transition: opacity 0.3s; }
-button:hover { opacity: 0.8; box-shadow: 0 6px 20px rgba(43, 108, 176, 0.4); }
-
-/* @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=StyleScript&display=swap'); */
-:root {
-  --deep-teal: #1E88E5;
-  --coral-glow: #FF6F61;
-  --soft-cream: #FDFCFA;
-  --charcoal-gray: #2D3748;
-  --lime-spark: #A0E7E5;
-  --frost-white: rgba(255, 255, 255, 0.2);
-  --gradient-primary: linear-gradient(135deg, #1E88E5, #FF6F61);
-  --gradient-glass: linear-gradient(135deg, rgba(30, 136, 229, 0.2), rgba(255, 111, 97, 0.2));
-}
-body { font-family: 'Inter', sans-serif; background: var(--soft-cream); color: var(--charcoal-gray); }
-h1, h2, h3 { font-family: 'StyleScript', cursive; }
-.glass {
-  background: var(--gradient-glass);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--frost-white);
-  border-radius: 16px;
-  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.1);
-}
-@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-.fade-in { animation: fadeIn 0.6s ease-out; }
-button { background: var(--gradient-primary); color: var(--soft-cream); padding: 10px 20px; border-radius: 8px; border: none; transition: opacity 0.3s, box-shadow 0.3s; }
-button:hover { opacity: 0.85; box-shadow: 0 6px 20px rgba(160, 231, 229, 0.5); }

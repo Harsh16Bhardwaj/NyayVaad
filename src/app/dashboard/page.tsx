@@ -172,11 +172,10 @@ export default function DashboardPage() {
 
   return (
     <ProtectedPage>
-      <div className="min-h-screen bg-neutral-900 pt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-white">Dashboard</h1>
+      <div className="min-h-screen  bg-gradient-to-br from-gray-950 via-gray-800 to-gray-950 pt-24">
+        <div className="max-w-7xl  mx-auto px-4 sm:px-6 lg:px-8">
           {/* Add your dashboard content here */}
-          <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950">
+          <div className="min-h-screen mt-10 rounded-2xl bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950">
             <div className="max-w-7xl mx-auto px-8 py-8 space-y-8">
               {/* Header */}
               <div className="flex justify-between items-center">

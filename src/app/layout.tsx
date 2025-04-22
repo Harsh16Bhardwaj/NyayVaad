@@ -4,6 +4,7 @@ import Footer from "@/components/footer";
 import Header from "@/components/header";
 import "./globals.css";
 import { ClerkProvider } from '@clerk/nextjs';
+import { dark } from '@clerk/themes';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,6 +36,13 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider
+      appearance={{
+        baseTheme: dark,
+        variables: {
+          colorPrimary: '#8B5CF6',
+          colorTextOnPrimaryBackground: 'white',
+        }
+      }}
       afterSignInUrl="/dashboard"
       afterSignUpUrl="/onboarding"
     >
