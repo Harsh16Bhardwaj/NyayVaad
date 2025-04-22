@@ -1,4 +1,4 @@
-import { inter, playfair, spaceGrotesk } from '../fonts';
+import { inter, josefinSans, spaceGrotesk } from '../fonts';
 
 export default function ChatLayout({
   children,
@@ -6,7 +6,7 @@ export default function ChatLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`relative min-h-screen ${inter.variable} ${playfair.variable} ${spaceGrotesk.variable}`}>
+    <div className={`relative min-h-screen ${inter.variable} ${josefinSans.variable} ${spaceGrotesk.variable}`}>
       <div className="inset-0 fixed z-20">
         {children}
       </div>

@@ -127,6 +127,10 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-poppins), sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-josefin-sans), sans-serif;
   }
 }
 
@@ -140,15 +144,17 @@
   --gradient-primary: linear-gradient(135deg, #ff6b35, #ffd60a);
   --gradient-glass: linear-gradient(135deg, rgb(187, 0, 109), rgb(255, 10, 88));
 }
+
 body {
-  font-family: "Inter", sans-serif;
+  font-family: var(--font-poppins), sans-serif;
   background: var(--soft-white);
   color: var(--cool-gray);
 }
+
 h1,
 h2,
 h3 {
-  font-family: "StyleScript", cursive;
+  font-family: var(--font-josefin-sans), sans-serif;
 }
 
 @keyframes fadeIn {
@@ -186,7 +192,7 @@ h3 {
   --charcoal-gray: #2d3748;
   --lime-spark: #a0e7e5;
   --frost-white: rgba(255, 255, 255, 0.2);
-  --gradient-primary: linear-gradient(135deg, #1e88e5, #22002b);
+  --gradient-primary: linear-gradient(135deg, #c31432, #240b36);
   --gradient-glass: linear-gradient(
     135deg,
     rgba(30, 136, 229, 0.2),
@@ -194,14 +200,14 @@ h3 {
   );
 }
 body {
-  font-family: "Inter", sans-serif;
+  font-family: var(--font-poppins), sans-serif;
   background: var(--soft-cream);
   color: var(--charcoal-gray);
 }
 h1,
 h2,
 h3 {
-  font-family: "StyleScript", cursive;
+  font-family: var(--font-josefin-sans), sans-serif;
 }
 .glass {
   background: var(--gradient-glass);

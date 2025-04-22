@@ -5,7 +5,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar as CalendarIcon, X } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
-
+import { Poppins } from 'next/font/google';
+const poppins = Poppins({
+    variable: "--font-poppins",
+    subsets: ["latin"],
+    weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  });
 interface CalendarViewProps {
   isOpen: boolean;
   onClose: () => void;
@@ -38,7 +43,7 @@ const CalendarView = ({ isOpen, onClose, events }: CalendarViewProps) => {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 20 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          className={`fixed ${poppins.className} h-screen inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm`}
         >
           <motion.div
             initial={{ scale: 0.95 }}
@@ -49,14 +54,14 @@ const CalendarView = ({ isOpen, onClose, events }: CalendarViewProps) => {
           >
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-semibold text-white font-[var(--font-playfair)]">
+              <h2 className="text-2xl font-semibold text-white font-[var(--font-josefin-sans)]">
                 Case Calendar
               </h2>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={onClose}
-                className="text-gray-400 hover:text-white hover:bg-white/10"
+                className="text-gray-400 buttton hover:text-white hover:bg-white/10"
               >
                 <X className="w-5 h-5" />
               </Button>
@@ -85,7 +90,7 @@ const CalendarView = ({ isOpen, onClose, events }: CalendarViewProps) => {
 
               {/* Events List */}
               <div className="bg-white/5 rounded-xl p-4">
-                <h3 className="text-lg font-semibold text-white mb-4 font-[var(--font-playfair)]">
+                <h3 className="text-lg font-semibold text-white mb-4 font-[var(--font-josefin-sans)]">
                   Events for {date?.toLocaleDateString()}
                 </h3>
                 <div className="space-y-3">
@@ -102,7 +107,7 @@ const CalendarView = ({ isOpen, onClose, events }: CalendarViewProps) => {
                           <span className="text-white font-medium">{event.title}</span>
                           <span className={`text-xs px-2 py-1 rounded-full ${
                             event.type === 'hearing' ? 'bg-purple-500/20 text-purple-300' :
-                            event.type === 'deadline' ? 'bg-red-500/20 text-red-300' :
+                            event.type === 'deadline' ? 'bg-red-500/20 text-red-600' :
                             'bg-blue-500/20 text-blue-300'
                           }`}>
                             {event.type}

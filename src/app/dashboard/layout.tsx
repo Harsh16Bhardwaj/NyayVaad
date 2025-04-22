@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { inter, playfair, spaceGrotesk } from '../fonts';
+import { inter, josefinSans, spaceGrotesk } from '../fonts';
 import Footer from '@/components/footer';
 
 interface DashboardLayoutProps {
@@ -8,7 +8,7 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
-    <div className={`${inter.variable} ${playfair.variable} ${spaceGrotesk.variable} min-h-screen bg-[#0A0118]`}>
+    <div className={`${inter.variable} ${josefinSans.variable} ${spaceGrotesk.variable} min-h-screen bg-[#0A0118]`}>
       {/* Subtle grid pattern overlay */}
       <div 
         className="fixed inset-0 opacity-[0.02] pointer-events-none" 

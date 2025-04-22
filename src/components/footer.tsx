@@ -1,8 +1,8 @@
 "use client";
-import { useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
-import { FaTwitter, FaLinkedin, FaInstagram } from 'react-icons/fa';
-import Link from 'next/link';
+import { useEffect, useRef } from "react";
+import { motion } from "framer-motion";
+import { FaTwitter, FaLinkedin, FaInstagram } from "react-icons/fa";
+import Link from "next/link";
 
 interface Particle {
   x: number;
@@ -16,26 +16,38 @@ const Footer = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const quickLinks = [
-    { href: '/dashboard', label: 'Dashboard' },
-    { href: '/chat', label: 'Chat' },
-    { href: '/summarize', label: 'Summarize' },
-    { href: '/hire', label: 'Hire' },
-    { href: '/contact', label: 'Contact' },
-    { href: '/fun', label: 'Fun' },
+    { href: "/dashboard", label: "Dashboard" },
+    { href: "/chat", label: "Chat" },
+    { href: "/summarize", label: "Summarize" },
+    { href: "/hire", label: "Hire" },
+    { href: "/contact", label: "Contact" },
+    { href: "/fun", label: "Fun" },
   ];
 
   const socials = [
-    { icon: <FaTwitter />, href: 'https://twitter.com/kourtsell', label: 'Twitter' },
-    { icon: <FaLinkedin />, href: 'https://linkedin.com/company/kourtsell', label: 'LinkedIn' },
-    { icon: <FaInstagram />, href: 'https://instagram.com/kourtsell', label: 'Instagram' },
+    {
+      icon: <FaTwitter />,
+      href: "https://twitter.com/kourtsell",
+      label: "Twitter",
+    },
+    {
+      icon: <FaLinkedin />,
+      href: "https://linkedin.com/company/kourtsell",
+      label: "LinkedIn",
+    },
+    {
+      icon: <FaInstagram />,
+      href: "https://instagram.com/kourtsell",
+      label: "Instagram",
+    },
   ];
 
   // Particle animation
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    
-    const ctx = canvas.getContext('2d');
+
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     canvas.width = window.innerWidth;
@@ -63,7 +75,7 @@ const Footer = () => {
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(214, 188, 250, 0.3)'; // Matching header's lavender color
+        ctx.fillStyle = "rgba(214, 188, 250, 0.3)"; // Matching header's lavender color
         ctx.fill();
       });
       requestAnimationFrame(animate);
@@ -81,113 +93,123 @@ const Footer = () => {
         }
       });
     };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
   return (
-    <motion.footer
-      className="bg-[#1b0020] relative py-12 px-6 mt-12"
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, ease: 'easeOut' }}
-    >
-      <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full opacity-20" />
-      <div className="max-w-7xl mx-auto text-center relative z-10">
-        {/* Branding */}
-        <motion.div
-          className="mb-8"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0, duration: 0.2 }}
-        >
-          <h4 className="text-4xl text-white font-stylescript drop-shadow-sm">NyayVaad</h4>
-          <p className="text-sm text-gray-300 font-inter mt-2">Your Legal Sidekick</p>
-        </motion.div>
+    <div className="mt-10">
+        <div className="w-full h-1 bg-white"></div>
+      <motion.footer
+        className="bg-[#1b0020] relative py-12 px-6 "
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+      >
+        <canvas
+          ref={canvasRef}
+          className="absolute top-0 left-0 w-full h-full opacity-20"
+        />
+        <div className="max-w-7xl mx-auto text-center relative z-10">
+          {/* Branding */}
+          <motion.div
+            className="mb-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0, duration: 0.2 }}
+          >
+            <h4 className="text-4xl text-white font-stylescript drop-shadow-sm">
+              NyayVaad
+            </h4>
+            <p className="text-sm text-gray-300 font-inter mt-2">
+              Your Legal Sidekick
+            </p>
+          </motion.div>
 
-        {/* Quick Links */}
-        <div className="flex flex-wrap justify-center gap-4 mb-8">
-          {quickLinks.map((link, index) => (
-            <motion.div
-              key={link.href}
-              className="glass rounded-full px-4 py-2 bg-[#1b0020]/50"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.01, duration: 0.3 }}
-              whileHover={{ 
-                scale: 1.1,
-                boxShadow: '0 8px 25px rgba(214, 188, 250, 0.5)',
-                backgroundColor: 'rgba(214, 188, 250, 0.2)'
-              }}
-            >
-              <Link
-                href={link.href}
-                className="text-white hover:text-lavender-haze font-inter transition"
+          {/* Quick Links */}
+          <div className="flex flex-wrap justify-center gap-4 mb-8">
+            {quickLinks.map((link, index) => (
+              <motion.div
+                key={link.href}
+                className="glass rounded-full px-4 py-2 bg-[#1b0020]/50"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.01, duration: 0.3 }}
+                whileHover={{
+                  scale: 1.1,
+                  boxShadow: "0 8px 25px rgba(214, 188, 250, 0.5)",
+                  backgroundColor: "rgba(214, 188, 250, 0.2)",
+                }}
               >
-                {link.label}
-              </Link>
-            </motion.div>
-          ))}
-        </div>
+                <Link
+                  href={link.href}
+                  className="text-white hover:text-lavender-haze font-inter transition"
+                >
+                  {link.label}
+                </Link>
+              </motion.div>
+            ))}
+          </div>
 
-        {/* Social Icons */}
-        <div className="flex justify-center gap-6 mb-8">
-          {socials.map((social, index) => (
-            <motion.a
-              key={index}
-              href={social.href}
-              aria-label={social.label}
-              className="text-white text-2xl hover:text-lavender-haze"
-              whileHover={{ 
-                scale: 1.1,
-                boxShadow: '0 8px 25px rgba(214, 188, 250, 0.5)'
+          {/* Social Icons */}
+          <div className="flex justify-center gap-6 mb-8">
+            {socials.map((social, index) => (
+              <motion.a
+                key={index}
+                href={social.href}
+                aria-label={social.label}
+                className="text-white text-2xl hover:text-lavender-haze"
+                whileHover={{
+                  scale: 1.1,
+                  boxShadow: "0 8px 25px rgba(214, 188, 250, 0.5)",
+                }}
+                whileTap={{ scale: 0.97 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: index * 0.1 + 0.3, duration: 0.5 }}
+              >
+                {social.icon}
+              </motion.a>
+            ))}
+          </div>
+
+          {/* Newsletter Signup */}
+          <motion.form
+            className="max-w-md mx-auto flex flex-col sm:flex-row gap-3"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+          >
+            <input
+              type="email"
+              placeholder="Enter your email"
+              className="glass p-3 rounded-lg flex-1 focus:outline-none focus:ring-2 focus:ring-lavender-haze bg-[#1b0020]/30 text-white placeholder-gray-400"
+            />
+            <motion.button
+              type="submit"
+              className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-6 py-3 rounded-lg font-inter"
+              whileHover={{
+                scale: 1.05,
+                boxShadow: "0 8px 25px rgba(214, 188, 250, 0.5)",
               }}
               whileTap={{ scale: 0.97 }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: index * 0.1 + 0.3, duration: 0.5 }}
             >
-              {social.icon}
-            </motion.a>
-          ))}
-        </div>
+              Subscribe
+            </motion.button>
+          </motion.form>
 
-        {/* Newsletter Signup */}
-        <motion.form
-          className="max-w-md mx-auto flex flex-col sm:flex-row gap-3"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
-        >
-          <input
-            type="email"
-            placeholder="Enter your email"
-            className="glass p-3 rounded-lg flex-1 focus:outline-none focus:ring-2 focus:ring-lavender-haze bg-[#1b0020]/30 text-white placeholder-gray-400"
-          />
-          <motion.button
-            type="submit"
-            className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-6 py-3 rounded-lg font-inter"
-            whileHover={{ 
-              scale: 1.05,
-              boxShadow: '0 8px 25px rgba(214, 188, 250, 0.5)'
-            }}
-            whileTap={{ scale: 0.97 }}
+          {/* Copyright */}
+          <motion.p
+            className="text-sm text-gray-400 font-inter mt-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
           >
-            Subscribe
-          </motion.button>
-        </motion.form>
-
-        {/* Copyright */}
-        <motion.p
-          className="text-sm text-gray-400 font-inter mt-8"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.5 }}
-        >
-          © 2024 NyayVaad. All rights reserved.
-        </motion.p>
-      </div>
-    </motion.footer>
+            © 2024 NyayVaad. All rights reserved.
+          </motion.p>
+        </div>
+      </motion.footer>
+    </div>
   );
 };
 

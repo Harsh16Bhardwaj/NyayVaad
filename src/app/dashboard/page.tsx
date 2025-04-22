@@ -13,8 +13,6 @@ import {
   Plus, 
   Trash2,
   BookOpen,
-
-
   Sparkles,
   MessageSquare,
   FileText as FileTextIcon,
@@ -27,6 +25,7 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import ProtectedPage from "@/components/ProtectedPage";
+import CalendarView from '@/components/CalendarView';
 
 interface Todo {
   id: string;
@@ -91,6 +90,7 @@ export default function DashboardPage() {
 
   const [selectedTodos, setSelectedTodos] = useState<string[]>([]);
   const [isBulkSelecting, setIsBulkSelecting] = useState(false);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const handleTodoStatusChange = (id: string, status: Todo['status']) => {
     setTodos(prev => prev.map(todo => 
@@ -170,19 +170,36 @@ export default function DashboardPage() {
     window.open(`https://www.linkedin.com/search/results/people/?keywords=${searchQuery}`, '_blank');
   };
 
+  // Add calendar events from todos and summaries
+  const calendarEvents = [
+    ...todos.map(todo => ({
+      id: todo.id,
+      title: todo.title,
+      date: todo.deadline,
+      type: 'deadline' as const
+    })),
+    ...summaries.map(summary => ({
+      id: `summary-${summary.id}`,
+      title: summary.title,
+      date: summary.date,
+      type: 'hearing' as const
+    }))
+  ];
+
   return (
     <ProtectedPage>
-      <div className="min-h-screen  bg-gradient-to-br from-gray-950 via-gray-800 to-gray-950 pt-24">
+      <div className="min-h-screen h-auto -mb-9 bg-gradient-to-br from-gray-950 via-gray-800 to-gray-950 pt-24">
         <div className="max-w-7xl  mx-auto px-4 sm:px-6 lg:px-8">
           {/* Add your dashboard content here */}
           <div className="min-h-screen mt-10 rounded-2xl bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950">
             <div className="max-w-7xl mx-auto px-8 py-8 space-y-8">
               {/* Header */}
               <div className="flex justify-between items-center">
-                <h1 className="text-3xl font-bold text-white font-[var(--font-playfair)]">Case Dashboard</h1>
+                <h1 className="text-3xl font-bold text-white font-[var(--font-josefin-sans)]">Case Dashboard</h1>
                 <div className="flex items-center space-x-4">
                   <Button
                     variant="outline"
+                    onClick={() => setIsCalendarOpen(true)}
                     className="bg-transparent border-purple-500/30 text-purple-400 hover:bg-purple-500/10 hover:text-purple-300"
                   >
                     <Calendar className="w-5 h-5 mr-2" />
@@ -191,6 +208,13 @@ export default function DashboardPage() {
                 </div>
               </div>
 
+              {/* Calendar Modal */}
+              <CalendarView
+                isOpen={isCalendarOpen}
+                onClose={() => setIsCalendarOpen(false)}
+                events={calendarEvents}
+              />
+
               {/* Main Grid */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Left Column - Todos */}
@@ -198,7 +222,7 @@ export default function DashboardPage() {
                   {/* Todo List Section */}
                   <div className="space-y-6">
                     <div className="flex justify-between items-center">
-                      <h2 className="text-xl font-semibold text-white font-[var(--font-playfair)]">Case Tasks</h2>
+                      <h2 className="text-xl font-semibold text-white font-[var(--font-josefin-sans)]">Case Tasks</h2>
                       <div className="flex items-center space-x-4">
                         {isBulkSelecting && (
                           <Button
@@ -259,7 +283,7 @@ export default function DashboardPage() {
                   {/* Case Summary Section */}
                   <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/5">
                     <div className="flex justify-between items-center mb-6">
-                      <h2 className="text-xl font-semibold text-white font-[var(--font-playfair)]">Case Summary</h2>
+                      <h2 className="text-xl font-semibold text-white font-[var(--font-josefin-sans)]">Case Summary</h2>
                       <Button
                         variant="outline"
                         className="bg-transparent border-purple-500/30 text-purple-400 hover:bg-purple-500/10 hover:text-purple-300"
@@ -309,7 +333,7 @@ export default function DashboardPage() {
                 <div className="space-y-8">
                   {/* Case Progress */}
                   <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/5">
-                    <h2 className="text-xl font-semibold text-white font-[var(--font-playfair)] mb-4">Case Progress</h2>
+                    <h2 className="text-xl font-semibold text-white font-[var(--font-josefin-sans)] mb-4">Case Progress</h2>
                     <div className="space-y-4">
                       {[
                         {
@@ -377,7 +401,7 @@ export default function DashboardPage() {
                   <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/5">
                     <div className="flex items-center space-x-3 mb-4">
                       <BookOpen className="w-6 h-6 text-purple-400" />
-                      <h2 className="text-xl font-semibold text-white font-[var(--font-playfair)]">Legal Word of the Day</h2>
+                      <h2 className="text-xl font-semibold text-white font-[var(--font-josefin-sans)]">Legal Word of the Day</h2>
                     </div>
                     <div className="space-y-2">
                       <h3 className="text-lg text-purple-400 font-[var(--font-space)]">Estoppel</h3>

@@ -152,10 +152,10 @@ export default function ChatPage() {
 
   return (
     <ProtectedPage>
-      <div className="min-h-screen bg-neutral-900 pt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-neutral-900 pt-10">
+        <div className=" mx-auto px-2 sm:px-2 ">
           <h1 className="text-3xl font-bold text-white">Chat</h1>
-          <div className="flex h-[calc(100vh-4rem)] mt-16 bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950">
+          <div className="flex h-[calc(100vh-4rem)] bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950">
             {/* Sidebar */}
             <div className="w-80 bg-black/60 backdrop-blur-lg border-r border-white/10 p-6 overflow-y-auto scrollbar-thin scrollbar-thumb-purple-500/30 scrollbar-track-transparent">
               <div className="flex items-center space-x-3 mb-8">
@@ -200,14 +200,14 @@ export default function ChatPage() {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     disabled={!isAnalysisEnabled}
-                    className={`px-6 py-3 rounded-xl font-medium flex items-center space-x-2 transition-all duration-300 ${
+                    className={`px-6 py-3  rounded-xl font-medium flex items-center space-x-2 transition-all duration-300 ${
                       isAnalysisEnabled
-                        ? 'bg-gradient-to-r from-purple-600 to-purple-800 text-white hover:from-purple-700 hover:to-purple-900'
+                        ? 'buttton'
                         : 'bg-gray-700 text-gray-400 cursor-not-allowed'
                     }`}
                   >
                     <Sparkles className="w-5 h-5" />
-                    <span className="font-[var(--font-space)]">Super Analysis</span>
+                    <span className="font-[var(--font-space)] ">Super Analysis</span>
                     {isAnalysisEnabled && (
                       <motion.span
                         animate={{ opacity: [0, 1, 0] }}

@@ -1,4 +1,4 @@
-import { Inter, Playfair_Display, Space_Grotesk } from 'next/font/google';
+import { Inter, Playfair_Display, Space_Grotesk , Poppins, Josefin_Sans} from 'next/font/google';
 
 export const inter = Inter({
   subsets: ['latin'],
@@ -6,7 +6,7 @@ export const inter = Inter({
   variable: '--font-inter',
 });
 
-export const playfair = Playfair_Display({
+export const josefinSans= Josefin_Sans({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
   variable: '--font-playfair',
