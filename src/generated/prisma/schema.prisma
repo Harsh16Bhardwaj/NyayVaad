@@ -1,0 +1,112 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id              String         @id @default(cuid())
+  email           String         @unique
+  name            String?
+  profession      String?
+  legalKnowledge  LegalKnowledge
+  jailTimeYears   Int?
+  warningSeverity String?
+  pendingCaseType String?
+  cases           Case[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([email])
+}
+
+model Case {
+  id            String         @id @default(cuid())
+  user          User           @relation(fields: [userId], references: [id])
+  userId        String
+  title         String
+  description   String
+  status        CaseStatus     @default(OPEN)
+  opponent      String?
+  timeline      String[] // Native text[] in PostgreSQL
+  evidence      Boolean
+  agreement     Boolean
+  impact        String?
+  intent        String?
+  involvedLaws  String[] // Native text[] in PostgreSQL
+  todos         Todo[]
+  extractedDocs ExtractedDoc[]
+  finalAnalysis String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([userId])
+}
+
+model ExtractedDoc {
+  id         String   @id @default(cuid())
+  docId      String   @unique
+  title      String
+  case       Case     @relation(fields: [caseId], references: [id])
+  caseId     String
+  rawContent String
+  aiSummary  String
+  createdAt  DateTime @default(now())
+
+  @@index([docId])
+}
+
+model Todo {
+  id          String     @id @default(cuid())
+  title       String
+  description String?
+  dueAt       DateTime?
+  status      TodoStatus @default(PENDING)
+  case        Case       @relation(fields: [caseId], references: [id])
+  caseId      String
+  createdAt   DateTime   @default(now())
+
+  @@index([caseId])
+}
+
+model LegalTerm {
+  id          String   @id @default(cuid())
+  word        String   @unique
+  description String
+  usage       String[] // Native text[] in PostgreSQL
+  category    String
+  source      String?
+  createdAt   DateTime @default(now())
+
+  @@index([word])
+}
+
+enum LegalKnowledge {
+  NONE
+  BASIC
+  INTERMEDIATE
+  LAWYER
+}
+
+enum CaseStatus {
+  OPEN
+  IN_PROGRESS
+  CLOSED
+}
+
+enum TodoStatus {
+  PENDING
+  COMPLETED
+  IGNORED
+}
