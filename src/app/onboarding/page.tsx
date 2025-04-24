@@ -1,5 +1,6 @@
 'use client';
-
+import { useUser } from '@clerk/nextjs';
+import { supabase } from '@/lib/supabase';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Input } from '@/components/ui/input';
@@ -14,11 +15,12 @@ import Scale from '@/../public/scale.jpg';
 export default function OnboardingPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
+    name: '',
     language: 'English',
-    profession: '',
+    profession: 'Cannot Disclose',
     legalKnowledge: 'NONE',
     involvements: [] as string[],
-    jailTimeYears: 1,
+    jailTimeYears: 0,
     warningSeverity: 'Low',
     pendingCaseType: 'None',
     fines: '',
@@ -26,15 +28,41 @@ export default function OnboardingPage() {
   const [step, setStep] = useState(1);
   const [error, setError] = useState('');
 
-  // Redirect unauthenticated users
   useEffect(() => {
-    async function checkUser() {
-      const user = await fetch('/api/auth/current').then((res) => res.json());
-      if (!user) router.push('/login');
-    }
-    checkUser();
-  }, [router]);
-
+    const userSync = async () => {
+      const { isSignedIn, user } = useUser();
+  
+      if (isSignedIn && user?.id) {
+        const { data, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+  
+        if (data) {
+          alert("USER FOUND");
+        } else if (!data && !error) {
+          const { error: insertError } = await supabase.from('users').insert([
+            {
+              id: user.id,
+              email: user.emailAddresses[0]?.emailAddress,
+            }
+          ]);
+  
+          if (insertError) {
+            console.error("Error inserting user:", insertError);
+          } else {
+            alert("USER CREATED");
+          }
+        } else {
+          console.error("Error fetching user:", error);
+        }
+      }
+    };
+  
+    userSync();
+  }, []);
+  
   const handleSubmit = async () => {
     if (!formData.language || !formData.profession || !formData.legalKnowledge) {
       setError('Please fill all required fields');
@@ -59,8 +87,9 @@ export default function OnboardingPage() {
 
   const nextStep = () => {
     if (step === 1 && !formData.language) return setError('Please select a language');
-    if (step === 2 && !formData.profession) return setError('Please select a profession');
-    if (step === 3 && !formData.legalKnowledge) return setError('Please select legal knowledge');
+    if (step === 2 && !formData.name) return setError('Please enter your name');
+    if (step === 3 && !formData.profession) return setError('Please select a profession');
+    if (step === 4 && !formData.legalKnowledge) return setError('Please select legal knowledge');
     setError('');
     setStep(step + 1);
   };
@@ -99,6 +128,22 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <div>
+              <h3 className="text-2xl font-bold text-gray-100">Getting to Know You</h3>
+              <h4 className="text-xl font-semibold text-teal-300 mt-1">What should we call you?</h4>
+              <p className="text-gray-400 text-base mt-1">We'd love to address you by your preferred name.</p>
+            </div>
+            <Input
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              placeholder="Enter your name"
+              className="bg-gray-900 text-gray-100 border-purple-800 text-lg hover:shadow-[0_0_10px_rgba(139,92,246,0.5)] transition-shadow"
+            />
+          </div>
+        );
+      case 3:
+        return (
+          <div className="space-y-6">
+            <div>
               <h3 className="text-2xl font-bold text-gray-100">Tell Us About You</h3>
               <h4 className="text-xl font-semibold text-teal-300 mt-1">Profession</h4>
               <p className="text-gray-400 text-base mt-1">Your profession helps us tailor legal advice to your unique needs.</p>
@@ -118,7 +163,7 @@ export default function OnboardingPage() {
             </Select>
           </div>
         );
-      case 3:
+      case 4:
         return (
           <div className="space-y-6">
             <div>
@@ -139,7 +184,7 @@ export default function OnboardingPage() {
             </div>
           </div>
         );
-      case 4:
+      case 5:
         return (
           <div className="space-y-6">
             <div>
@@ -227,7 +272,7 @@ export default function OnboardingPage() {
             )}
           </div>
         );
-      case 5:
+      case 6:
         return (
           <div className="space-y-6 text-center">
             <h3 className="text-2xl font-bold text-gray-100">Ready to Begin!</h3>
@@ -296,17 +341,17 @@ export default function OnboardingPage() {
             {/* Progress Bar */}
             <div className="mb-6">
               <div className="flex justify-between mb-2">
-                {Array.from({ length: 5 }, (_, i) => (
+                {Array.from({ length: 6 }, (_, i) => (
                   <motion.div
                     key={i}
-                    className={`w-1/5 h-2 rounded-full ${i + 1 <= step ? 'bg-gradient-to-r from-teal-600 to-indigo-600' : 'bg-gray-700'}`}
+                    className={`w-1/6 h-2 rounded-full ${i + 1 <= step ? 'bg-gradient-to-r from-teal-600 to-indigo-600' : 'bg-gray-700'}`}
                     initial={{ scale: 0.8 }}
                     animate={{ scale: i + 1 <= step ? 1 : 0.8 }}
                     transition={{ duration: 0.3 }}
                   />
                 ))}
               </div>
-              <p className="text-gray-400 text-base text-center">Step {step} of 5</p>
+              <p className="text-gray-400 text-base text-center">Step {step} of 6</p>
             </div>
 
             {/* Form Content */}
@@ -328,7 +373,7 @@ export default function OnboardingPage() {
                   Back
                 </motion.button>
               )}
-              {step < 5 ? (
+              {step < 6 ? (
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}

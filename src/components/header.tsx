@@ -12,11 +12,14 @@ import {
   SignedIn,
   SignedOut,
 } from "@clerk/nextjs";
+import { supabase } from "@/lib/supabase";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const canvasRef = useRef(null);
-  const { isSignedIn, user } = useUser();
+  
+  
+  
 
   const navSignedInLinks = [
     { href: "/dashboard", label: "Dashboard" },

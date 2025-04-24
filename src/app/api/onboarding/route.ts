@@ -1,12 +1,14 @@
-import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs';
-import { supabase } from '@/lib/supabase';
+import { NextResponse } from "next/server";
+import { useUser } from "@clerk/nextjs";
+import { supabase } from "@/lib/supabase";
+import { getAuth } from '@clerk/nextjs/server';
+
 
 export async function POST(req: Request) {
   try {
-    const { userId } = auth();
-    if (!userId) {
-      return new NextResponse('Unauthorized', { status: 401 });
+    const { user, isSignedIn } = useUser();
+    if (!isSignedIn) {
+      return new NextResponse("Unauthorized", { status: 401 });
     }
 
     const body = await req.json();
@@ -21,18 +23,10 @@ export async function POST(req: Request) {
       fines,
     } = body;
 
-    // Validate required fields
-    if (!language || !profession || !legalKnowledge) {
-      return new NextResponse('Missing required fields', { status: 400 });
-    }
-
-    // Insert user data into Supabase
     const { data, error } = await supabase
-      .from('users')
+      .from("users")
       .upsert({
-        id: userId,
-        email: userId, // You might want to get the actual email from Clerk
-        name: null, // You can add this later
+        name: null, 
         profession,
         legal_knowledge: legalKnowledge,
         jail_time_years: jailTimeYears || null,
@@ -47,13 +41,13 @@ export async function POST(req: Request) {
       .select();
 
     if (error) {
-      console.error('Supabase error:', error);
-      return new NextResponse('Database error', { status: 500 });
+      console.error("Supabase error:", error);
+      return new NextResponse("Database error", { status: 500 });
     }
 
     return NextResponse.json(data[0]);
   } catch (error) {
-    console.error('Onboarding error:', error);
-    return new NextResponse('Internal error', { status: 500 });
+    console.error("Onboarding error:", error);
+    return new NextResponse("Internal error", { status: 500 });
   }
-} 
+}
