@@ -1,18 +1,20 @@
 import { NextResponse } from "next/server";
-import { useUser } from "@clerk/nextjs";
-import { supabase } from "@/lib/supabase";
+import type { NextRequest } from "next/server";
 import { getAuth } from '@clerk/nextjs/server';
+import { PrismaClient } from '@prisma/client';
 
+const prisma = new PrismaClient();
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const { user, isSignedIn } = useUser();
-    if (!isSignedIn) {
+    const { userId } = getAuth(req);
+    if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
     const body = await req.json();
     const {
+      name,
       language,
       profession,
       legalKnowledge,
@@ -23,29 +25,41 @@ export async function POST(req: Request) {
       fines,
     } = body;
 
-    const { data, error } = await supabase
-      .from("users")
-      .upsert({
-        name: null, 
-        profession,
-        legal_knowledge: legalKnowledge,
-        jail_time_years: jailTimeYears || null,
-        warning_severity: warningSeverity || null,
-        pending_case_type: pendingCaseType || null,
-        language,
-        legal_involvements: involvements,
-        fines: fines || null,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
-      .select();
-
-    if (error) {
-      console.error("Supabase error:", error);
-      return new NextResponse("Database error", { status: 500 });
+    if (!name || !profession || !legalKnowledge) {
+      return new NextResponse("Missing required fields", { status: 400 });
     }
 
-    return NextResponse.json(data[0]);
+    // Using upsert here because we want to update if user exists, create if not
+    const user = await prisma.user.upsert({
+      where: { clerkId: userId },
+      update: {
+        name: name || 'John Doe',
+        profession: profession || 'Cannot Disclose',
+        legalKnowledge:legalKnowledge || 'Basic',
+        jailTimeYears: jailTimeYears || null,
+        warningSeverity: warningSeverity || null,
+        pendingCaseType: pendingCaseType || null,
+        legalInvolvements: involvements,
+        fines: fines || null,
+        updatedAt: new Date(),
+      },
+      create: {
+        clerkId: userId,
+        name,
+        profession,
+        legalKnowledge,
+        jailTimeYears: jailTimeYears || null,
+        warningSeverity: warningSeverity || null,
+        pendingCaseType: pendingCaseType || null,
+        language,
+        legalInvolvements: involvements,
+        fines: fines || null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    });
+
+    return NextResponse.json(user);
   } catch (error) {
     console.error("Onboarding error:", error);
     return new NextResponse("Internal error", { status: 500 });

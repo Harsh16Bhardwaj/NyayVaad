@@ -6,16 +6,17 @@ import { format } from 'date-fns';
 import { Scale, Sparkles } from 'lucide-react';
 import { ChatMessage, CaseData } from '@/types/case';
 import EditFieldModal from '@/components/EditFieldModal';
-import ProtectedPage from "@/components/ProtectedPage";
+import ProtectedPage from '@/components/ProtectedPage';
 
 const initialCaseData: CaseData = {
+  temp_description: null,
   description: null,
   opponent: null,
   timeline_location: null,
   evidence: null,
   agreements_pre_steps: null,
   impact_intent: null,
-  intake: false,
+  output: false, // Added output field
 };
 
 export default function ChatPage() {
@@ -27,12 +28,16 @@ export default function ChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [editingField, setEditingField] = useState<{ name: string; value: string | null } | null>(null);
   const [isAnalysisEnabled, setIsAnalysisEnabled] = useState(false);
+  const [tempDescription, setTempDescription] = useState<string | null>(null);
+  const [showDescriptionConfirm, setShowDescriptionConfirm] = useState(false);
+  const [isStoringCase, setIsStoringCase] = useState(false);
+  const [caseStored, setCaseStored] = useState(false);
 
   useEffect(() => {
     const triggerPipeline = async () => {
       if (caseData.description) {
         try {
-          console.log("Frontend - Triggering pipeline with description:", caseData.description);
+          console.log('Frontend - Triggering pipeline with description:', caseData.description);
           const response = await fetch('/api/fetch-docs', {
             method: 'POST',
             headers: {
@@ -44,10 +49,8 @@ export default function ChatPage() {
           if (!response.ok) {
             throw new Error('Pipeline request failed');
           }
-
-
         } catch (error) {
-          console.error("Frontend - Error in pipeline call:", error);
+          console.error('Frontend - Error in pipeline call:', error);
         }
       }
     };
@@ -63,9 +66,8 @@ export default function ChatPage() {
     scrollToBottom();
   }, [messages]);
 
-
   useEffect(() => {
-    const allFieldsFilled = Object.values(caseData).every(value => value !== null);
+    const allFieldsFilled = Object.entries(caseData).every(([key, value]) => key === 'output' || value !== null);
     setIsAnalysisEnabled(allFieldsFilled);
   }, [caseData]);
 
@@ -84,17 +86,19 @@ export default function ChatPage() {
     setInput('');
     setIsLoading(true);
 
-    // Find the next empty field to ask
-    const nextField = Object.entries(caseData).find(([_, value]) => value === null)?.[0];
-    console.log("Frontend - Next field to ask:", nextField);
+    const nextField = Object.entries(caseData).find(
+      ([key, value]) => key !== 'output' && value === null
+    )?.[0] || (isAnalysisEnabled ? 'output' : null);
+    console.log('Frontend - Next field to ask:', nextField);
 
     try {
-      const requestPayload = { 
+      const requestPayload = {
         message: input,
         sessionId,
-        nextField
+        nextField,
+        caseData: nextField === 'output' ? caseData : undefined,
       };
-      console.log("Frontend - Sending request:", requestPayload);
+      console.log('Frontend - Sending request:', requestPayload);
 
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -105,25 +109,46 @@ export default function ChatPage() {
       });
 
       const data = await response.json();
-      console.log("Frontend - Received response:", data);
-      
+      console.log('Frontend - Received response:', data);
+
+      if (nextField === 'output') {
+        setIsStoringCase(true);
+        setCaseStored(true);
+      }
+
       // Update case data if we received an updated field
       if (data.updatedField && data.updatedValue !== undefined) {
-        console.log("Frontend - Updating case data field:", data.updatedField, data.updatedValue);
-        setCaseData(prev => ({
+        console.log('Frontend - Updating case data field:', data.updatedField, data.updatedValue);
+        setCaseData((prev) => ({
           ...prev,
-          [data.updatedField]: data.updatedValue
+          [data.updatedField]: data.updatedValue,
         }));
+      }
+
+      let aiMessageContent: string;
+      if (data.outputData) {
+        const { case_summary, laws_involved, todos } = data.outputData;
+        aiMessageContent = `
+          **Case Summary**: ${case_summary}
+
+          **Relevant Laws**:
+          ${laws_involved.map((law: any) => `- **${law.name}**: ${law.description}`).join('\n')}
+
+          **Action Plan (TODOs)**:
+          ${todos.map((todo: any) => `- **${todo.title}**: ${todo.description}`).join('\n')}
+        `;
+      } else {
+        aiMessageContent = data.response;
       }
 
       const aiMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
-        content: data.response,
+        content: aiMessageContent,
         sender: 'ai',
         timestamp: new Date(),
       };
 
-      console.log("Frontend - Creating AI message:", aiMessage);
+      console.log('Frontend - Creating AI message:', aiMessage);
       setMessages((prev) => [...prev, aiMessage]);
     } catch (error) {
       console.error('Frontend - Error:', error);
@@ -136,6 +161,7 @@ export default function ChatPage() {
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
+      setIsStoringCase(false);
     }
   };
 
@@ -144,18 +170,36 @@ export default function ChatPage() {
   };
 
   const handleSaveField = (fieldName: string, newValue: string) => {
-    setCaseData(prev => ({
-      ...prev,
-      [fieldName]: newValue
-    }));
+    if (fieldName === 'description') {
+      setTempDescription(newValue);
+      setShowDescriptionConfirm(true);
+    } else {
+      setCaseData((prev) => ({
+        ...prev,
+        [fieldName]: newValue,
+      }));
+    }
+  };
+
+  const handleConfirmDescription = (confirmed: boolean) => {
+    if (confirmed && tempDescription) {
+      setCaseData((prev) => ({
+        ...prev,
+        description: tempDescription,
+      }));
+    }
+    setTempDescription(null);
+    setShowDescriptionConfirm(false);
   };
 
   return (
     <ProtectedPage>
       <div className="min-h-screen bg-neutral-900 pt-10">
-        <div className=" mx-auto px-2 sm:px-2 ">
+        <div className="mx-auto px-2 sm:px-2">
           <h1 className="text-3xl font-bold text-white">Chat</h1>
-          <div className="flex h-[calc(100vh-4rem)] bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950">
+          <div className="flex h-[calc
+
+(100vh-4rem)] bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950">
             {/* Sidebar */}
             <div className="w-80 bg-black/60 backdrop-blur-lg border-r border-white/10 p-6 overflow-y-auto scrollbar-thin scrollbar-thumb-purple-500/30 scrollbar-track-transparent">
               <div className="flex items-center space-x-3 mb-8">
@@ -200,14 +244,19 @@ export default function ChatPage() {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     disabled={!isAnalysisEnabled}
-                    className={`px-6 py-3  rounded-xl font-medium flex items-center space-x-2 transition-all duration-300 ${
+                    className={`px-6 py-3 rounded-xl font-medium flex items-center space-x-2 transition-all duration-300 ${
                       isAnalysisEnabled
-                        ? 'buttton'
+                        ? 'button'
                         : 'bg-gray-700 text-gray-400 cursor-not-allowed'
                     }`}
+                    onClick={() => {
+                      if (isAnalysisEnabled) {
+                        handleSubmit({ preventDefault: () => {} } as React.FormEvent);
+                      }
+                    }}
                   >
                     <Sparkles className="w-5 h-5" />
-                    <span className="font-[var(--font-space)] ">Super Analysis</span>
+                    <span className="font-[var(--font-space)]">Super Analysis</span>
                     {isAnalysisEnabled && (
                       <motion.span
                         animate={{ opacity: [0, 1, 0] }}
@@ -239,7 +288,7 @@ export default function ChatPage() {
                             : 'bg-white/10 rounded-bl-none'
                         }`}
                       >
-                        <p className="text-base text-white">{message.content}</p>
+                        <p className="text-base text-white whitespace-pre-wrap">{message.content}</p>
                         <p className="text-xs text-gray-300 mt-2">{format(message.timestamp, 'h:mm a')}</p>
                       </div>
                     </motion.div>
@@ -291,6 +340,74 @@ export default function ChatPage() {
                 }
               }}
             />
+
+            {/* Description Confirmation Modal */}
+            <AnimatePresence>
+              {showDescriptionConfirm && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center"
+                >
+                  <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.9, opacity: 0 }}
+                    className="bg-gray-900 rounded-xl p-6 w-full max-w-md border border-purple-500/20"
+                  >
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-xl font-semibold text-white">
+                        Confirm Case Description
+                      </h3>
+                    </div>
+                    <div className="mb-6">
+                      <p className="text-gray-300 mb-4">
+                        This will trigger the pipeline analysis. Are you sure you want to update the case description?
+                      </p>
+                      <div className="bg-gray-800 rounded-lg p-4">
+                        <p className="text-white whitespace-pre-wrap">{tempDescription}</p>
+                      </div>
+                    </div>
+                    <div className="flex justify-end space-x-3">
+                      <button
+                        onClick={() => handleConfirmDescription(false)}
+                        className="px-4 py-2 cursor-pointer text-sm font-medium text-gray-300 hover:text-white transition-colors font-[var(--font-space)]"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={() => handleConfirmDescription(true)}
+                        className="px-4 py-2 cursor-pointer text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors font-[var(--font-space)]"
+                      >
+                        Confirm & Update
+                      </button>
+                    </div>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {isStoringCase && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="fixed bottom-4 right-4 bg-purple-600 text-white px-4 py-2 rounded-lg shadow-lg"
+              >
+                Storing case data...
+              </motion.div>
+            )}
+
+            {caseStored && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                className="fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg"
+              >
+                Case stored successfully!
+              </motion.div>
+            )}
           </div>
         </div>
       </div>
