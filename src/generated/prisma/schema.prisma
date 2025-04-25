@@ -17,6 +17,7 @@ datasource db {
 
 model User {
   id              String         @id @default(cuid())
+  clerkId         String         @unique
   email           String         @unique
   name            String?
   profession      String?
@@ -29,6 +30,7 @@ model User {
   updatedAt       DateTime       @updatedAt
 
   @@index([email])
+  @@index([clerkId])
 }
 
 model Case {

@@ -1,6 +1,6 @@
 'use client';
 import { useUser } from '@clerk/nextjs';
-import { supabase } from '@/lib/supabase';
+import prisma from '@/lib/prisma';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Input } from '@/components/ui/input';
@@ -12,6 +12,7 @@ import { ArrowLeft, Sparkles, Home } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Scale from '@/../public/scale.jpg';
+
 export default function OnboardingPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -28,68 +29,114 @@ export default function OnboardingPage() {
   const [step, setStep] = useState(1);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    const userSync = async () => {
-      const { isSignedIn, user } = useUser();
+  // useEffect(() => {
+  //   const userSync = async () => {
+  //     const { isSignedIn, user } = useUser();
   
-      if (isSignedIn && user?.id) {
-        const { data, error } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', user.id)
-          .single();
+  //     if (isSignedIn && user?.id) {
+  //       try {
+  //         console.log('Onboarding - Starting user sync for clerkId:', user.id);
+  //         const existingUser = await prisma.user.findUnique({
+  //           where: { clerkId: user.id },
+  //           select: { id: true, name: true, email: true }
+  //         });
+
+  //         if (existingUser) {
+  //           console.log('Onboarding - Existing user found:', existingUser);
+  //           // Pre-fill form with existing user data if available
+  //           setFormData(prev => ({
+  //             ...prev,
+  //             name: existingUser.name || prev.name,
+  //           }));
+  //         } else {
+  //           console.log('Onboarding - Creating new user for clerkId:', user.id);
+  //           const newUser = await prisma.user.create({
+  //             data: {
+  //               clerkId: user.id,
+  //               email: user.emailAddresses[0]?.emailAddress || '',
+  //               name: user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : null,
+  //               legalKnowledge: 'NONE', // Default value
+  //               profession: 'Cannot Disclose', // Default value
+  //             }
+  //           });
+  //           console.log('Onboarding - New user created:', newUser);
+  //         }
+  //       } catch (error) {
+  //         console.error('Onboarding - Error in user sync:', {
+  //           error,
+  //           message: error instanceof Error ? error.message : 'Unknown error',
+  //           stack: error instanceof Error ? error.stack : undefined
+  //         });
+  //       }
+  //     }
+  //   };
   
-        if (data) {
-          alert("USER FOUND");
-        } else if (!data && !error) {
-          const { error: insertError } = await supabase.from('users').insert([
-            {
-              id: user.id,
-              email: user.emailAddresses[0]?.emailAddress,
-            }
-          ]);
+  //   userSync();
+  // }, []);
   
-          if (insertError) {
-            console.error("Error inserting user:", insertError);
-          } else {
-            alert("USER CREATED");
-          }
-        } else {
-          console.error("Error fetching user:", error);
-        }
-      }
-    };
-  
-    userSync();
-  }, []);
-  
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      nextStep();
+    }
+  };
+
   const handleSubmit = async () => {
     if (!formData.language || !formData.profession || !formData.legalKnowledge) {
+      console.error('Onboarding - Missing required fields:', {
+        language: formData.language,
+        profession: formData.profession,
+        legalKnowledge: formData.legalKnowledge
+      });
       setError('Please fill all required fields');
       return;
     }
 
     try {
+      console.log('Onboarding - Submitting form data:', formData);
       const res = await fetch('/api/onboarding', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
+      
+      const data = await res.json();
+      console.log('Onboarding - API response:', data);
+
       if (res.ok) {
         router.push('/dashboard');
       } else {
-        setError('Failed to save preferences');
+        console.error('Onboarding - API error:', {
+          status: res.status,
+          statusText: res.statusText,
+          data
+        });
+        setError(data.error || 'Failed to save preferences');
       }
-    } catch {
-      setError('An error occurred');
+    } catch (error) {
+      console.error('Onboarding - Network error:', error);
+      setError('An error occurred while saving your preferences');
     }
   };
 
   const nextStep = () => {
-    if (step === 1 && !formData.language) return setError('Please select a language');
-    if (step === 2 && !formData.name) return setError('Please enter your name');
-    if (step === 3 && !formData.profession) return setError('Please select a profession');
-    if (step === 4 && !formData.legalKnowledge) return setError('Please select legal knowledge');
+    console.log('Onboarding - Moving to next step:', step + 1);
+    if (step === 1 && !formData.language) {
+      console.error('Onboarding - Language not selected');
+      return setError('Please select a language');
+    }
+    if (step === 2 && !formData.name) {
+      console.error('Onboarding - Name not provided');
+      return setError('Please enter your name');
+    }
+    if (step === 3 && !formData.profession) {
+      console.error('Onboarding - Profession not selected');
+      return setError('Please select a profession');
+    }
+    if (step === 4 && !formData.legalKnowledge) {
+      console.error('Onboarding - Legal knowledge not selected');
+      return setError('Please select legal knowledge');
+    }
     setError('');
     setStep(step + 1);
   };
@@ -137,6 +184,7 @@ export default function OnboardingPage() {
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder="Enter your name"
               className="bg-gray-900 text-gray-100 border-purple-800 text-lg hover:shadow-[0_0_10px_rgba(139,92,246,0.5)] transition-shadow"
+              onKeyDown={handleKeyPress}
             />
           </div>
         );

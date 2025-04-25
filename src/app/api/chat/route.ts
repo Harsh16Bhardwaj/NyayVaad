@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import type { CaseData } from '@/types/case';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@/generated/prisma';
 import { getAuth } from '@clerk/nextjs/server';
 
 const prisma = new PrismaClient();
@@ -58,7 +58,11 @@ export async function POST(request: NextRequest) {
       throw new Error('Failed to parse Langflow response');
     }
 
-    console.log('Backend - Parsed response:', parsedResponse);
+    console.log('Backend - Field Update:', {
+      updatedField: parsedResponse.updated_field,
+      updatedValue: parsedResponse.updated_value,
+      nextField: parsedResponse.next_field
+    });
 
     let responseData;
     if (nextField === 'output') {

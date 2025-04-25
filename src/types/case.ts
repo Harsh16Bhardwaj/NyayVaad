@@ -1,5 +1,4 @@
 export interface CaseData {
-  temp_description: string | null;
   description: string | null;
   opponent: string | null;
   timeline_location: string | null;
