@@ -142,7 +142,6 @@ exports.Prisma.CaseScalarFieldEnum = {
   agreement: 'agreement',
   impact: 'impact',
   intent: 'intent',
-  involvedLaws: 'involvedLaws',
   finalAnalysis: 'finalAnalysis',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -175,6 +174,15 @@ exports.Prisma.LegalTermScalarFieldEnum = {
   usage: 'usage',
   category: 'category',
   source: 'source',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.EnhancedLawScalarFieldEnum = {
+  id: 'id',
+  law: 'law',
+  description: 'description',
+  relevance: 'relevance',
+  caseId: 'caseId',
   createdAt: 'createdAt'
 };
 
@@ -216,7 +224,8 @@ exports.Prisma.ModelName = {
   Case: 'Case',
   ExtractedDoc: 'ExtractedDoc',
   Todo: 'Todo',
-  LegalTerm: 'LegalTerm'
+  LegalTerm: 'LegalTerm',
+  EnhancedLaw: 'EnhancedLaw'
 };
 
 /**

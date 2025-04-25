@@ -16,8 +16,8 @@ datasource db {
 }
 
 model User {
-  id              String   @id @default(cuid())
-  email           String   @unique
+  id              String         @id @default(cuid())
+  email           String         @unique
   name            String?
   profession      String?
   legalKnowledge  LegalKnowledge
@@ -25,30 +25,32 @@ model User {
   warningSeverity String?
   pendingCaseType String?
   cases           Case[]
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
   @@index([email])
 }
 
 model Case {
-  id             String         @id @default(cuid())
-  user           User           @relation(fields: [userId], references: [id])
-  userId         String
-  title          String
-  description    String
-  status         CaseStatus     @default(OPEN)
-  opponent       String?
-  timeline       String[]       // Native text[] in PostgreSQL
-  evidence       Boolean
-  agreement      Boolean
-  impact         String?
-  intent         String?
-  involvedLaws   String[]       // Native text[] in PostgreSQL
-  todos          Todo[]
-  extractedDocs  ExtractedDoc[]
-  finalAnalysis  String?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  id            String         @id @default(cuid())
+  user          User           @relation(fields: [userId], references: [id])
+  userId        String
+  title         String
+  description   String
+  status        CaseStatus     @default(OPEN)
+  opponent      String?
+  timeline      String[]
+  evidence      Boolean
+  agreement     Boolean
+  impact        String?
+  intent        String?
+  involvedLaws  EnhancedLaw[]
+  todos         Todo[]
+  extractedDocs ExtractedDoc[]
+  finalAnalysis String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
   @@index([userId])
 }
 
@@ -61,18 +63,20 @@ model ExtractedDoc {
   rawContent String
   aiSummary  String
   createdAt  DateTime @default(now())
+
   @@index([docId])
 }
 
 model Todo {
-  id          String      @id @default(cuid())
+  id          String     @id @default(cuid())
   title       String
   description String?
   dueAt       DateTime?
-  status      TodoStatus  @default(PENDING)
-  case        Case        @relation(fields: [caseId], references: [id])
+  status      TodoStatus @default(PENDING)
+  case        Case       @relation(fields: [caseId], references: [id])
   caseId      String
-  createdAt   DateTime    @default(now())
+  createdAt   DateTime   @default(now())
+
   @@index([caseId])
 }
 
@@ -84,7 +88,18 @@ model LegalTerm {
   category    String
   source      String?
   createdAt   DateTime @default(now())
+
   @@index([word])
+}
+
+model EnhancedLaw {
+  id          String   @id @default(cuid())
+  law         String
+  description String
+  relevance   String
+  case        Case     @relation(fields: [caseId], references: [id])
+  caseId      String
+  createdAt   DateTime @default(now())
 }
 
 enum LegalKnowledge {

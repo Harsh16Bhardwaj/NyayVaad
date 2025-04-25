@@ -39,12 +39,12 @@ model Case {
   description   String
   status        CaseStatus     @default(OPEN)
   opponent      String?
-  timeline      String[] // Native text[] in PostgreSQL
+  timeline      String[]
   evidence      Boolean
   agreement     Boolean
   impact        String?
   intent        String?
-  involvedLaws  String[] // Native text[] in PostgreSQL
+  involvedLaws  EnhancedLaw[]
   todos         Todo[]
   extractedDocs ExtractedDoc[]
   finalAnalysis String?
@@ -90,6 +90,16 @@ model LegalTerm {
   createdAt   DateTime @default(now())
 
   @@index([word])
+}
+
+model EnhancedLaw {
+  id          String   @id @default(cuid())
+  law         String
+  description String
+  relevance   String
+  case        Case     @relation(fields: [caseId], references: [id])
+  caseId      String
+  createdAt   DateTime @default(now())
 }
 
 enum LegalKnowledge {
