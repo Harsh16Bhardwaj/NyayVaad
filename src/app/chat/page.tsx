@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
-import { Scale, Sparkles } from 'lucide-react';
+import { Scale, Sparkles, RefreshCw } from 'lucide-react';
 import { ChatMessage, CaseData } from '@/types/case';
 import EditFieldModal from '@/components/EditFieldModal';
 import ProtectedPage from '@/components/ProtectedPage';
@@ -11,12 +11,20 @@ import ProtectedPage from '@/components/ProtectedPage';
 const initialCaseData: CaseData = {
   description: null,
   opponent: null,
-  timeline_location: null,
+  timeline: null,
   evidence: null,
-  agreements_pre_steps: null,
-  impact_intent: null,
-  output: false, 
+  agreement: null,
+  output: false,
 };
+
+const fieldOrder = [
+  'description',
+  'opponent',
+  'timeline',
+  'evidence',
+  'agreement',
+  'output',
+];
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -31,31 +39,8 @@ export default function ChatPage() {
   const [isStoringCase, setIsStoringCase] = useState(false);
   const [caseStored, setCaseStored] = useState(false);
   const [descriptionUpdated, setDescriptionUpdated] = useState(false);
-
-  // useEffect(() => {
-  //   const triggerPipeline = async () => {
-  //     if (caseData.description) {
-  //       try {
-  //         console.log('Frontend - Triggering pipeline with description:', caseData.description);
-  //         const response = await fetch('/api/fetch-docs', {
-  //           method: 'POST',
-  //           headers: {
-  //             'Content-Type': 'application/json',
-  //           },
-  //           body: JSON.stringify({ description: caseData.description }),
-  //         });
-
-  //         if (!response.ok) {
-  //           throw new Error('Pipeline request failed');
-  //         }
-  //       } catch (error) {
-  //         console.error('Frontend - Error in pipeline call:', error);
-  //       }
-  //     }
-  //   };
-
-  //   triggerPipeline();
-  // }, [caseData.description]);
+  const [pendingAiResponse, setPendingAiResponse] = useState<string | null>(null);
+  const [isFinalAnalysis, setIsFinalAnalysis] = useState(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -66,9 +51,55 @@ export default function ChatPage() {
   }, [messages]);
 
   useEffect(() => {
-    const allFieldsFilled = Object.entries(caseData).every(([key, value]) => key === 'output' || value !== null);
+    const allFieldsFilled = Object.entries(caseData).every(([key, value]) => {
+      if (key === 'output') return true;
+      if (key === 'timeline') return Array.isArray(value) && value.length > 0;
+      if (typeof value === 'boolean') return value === true || value === false;
+      return value !== null && value !== '';
+    });
+    console.log('Frontend - Checking all fields filled:', {
+      caseData,
+      allFieldsFilled,
+      unfilled: Object.entries(caseData).filter(([k, v]) => k !== 'output' && (v === null || v === '' || (Array.isArray(v) && v.length === 0))),
+    });
     setIsAnalysisEnabled(allFieldsFilled);
   }, [caseData]);
+
+  const calculateProgress = () => {
+    const fields = fieldOrder.slice(0, -1);
+    const filledFields = fields.filter((key) => {
+      const value = caseData[key as keyof CaseData];
+      if (key === 'timeline') return Array.isArray(value) && value.length > 0;
+      if (typeof value === 'boolean') return value === true || value === false;
+      return value !== null && value !== '';
+    }).length;
+    const progress = (filledFields / fields.length) * 100;
+    console.log('Frontend - Calculating progress:', { filledFields, totalFields: fields.length, progress });
+    return progress;
+  };
+
+  const getNextField = () => {
+    if (isAnalysisEnabled) {
+      console.log('Frontend - All fields filled, nextField is output');
+      return 'output';
+    }
+    const nextField = fieldOrder.find((field) => {
+      if (field === 'output') return false;
+      const value = caseData[field as keyof CaseData];
+      if (field === 'timeline') return !Array.isArray(value) || value.length === 0;
+      if (typeof value === 'boolean') return value === false;
+      return value === null || value === '';
+    });
+    console.log('Frontend - Finding next field:', {
+      caseData,
+      nextField: nextField || null,
+      fieldStatuses: fieldOrder.map((f) => ({
+        field: f,
+        filled: f === 'timeline' ? Array.isArray(caseData[f]) && caseData[f].length > 0 : caseData[f as keyof CaseData] !== null && caseData[f as keyof CaseData] !== '',
+      })),
+    });
+    return nextField || null;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,14 +112,13 @@ export default function ChatPage() {
       timestamp: new Date(),
     };
 
+    console.log('Frontend - Submitting user message:', { userMessage, caseData });
+
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
 
-    const nextField = Object.entries(caseData).find(
-      ([key, value]) => key !== 'output' && value === null
-    )?.[0] || (isAnalysisEnabled ? 'output' : null);
-    console.log('Frontend - Next field to ask:', nextField);
+    const nextField = getNextField();
 
     try {
       const requestPayload = {
@@ -97,58 +127,114 @@ export default function ChatPage() {
         nextField,
         caseData: nextField === 'output' ? caseData : undefined,
       };
-      console.log('Frontend - Sending request:', requestPayload);
+
+      console.log('Frontend - Sending API request:', requestPayload);
 
       const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestPayload),
       });
 
-      const data = await response.json();
-      console.log('Frontend - Received response:', data);
-
-      if (nextField === 'output') {
-        setIsStoringCase(true);
-        setCaseStored(true);
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Frontend - API request failed:', { errorData, status: response.status });
+        throw new Error(errorData.response || `HTTP error: ${response.status}`);
       }
 
-      // Update case data if we received an updated field
+      const data = await response.json();
+      console.log('Frontend - Received API response:', {
+        response: data,
+        updatedField: data.updatedField,
+        updatedValue: data.updatedValue,
+        nextField: data.nextField,
+      });
+
+      if (data.descriptionLocked) {
+        console.log('Frontend - Description locked, setting descriptionUpdated');
+        setDescriptionUpdated(true);
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: (Date.now() + 1).toString(),
+            content: 'The case description is locked and cannot be changed.',
+            sender: 'ai',
+            timestamp: new Date(),
+          },
+        ]);
+        setIsLoading(false);
+        return;
+      }
+
+      if (nextField === 'output') {
+        console.log('Frontend - Processing output response');
+        setIsStoringCase(true);
+        setCaseStored(true);
+        setIsFinalAnalysis(true);
+        setCaseData((prev) => {
+          const newCaseData = { ...prev, output: true };
+          console.log('Frontend - Updated caseData for output:', { old: prev, new: newCaseData });
+          return newCaseData;
+        });
+      }
+
+      const validFields = fieldOrder;
+      if (data.updatedField && !validFields.includes(data.updatedField)) {
+        console.error('Frontend - Invalid updatedField received:', { updatedField: data.updatedField, validFields });
+        throw new Error('Invalid field received from backend');
+      }
+
       if (data.updatedField && data.updatedValue !== undefined) {
-        console.log('Frontend - Updating case data field:', data.updatedField, data.updatedValue);
-        
-        // If the updated field is description, show the confirmation modal
         if (data.updatedField === 'description') {
-          setEditingField({
-            name: 'description',
-            value: data.updatedValue
+          console.log('Frontend - Received description update, opening confirmation modal:', {
+            value: data.updatedValue,
+            response: data.response,
           });
+          setEditingField({ name: 'description', value: data.updatedValue });
+          setPendingAiResponse(data.response || 'Please confirm the case description.');
           setShowDescriptionConfirm(true);
-          return; // Don't update the case data yet
+          setIsLoading(false);
+          return;
         }
 
-        setCaseData((prev) => ({
-          ...prev,
-          [data.updatedField]: data.updatedValue,
-        }));
+        setCaseData((prev) => {
+          const newCaseData = {
+            ...prev,
+            [data.updatedField]:
+              data.updatedField === 'timeline'
+                ? [data.updatedValue]
+                : data.updatedField === 'evidence' || data.updatedField === 'agreement'
+                ? data.updatedValue.toLowerCase() === 'true' || data.updatedValue.toLowerCase() === 'yes'
+                  ? true
+                  : false
+                : data.updatedValue,
+          };
+          console.log('Frontend - Updated caseData:', {
+            updatedField: data.updatedField,
+            updatedValue: data.updatedValue,
+            old: prev,
+            new: newCaseData,
+          });
+          return newCaseData;
+        });
       }
 
       let aiMessageContent: string;
       if (data.outputData) {
-        const { case_summary, laws_involved, todos } = data.outputData;
+        const { case_summary = 'No summary provided', laws_involved = [], todos = [] } = data.outputData;
         aiMessageContent = `
           **Case Summary**: ${case_summary}
-
           **Relevant Laws**:
-          ${laws_involved.map((law: any) => `- **${law.name}**: ${law.description}`).join('\n')}
-
+          ${laws_involved.length > 0
+            ? laws_involved.map((law: any) => `- **${law.name}**: ${law.description}`).join('\n')
+            : 'No laws identified.'}
           **Action Plan (TODOs)**:
-          ${todos.map((todo: any) => `- **${todo.title}**: ${todo.description}`).join('\n')}
+          ${todos.length > 0
+            ? todos.map((todo: any) => `- **${todo.title}**: ${todo.description}`).join('\n')
+            : 'No action items provided.'}
         `;
       } else {
-        aiMessageContent = data.response;
+        aiMessageContent = data.response || 'No response provided.';
       }
 
       const aiMessage: ChatMessage = {
@@ -158,13 +244,13 @@ export default function ChatPage() {
         timestamp: new Date(),
       };
 
-      console.log('Frontend - Creating AI message:', aiMessage);
+      console.log('Frontend - Adding AI message to chat:', { aiMessage });
       setMessages((prev) => [...prev, aiMessage]);
     } catch (error) {
-      console.error('Frontend - Error:', error);
+      console.error('Frontend - Error in handleSubmit:', { error, stack: error instanceof Error ? error.stack : null });
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
-        content: 'Sorry, there was an error processing your request. Please try again.',
+        content: error instanceof Error ? error.message : 'Sorry, there was an error processing your request. Please try again.',
         sender: 'ai',
         timestamp: new Date(),
       };
@@ -175,44 +261,103 @@ export default function ChatPage() {
     }
   };
 
-  const handleEditField = (fieldName: string, currentValue: string | null) => {
-    // If description is already updated, don't allow editing
+  const handleEditField = (fieldName: string, currentValue: string | boolean | string[] | null) => {
     if (fieldName === 'description' && descriptionUpdated) {
+      console.log('Frontend - Blocked edit attempt for locked description');
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: (Date.now() + 1).toString(),
+          content: 'The case description is locked and cannot be changed.',
+          sender: 'ai',
+          timestamp: new Date(),
+        },
+      ]);
       return;
     }
-    setEditingField({ name: fieldName, value: currentValue });
+    if (fieldName === 'output') return;
+    const value = Array.isArray(currentValue) ? currentValue[0] || null : currentValue?.toString() || null;
+    console.log('Frontend - Opening edit modal for field:', { fieldName, currentValue, modalValue: value });
+    setEditingField({ name: fieldName, value });
   };
 
   const handleSaveField = (fieldName: string, newValue: string) => {
+    console.log('Frontend - Saving field:', { fieldName, newValue });
     if (fieldName === 'description') {
       setShowDescriptionConfirm(true);
     } else {
-      setCaseData((prev) => ({
-        ...prev,
-        [fieldName]: newValue,
-      }));
+      setCaseData((prev) => {
+        const newCaseData = {
+          ...prev,
+          [fieldName]:
+            fieldName === 'timeline'
+              ? [newValue]
+              : fieldName === 'evidence' || fieldName === 'agreement'
+              ? newValue.toLowerCase() === 'true' || newValue.toLowerCase() === 'yes'
+                ? true
+                : false
+              : newValue,
+        };
+        console.log('Frontend - Updated caseData after save:', { old: prev, new: newCaseData });
+        return newCaseData;
+      });
     }
   };
 
   const handleConfirmDescription = (confirmed: boolean) => {
+    console.log('Frontend - Confirming description:', { confirmed, editingField });
     if (confirmed && editingField?.value) {
-      setCaseData((prev) => ({
-        ...prev,
-        description: editingField.value,
-      }));
+      setCaseData((prev) => {
+        const newCaseData = { ...prev, description: editingField.value };
+        console.log('Frontend - Confirmed description, updated caseData:', { old: prev, new: newCaseData });
+        return newCaseData;
+      });
       setDescriptionUpdated(true);
     }
+
+    if (pendingAiResponse) {
+      const aiMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        content: pendingAiResponse,
+        sender: 'ai',
+        timestamp: new Date(),
+      };
+      console.log('Frontend - Adding pending AI response to chat:', { aiMessage });
+      setMessages((prev) => [...prev, aiMessage]);
+      setPendingAiResponse(null);
+    }
+
     setEditingField(null);
     setShowDescriptionConfirm(false);
+  };
+
+  const handleReset = () => {
+    console.log('Frontend - Resetting case data and state');
+    setCaseData(initialCaseData);
+    setMessages([]);
+    setDescriptionUpdated(false);
+    setCaseStored(false);
+    setPendingAiResponse(null);
+    setIsFinalAnalysis(false);
   };
 
   return (
     <ProtectedPage>
       <div className="min-h-screen bg-neutral-900 pt-10">
         <div className="mx-auto px-2 sm:px-2">
-          <h1 className="text-2xl font-bold text-white">Chat</h1>
+          <h1 className="text-2xl font-bold text-white flex items-center justify-between">
+            Chat
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleReset}
+              className="flex items-center space-x-1 text-sm text-gray-400 hover:text-white"
+            >
+              <RefreshCw className="w-4 h-4" />
+              <span>Reset Case</span>
+            </motion.button>
+          </h1>
           <div className="flex h-[calc(100vh-6rem)] bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950">
-            {/* Sidebar */}
             <div className="w-80 bg-black/60 backdrop-blur-lg border-r border-white/10 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-purple-500/30 scrollbar-track-transparent">
               <div className="flex items-center space-x-3 mb-6">
                 <Scale className="w-5 h-5 text-purple-400" />
@@ -231,10 +376,18 @@ export default function ChatPage() {
                       <h3 className="text-xs text-purple-400 font-[var(--font-space)] uppercase tracking-wider">
                         {key.replace(/_/g, ' ')}
                       </h3>
-                      <div className={`w-2 h-2 rounded-full ${value ? 'bg-green-500' : 'bg-gray-500'}`} />
+                      <div
+                        className={`w-2 h-2 rounded-full ${
+                          (typeof value === 'boolean' && (value === true || value === false)) ||
+                          (typeof value === 'string' && value) ||
+                          (Array.isArray(value) && value.length > 0)
+                            ? 'bg-green-500'
+                            : 'bg-gray-500'
+                        }`}
+                      />
                     </div>
                     <p className="text-sm text-gray-300 mt-1 font-[var(--font-inter)] line-clamp-2">
-                      {value || 'Not provided yet'}
+                      {Array.isArray(value) ? value.join(', ') || 'Not provided yet' : value?.toString() || 'Not provided yet'}
                     </p>
                     <div className="mt-1 text-xs text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity font-[var(--font-space)]">
                       Click to edit
@@ -244,13 +397,39 @@ export default function ChatPage() {
               </div>
             </div>
 
-            {/* Chat */}
             <div className="flex-1 flex flex-col">
               <div className="bg-black/60 backdrop-blur-lg border-b border-white/10 p-4">
+                <div className="relative mb-2">
+                  <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+                    <motion.div
+                      className="h-full bg-purple-600"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${calculateProgress()}%` }}
+                      transition={{ duration: 0.5 }}
+                    />
+                  </div>
+                  <p className="text-xs text-gray-400 mt-1 font-[var(--font-inter)]">
+                    Case Completion: {Math.round(calculateProgress())}% (
+                    {fieldOrder
+                      .slice(0, -1)
+                      .filter((key) => {
+                        const value = caseData[key as keyof CaseData];
+                        return key === 'timeline'
+                          ? Array.isArray(value) && value.length > 0
+                          : typeof value === 'boolean'
+                          ? value === true || value === false
+                          : value !== null && value !== '';
+                      })
+                      .join(', ')}
+                    )
+                  </p>
+                </div>
                 <div className="flex items-center justify-between">
                   <div>
                     <h1 className="text-2xl font-bold text-white font-[var(--font-playfair)]">Legal Assistant</h1>
-                    <p className="text-gray-400 text-xs mt-1 font-[var(--font-inter)]">Let's gather information about your case</p>
+                    <p className="text-gray-400 text-xs mt-1 font-[var(--font-inter)]">
+                      {isFinalAnalysis ? 'Your case is ready! Ask me anything.' : "Let's gather information about your case"}
+                    </p>
                   </div>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
@@ -258,11 +437,12 @@ export default function ChatPage() {
                     disabled={!isAnalysisEnabled}
                     className={`px-4 py-2 rounded-xl font-medium flex items-center space-x-2 transition-all duration-300 ${
                       isAnalysisEnabled
-                        ? 'button'
+                        ? 'bg-purple-600 text-white hover:bg-purple-700'
                         : 'bg-gray-700 text-gray-400 cursor-not-allowed'
                     }`}
                     onClick={() => {
                       if (isAnalysisEnabled) {
+                        console.log('Frontend - Triggering Super Analysis');
                         handleSubmit({ preventDefault: () => {} } as React.FormEvent);
                       }
                     }}
@@ -327,12 +507,16 @@ export default function ChatPage() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder="Type your message..."
-                    className="flex-1 bg-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-400 border border-white/10"
+                    className="flex-1 bg-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-400 border border-white/10 focus:outline-none focus:border-purple-500"
                   />
                   <button
                     type="submit"
                     disabled={isLoading || !input.trim()}
-                    className="bg-purple-600 hover:bg-purple-700 rounded-xl px-6 py-3 text-sm text-white font-medium"
+                    className={`px-6 py-3 rounded-xl text-sm text-white font-medium ${
+                      isLoading || !input.trim()
+                        ? 'bg-gray-600 cursor-not-allowed'
+                        : 'bg-purple-600 hover:bg-purple-700'
+                    }`}
                   >
                     Send
                   </button>
@@ -340,10 +524,12 @@ export default function ChatPage() {
               </div>
             </div>
 
-            {/* Edit Modal */}
             <EditFieldModal
               isOpen={!!editingField}
-              onClose={() => setEditingField(null)}
+              onClose={() => {
+                console.log('Frontend - Closing edit modal');
+                setEditingField(null);
+              }}
               fieldName={editingField?.name || ''}
               currentValue={editingField?.value || null}
               onSave={(value) => {
@@ -354,7 +540,6 @@ export default function ChatPage() {
               disabled={editingField?.name === 'description' && descriptionUpdated}
             />
 
-            {/* Description Confirmation Modal */}
             <AnimatePresence>
               {showDescriptionConfirm && (
                 <motion.div
@@ -370,13 +555,12 @@ export default function ChatPage() {
                     className="bg-gray-900 rounded-xl p-4 w-full max-w-md border border-purple-500/20"
                   >
                     <div className="flex justify-between items-center mb-3">
-                      <h3 className="text-lg font-semibold text-white">
-                        Confirm Case Description
-                      </h3>
+                      <h3 className="text-lg font-semibold text-white">Confirm Case Description</h3>
                     </div>
                     <div className="mb-4">
                       <p className="text-sm text-gray-300 mb-3">
-                        This will trigger the pipeline analysis. <span className="text-red-400 font-bold">This cannot be changed later.</span> Are you sure you want to update the case description?
+                        This will lock the case description.{' '}
+                        <span className="text-red-400 font-bold">It cannot be changed later.</span> Are you sure?
                       </p>
                       <div className="bg-gray-800 rounded-lg p-3">
                         <p className="text-sm text-white whitespace-pre-wrap">{editingField?.value}</p>
@@ -385,13 +569,13 @@ export default function ChatPage() {
                     <div className="flex justify-end space-x-2">
                       <button
                         onClick={() => handleConfirmDescription(false)}
-                        className="px-3 py-1.5 cursor-pointer text-xs font-medium text-gray-300 hover:text-white transition-colors font-[var(--font-space)]"
+                        className="px-3 py-1.5 text-xs font-medium text-gray-300 hover:text-white transition-colors font-[var(--font-space)]"
                       >
                         Cancel
                       </button>
                       <button
                         onClick={() => handleConfirmDescription(true)}
-                        className="px-3 py-1.5 cursor-pointer text-xs font-medium text-white bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors font-[var(--font-space)]"
+                        className="px-3 py-1.5 text-xs font-medium text-white bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors font-[var(--font-space)]"
                       >
                         Confirm & Update
                       </button>

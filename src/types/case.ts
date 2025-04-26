@@ -1,11 +1,9 @@
 export interface CaseData {
   description: string | null;
   opponent: string | null;
-  timeline_location: string | null;
-  evidence: string | null;
-  agreements_pre_steps: string | null;
-  impact_intent: string | null;
-  output: boolean;
+  timeline: string | null;
+  evidence: boolean | null;
+  agreement: boolean | null;
 }
 
 export interface ChatMessage {

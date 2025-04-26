@@ -2649,8 +2649,6 @@ export namespace Prisma {
     opponent: string | null
     evidence: boolean | null
     agreement: boolean | null
-    impact: string | null
-    intent: string | null
     finalAnalysis: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -2665,8 +2663,6 @@ export namespace Prisma {
     opponent: string | null
     evidence: boolean | null
     agreement: boolean | null
-    impact: string | null
-    intent: string | null
     finalAnalysis: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -2682,8 +2678,6 @@ export namespace Prisma {
     timeline: number
     evidence: number
     agreement: number
-    impact: number
-    intent: number
     finalAnalysis: number
     createdAt: number
     updatedAt: number
@@ -2700,8 +2694,6 @@ export namespace Prisma {
     opponent?: true
     evidence?: true
     agreement?: true
-    impact?: true
-    intent?: true
     finalAnalysis?: true
     createdAt?: true
     updatedAt?: true
@@ -2716,8 +2708,6 @@ export namespace Prisma {
     opponent?: true
     evidence?: true
     agreement?: true
-    impact?: true
-    intent?: true
     finalAnalysis?: true
     createdAt?: true
     updatedAt?: true
@@ -2733,8 +2723,6 @@ export namespace Prisma {
     timeline?: true
     evidence?: true
     agreement?: true
-    impact?: true
-    intent?: true
     finalAnalysis?: true
     createdAt?: true
     updatedAt?: true
@@ -2823,8 +2811,6 @@ export namespace Prisma {
     timeline: string[]
     evidence: boolean
     agreement: boolean
-    impact: string | null
-    intent: string | null
     finalAnalysis: string | null
     createdAt: Date
     updatedAt: Date
@@ -2857,8 +2843,6 @@ export namespace Prisma {
     timeline?: boolean
     evidence?: boolean
     agreement?: boolean
-    impact?: boolean
-    intent?: boolean
     finalAnalysis?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -2879,8 +2863,6 @@ export namespace Prisma {
     timeline?: boolean
     evidence?: boolean
     agreement?: boolean
-    impact?: boolean
-    intent?: boolean
     finalAnalysis?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -2897,8 +2879,6 @@ export namespace Prisma {
     timeline?: boolean
     evidence?: boolean
     agreement?: boolean
-    impact?: boolean
-    intent?: boolean
     finalAnalysis?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -2915,14 +2895,12 @@ export namespace Prisma {
     timeline?: boolean
     evidence?: boolean
     agreement?: boolean
-    impact?: boolean
-    intent?: boolean
     finalAnalysis?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type CaseOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "title" | "description" | "status" | "opponent" | "timeline" | "evidence" | "agreement" | "impact" | "intent" | "finalAnalysis" | "createdAt" | "updatedAt", ExtArgs["result"]["case"]>
+  export type CaseOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "title" | "description" | "status" | "opponent" | "timeline" | "evidence" | "agreement" | "finalAnalysis" | "createdAt" | "updatedAt", ExtArgs["result"]["case"]>
   export type CaseInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     involvedLaws?: boolean | Case$involvedLawsArgs<ExtArgs>
@@ -2955,8 +2933,6 @@ export namespace Prisma {
       timeline: string[]
       evidence: boolean
       agreement: boolean
-      impact: string | null
-      intent: string | null
       finalAnalysis: string | null
       createdAt: Date
       updatedAt: Date
@@ -3396,8 +3372,6 @@ export namespace Prisma {
     readonly timeline: FieldRef<"Case", 'String[]'>
     readonly evidence: FieldRef<"Case", 'Boolean'>
     readonly agreement: FieldRef<"Case", 'Boolean'>
-    readonly impact: FieldRef<"Case", 'String'>
-    readonly intent: FieldRef<"Case", 'String'>
     readonly finalAnalysis: FieldRef<"Case", 'String'>
     readonly createdAt: FieldRef<"Case", 'DateTime'>
     readonly updatedAt: FieldRef<"Case", 'DateTime'>
@@ -8184,8 +8158,6 @@ export namespace Prisma {
     timeline: 'timeline',
     evidence: 'evidence',
     agreement: 'agreement',
-    impact: 'impact',
-    intent: 'intent',
     finalAnalysis: 'finalAnalysis',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -8482,8 +8454,6 @@ export namespace Prisma {
     timeline?: StringNullableListFilter<"Case">
     evidence?: BoolFilter<"Case"> | boolean
     agreement?: BoolFilter<"Case"> | boolean
-    impact?: StringNullableFilter<"Case"> | string | null
-    intent?: StringNullableFilter<"Case"> | string | null
     finalAnalysis?: StringNullableFilter<"Case"> | string | null
     createdAt?: DateTimeFilter<"Case"> | Date | string
     updatedAt?: DateTimeFilter<"Case"> | Date | string
@@ -8503,8 +8473,6 @@ export namespace Prisma {
     timeline?: SortOrder
     evidence?: SortOrder
     agreement?: SortOrder
-    impact?: SortOrderInput | SortOrder
-    intent?: SortOrderInput | SortOrder
     finalAnalysis?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -8527,8 +8495,6 @@ export namespace Prisma {
     timeline?: StringNullableListFilter<"Case">
     evidence?: BoolFilter<"Case"> | boolean
     agreement?: BoolFilter<"Case"> | boolean
-    impact?: StringNullableFilter<"Case"> | string | null
-    intent?: StringNullableFilter<"Case"> | string | null
     finalAnalysis?: StringNullableFilter<"Case"> | string | null
     createdAt?: DateTimeFilter<"Case"> | Date | string
     updatedAt?: DateTimeFilter<"Case"> | Date | string
@@ -8548,8 +8514,6 @@ export namespace Prisma {
     timeline?: SortOrder
     evidence?: SortOrder
     agreement?: SortOrder
-    impact?: SortOrderInput | SortOrder
-    intent?: SortOrderInput | SortOrder
     finalAnalysis?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -8571,8 +8535,6 @@ export namespace Prisma {
     timeline?: StringNullableListFilter<"Case">
     evidence?: BoolWithAggregatesFilter<"Case"> | boolean
     agreement?: BoolWithAggregatesFilter<"Case"> | boolean
-    impact?: StringNullableWithAggregatesFilter<"Case"> | string | null
-    intent?: StringNullableWithAggregatesFilter<"Case"> | string | null
     finalAnalysis?: StringNullableWithAggregatesFilter<"Case"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Case"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Case"> | Date | string
@@ -8941,8 +8903,6 @@ export namespace Prisma {
     timeline?: CaseCreatetimelineInput | string[]
     evidence: boolean
     agreement: boolean
-    impact?: string | null
-    intent?: string | null
     finalAnalysis?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -8962,8 +8922,6 @@ export namespace Prisma {
     timeline?: CaseCreatetimelineInput | string[]
     evidence: boolean
     agreement: boolean
-    impact?: string | null
-    intent?: string | null
     finalAnalysis?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -8981,8 +8939,6 @@ export namespace Prisma {
     timeline?: CaseUpdatetimelineInput | string[]
     evidence?: BoolFieldUpdateOperationsInput | boolean
     agreement?: BoolFieldUpdateOperationsInput | boolean
-    impact?: NullableStringFieldUpdateOperationsInput | string | null
-    intent?: NullableStringFieldUpdateOperationsInput | string | null
     finalAnalysis?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -9002,8 +8958,6 @@ export namespace Prisma {
     timeline?: CaseUpdatetimelineInput | string[]
     evidence?: BoolFieldUpdateOperationsInput | boolean
     agreement?: BoolFieldUpdateOperationsInput | boolean
-    impact?: NullableStringFieldUpdateOperationsInput | string | null
-    intent?: NullableStringFieldUpdateOperationsInput | string | null
     finalAnalysis?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -9022,8 +8976,6 @@ export namespace Prisma {
     timeline?: CaseCreatetimelineInput | string[]
     evidence: boolean
     agreement: boolean
-    impact?: string | null
-    intent?: string | null
     finalAnalysis?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -9038,8 +8990,6 @@ export namespace Prisma {
     timeline?: CaseUpdatetimelineInput | string[]
     evidence?: BoolFieldUpdateOperationsInput | boolean
     agreement?: BoolFieldUpdateOperationsInput | boolean
-    impact?: NullableStringFieldUpdateOperationsInput | string | null
-    intent?: NullableStringFieldUpdateOperationsInput | string | null
     finalAnalysis?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -9055,8 +9005,6 @@ export namespace Prisma {
     timeline?: CaseUpdatetimelineInput | string[]
     evidence?: BoolFieldUpdateOperationsInput | boolean
     agreement?: BoolFieldUpdateOperationsInput | boolean
-    impact?: NullableStringFieldUpdateOperationsInput | string | null
-    intent?: NullableStringFieldUpdateOperationsInput | string | null
     finalAnalysis?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -9597,8 +9545,6 @@ export namespace Prisma {
     timeline?: SortOrder
     evidence?: SortOrder
     agreement?: SortOrder
-    impact?: SortOrder
-    intent?: SortOrder
     finalAnalysis?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -9613,8 +9559,6 @@ export namespace Prisma {
     opponent?: SortOrder
     evidence?: SortOrder
     agreement?: SortOrder
-    impact?: SortOrder
-    intent?: SortOrder
     finalAnalysis?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -9629,8 +9573,6 @@ export namespace Prisma {
     opponent?: SortOrder
     evidence?: SortOrder
     agreement?: SortOrder
-    impact?: SortOrder
-    intent?: SortOrder
     finalAnalysis?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -10332,8 +10274,6 @@ export namespace Prisma {
     timeline?: CaseCreatetimelineInput | string[]
     evidence: boolean
     agreement: boolean
-    impact?: string | null
-    intent?: string | null
     finalAnalysis?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -10351,8 +10291,6 @@ export namespace Prisma {
     timeline?: CaseCreatetimelineInput | string[]
     evidence: boolean
     agreement: boolean
-    impact?: string | null
-    intent?: string | null
     finalAnalysis?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -10400,8 +10338,6 @@ export namespace Prisma {
     timeline?: StringNullableListFilter<"Case">
     evidence?: BoolFilter<"Case"> | boolean
     agreement?: BoolFilter<"Case"> | boolean
-    impact?: StringNullableFilter<"Case"> | string | null
-    intent?: StringNullableFilter<"Case"> | string | null
     finalAnalysis?: StringNullableFilter<"Case"> | string | null
     createdAt?: DateTimeFilter<"Case"> | Date | string
     updatedAt?: DateTimeFilter<"Case"> | Date | string
@@ -10656,8 +10592,6 @@ export namespace Prisma {
     timeline?: CaseCreatetimelineInput | string[]
     evidence: boolean
     agreement: boolean
-    impact?: string | null
-    intent?: string | null
     finalAnalysis?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -10676,8 +10610,6 @@ export namespace Prisma {
     timeline?: CaseCreatetimelineInput | string[]
     evidence: boolean
     agreement: boolean
-    impact?: string | null
-    intent?: string | null
     finalAnalysis?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -10710,8 +10642,6 @@ export namespace Prisma {
     timeline?: CaseUpdatetimelineInput | string[]
     evidence?: BoolFieldUpdateOperationsInput | boolean
     agreement?: BoolFieldUpdateOperationsInput | boolean
-    impact?: NullableStringFieldUpdateOperationsInput | string | null
-    intent?: NullableStringFieldUpdateOperationsInput | string | null
     finalAnalysis?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10730,8 +10660,6 @@ export namespace Prisma {
     timeline?: CaseUpdatetimelineInput | string[]
     evidence?: BoolFieldUpdateOperationsInput | boolean
     agreement?: BoolFieldUpdateOperationsInput | boolean
-    impact?: NullableStringFieldUpdateOperationsInput | string | null
-    intent?: NullableStringFieldUpdateOperationsInput | string | null
     finalAnalysis?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10748,8 +10676,6 @@ export namespace Prisma {
     timeline?: CaseCreatetimelineInput | string[]
     evidence: boolean
     agreement: boolean
-    impact?: string | null
-    intent?: string | null
     finalAnalysis?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -10768,8 +10694,6 @@ export namespace Prisma {
     timeline?: CaseCreatetimelineInput | string[]
     evidence: boolean
     agreement: boolean
-    impact?: string | null
-    intent?: string | null
     finalAnalysis?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -10802,8 +10726,6 @@ export namespace Prisma {
     timeline?: CaseUpdatetimelineInput | string[]
     evidence?: BoolFieldUpdateOperationsInput | boolean
     agreement?: BoolFieldUpdateOperationsInput | boolean
-    impact?: NullableStringFieldUpdateOperationsInput | string | null
-    intent?: NullableStringFieldUpdateOperationsInput | string | null
     finalAnalysis?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10822,8 +10744,6 @@ export namespace Prisma {
     timeline?: CaseUpdatetimelineInput | string[]
     evidence?: BoolFieldUpdateOperationsInput | boolean
     agreement?: BoolFieldUpdateOperationsInput | boolean
-    impact?: NullableStringFieldUpdateOperationsInput | string | null
-    intent?: NullableStringFieldUpdateOperationsInput | string | null
     finalAnalysis?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10840,8 +10760,6 @@ export namespace Prisma {
     timeline?: CaseCreatetimelineInput | string[]
     evidence: boolean
     agreement: boolean
-    impact?: string | null
-    intent?: string | null
     finalAnalysis?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -10860,8 +10778,6 @@ export namespace Prisma {
     timeline?: CaseCreatetimelineInput | string[]
     evidence: boolean
     agreement: boolean
-    impact?: string | null
-    intent?: string | null
     finalAnalysis?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -10894,8 +10810,6 @@ export namespace Prisma {
     timeline?: CaseUpdatetimelineInput | string[]
     evidence?: BoolFieldUpdateOperationsInput | boolean
     agreement?: BoolFieldUpdateOperationsInput | boolean
-    impact?: NullableStringFieldUpdateOperationsInput | string | null
-    intent?: NullableStringFieldUpdateOperationsInput | string | null
     finalAnalysis?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10914,8 +10828,6 @@ export namespace Prisma {
     timeline?: CaseUpdatetimelineInput | string[]
     evidence?: BoolFieldUpdateOperationsInput | boolean
     agreement?: BoolFieldUpdateOperationsInput | boolean
-    impact?: NullableStringFieldUpdateOperationsInput | string | null
-    intent?: NullableStringFieldUpdateOperationsInput | string | null
     finalAnalysis?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10932,8 +10844,6 @@ export namespace Prisma {
     timeline?: CaseCreatetimelineInput | string[]
     evidence: boolean
     agreement: boolean
-    impact?: string | null
-    intent?: string | null
     finalAnalysis?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -10948,8 +10858,6 @@ export namespace Prisma {
     timeline?: CaseUpdatetimelineInput | string[]
     evidence?: BoolFieldUpdateOperationsInput | boolean
     agreement?: BoolFieldUpdateOperationsInput | boolean
-    impact?: NullableStringFieldUpdateOperationsInput | string | null
-    intent?: NullableStringFieldUpdateOperationsInput | string | null
     finalAnalysis?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10967,8 +10875,6 @@ export namespace Prisma {
     timeline?: CaseUpdatetimelineInput | string[]
     evidence?: BoolFieldUpdateOperationsInput | boolean
     agreement?: BoolFieldUpdateOperationsInput | boolean
-    impact?: NullableStringFieldUpdateOperationsInput | string | null
-    intent?: NullableStringFieldUpdateOperationsInput | string | null
     finalAnalysis?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10986,8 +10892,6 @@ export namespace Prisma {
     timeline?: CaseUpdatetimelineInput | string[]
     evidence?: BoolFieldUpdateOperationsInput | boolean
     agreement?: BoolFieldUpdateOperationsInput | boolean
-    impact?: NullableStringFieldUpdateOperationsInput | string | null
-    intent?: NullableStringFieldUpdateOperationsInput | string | null
     finalAnalysis?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string

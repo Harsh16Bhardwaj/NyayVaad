@@ -141,8 +141,6 @@ exports.Prisma.CaseScalarFieldEnum = {
   timeline: 'timeline',
   evidence: 'evidence',
   agreement: 'agreement',
-  impact: 'impact',
-  intent: 'intent',
   finalAnalysis: 'finalAnalysis',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
