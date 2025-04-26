@@ -98,7 +98,7 @@ const Footer = () => {
   }, []);
 
   return (
-    <div className="mt-10">
+    <div className="mt-0">
         <div className="w-full h-1 bg-white"></div>
       <motion.footer
         className="bg-[#1b0020] relative py-12 px-6 "

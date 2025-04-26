@@ -48,7 +48,7 @@ export default function RootLayout({
     >
       <html lang="en">
         <body
-          className={`${poppins.variable} ${josefinSans.variable} antialiased bg-neutral-900`}
+          className={`${poppins.variable} ${josefinSans.variable} antialiased bg-neutral-950`}
         >
           <Header />
           {children}

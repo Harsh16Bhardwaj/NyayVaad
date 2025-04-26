@@ -208,53 +208,6 @@ export default function FunPage() {
           </div>
         </div>
 
-        {/* Additional Resources Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-8 border border-purple-800/30 shadow-lg"
-        >
-          <h2 className="text-2xl font-semibold text-gray-100 font-[var(--font-inter)] mb-6">Legal Resources</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-100 font-[var(--font-inter)] mb-2">Indian Kanoon</h3>
-              <p className="text-sm text-gray-400 font-[var(--font-inter)] mb-4">
-                Access Indian court judgments, statutes, and legal documents to support your case research.
-              </p>
-              <Link href="https://indiankanoon.org" target="_blank" className="text-indigo-400 text-sm flex items-center hover:text-indigo-300">
-                Visit Indian Kanoon <ExternalLink className="w-4 h-4 ml-1" />
-              </Link>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-100 font-[var(--font-inter)] mb-2">Consumer Protection Act</h3>
-              <p className="text-sm text-gray-400 font-[var(--font-inter)] mb-4">
-                Understand your rights under the Consumer Protection Act, 2019, for disputes like faulty services.
-              </p>
-              <Link href="https://indiankanoon.org/doc/123456/" target="_blank" className="text-indigo-400 text-sm flex items-center hover:text-indigo-300">
-                Read the Act <ExternalLink className="w-4 h-4 ml-1" />
-              </Link>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-100 font-[var(--font-inter)] mb-2">Legal Aid Services</h3>
-              <p className="text-sm text-gray-400 font-[var(--font-inter)] mb-4">
-                Discover free or low-cost legal aid services across India for case support.
-              </p>
-              <Link href="https://nalsa.gov.in" target="_blank" className="text-indigo-400 text-sm flex items-center hover:text-indigo-300">
-                Explore Legal Aid <ExternalLink className="w-4 h-4 ml-1" />
-              </Link>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-100 font-[var(--font-inter)] mb-2">San Sam</h3>
-              <p className="text-sm text-gray-400 font-[var(--font-inter)] mb-4">
-                Visit our partner site for advanced legal research tools and resources.
-              </p>
-              <Link href="https://harsh16bhardwaj.github.io/San_Sam/" target="_blank" className="text-indigo-400 text-sm flex items-center hover:text-indigo-300">
-                Visit San Sam <ExternalLink className="w-4 h-4 ml-1" />
-              </Link>
-            </div>
-          </div>
-        </motion.div>
 
         {/* Website Showcase Section */}
         <motion.div
@@ -442,6 +395,53 @@ export default function FunPage() {
           </div>
         </motion.div>
 
+                {/* Additional Resources Section */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.4 }}
+                  className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-8 border border-purple-800/30 shadow-lg"
+                >
+                  <h2 className="text-2xl font-semibold text-gray-100 font-[var(--font-inter)] mb-6">Legal Resources</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-100 font-[var(--font-inter)] mb-2">Indian Kanoon</h3>
+                      <p className="text-sm text-gray-400 font-[var(--font-inter)] mb-4">
+                        Access Indian court judgments, statutes, and legal documents to support your case research.
+                      </p>
+                      <Link href="https://indiankanoon.org" target="_blank" className="text-indigo-400 text-sm flex items-center hover:text-indigo-300">
+                        Visit Indian Kanoon <ExternalLink className="w-4 h-4 ml-1" />
+                      </Link>
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-100 font-[var(--font-inter)] mb-2">Consumer Protection Act</h3>
+                      <p className="text-sm text-gray-400 font-[var(--font-inter)] mb-4">
+                        Understand your rights under the Consumer Protection Act, 2019, for disputes like faulty services.
+                      </p>
+                      <Link href="https://indiankanoon.org/doc/123456/" target="_blank" className="text-indigo-400 text-sm flex items-center hover:text-indigo-300">
+                        Read the Act <ExternalLink className="w-4 h-4 ml-1" />
+                      </Link>
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-100 font-[var(--font-inter)] mb-2">Legal Aid Services</h3>
+                      <p className="text-sm text-gray-400 font-[var(--font-inter)] mb-4">
+                        Discover free or low-cost legal aid services across India for case support.
+                      </p>
+                      <Link href="https://nalsa.gov.in" target="_blank" className="text-indigo-400 text-sm flex items-center hover:text-indigo-300">
+                        Explore Legal Aid <ExternalLink className="w-4 h-4 ml-1" />
+                      </Link>
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-100 font-[var(--font-inter)] mb-2">San Sam</h3>
+                      <p className="text-sm text-gray-400 font-[var(--font-inter)] mb-4">
+                        Visit our partner site for advanced legal research tools and resources.
+                      </p>
+                      <Link href="https://harsh16bhardwaj.github.io/San_Sam/" target="_blank" className="text-indigo-400 text-sm flex items-center hover:text-indigo-300">
+                        Visit San Sam <ExternalLink className="w-4 h-4 ml-1" />
+                      </Link>
+                    </div>
+                  </div>
+                </motion.div>
         {/* Term Detail Modal */}
         <AnimatePresence>
           {selectedTerm && (

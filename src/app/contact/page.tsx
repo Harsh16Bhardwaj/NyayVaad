@@ -158,7 +158,7 @@ const ContactPage = () => {
           className="text-5xl md:text-5xl decoration-2  underline-offset-4 font-extrabold text-center mb-12 bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-indigo-500 ]"
         >
           Got an Issue?
-          <span className='text-white text-lg'>We have you covered</span>
+          <span className='text-white text-2xl ml-2'>We have you covered</span>
         </motion.h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -306,10 +306,14 @@ const ContactPage = () => {
             <p className="text-sm text-gray-400 mb-6 font-[var(--font-inter)] text-center">
               Reach out to us through any of our social channels or visit our office in Delhi.
             </p>
-            <div className="relative w-full h-80 flex items-center justify-center">
+
+            
+
+            {/* Social Media Constellation */}
+            <div className="relative w-full h-80 flex items-center justify-center mb-8">
               {/* Central Node */}
               <motion.div
-                className="absolute w-16 h-16 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full flex items-center justify-center text-sm font-semibold font-[var(--font-inter)] border-2 border-white/20"
+                className="absolute w-16 h-16 text-xs bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full flex items-center justify-center font-semibold font-[var(--font-inter)] border-2 border-white/20"
                 animate={{ scale: [1, 1.1, 1], opacity: [0.8, 1, 0.8] }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
@@ -368,6 +372,56 @@ const ContactPage = () => {
                 </motion.a>
               ))}
             </div>
+
+            {/* Office Information */}
+            <div className="w-full mb-8 p-4 bg-gray-800/50 rounded-xl border border-indigo-500/20">
+              <h3 className="text-lg font-semibold text-white mb-3 font-[var(--font-inter)]">Our Office</h3>
+              <div className="space-y-2">
+                <p className="text-gray-300 text-sm flex items-center">
+                  <span className="w-5 h-5 mr-2 flex items-center justify-center bg-indigo-500/20 rounded-full">
+                    📍
+                  </span>
+                  123 Legal Avenue, Connaught Place, New Delhi - 110001
+                </p>
+                <p className="text-gray-300 text-sm flex items-center">
+                  <span className="w-5 h-5 mr-2 flex items-center justify-center bg-indigo-500/20 rounded-full">
+                    🕒
+                  </span>
+                  Mon-Fri: 9:00 AM - 6:00 PM
+                </p>
+                <p className="text-gray-300 text-sm flex items-center">
+                  <span className="w-5 h-5 mr-2 flex items-center justify-center bg-indigo-500/20 rounded-full">
+                    📞
+                  </span>
+                  +91 1234567890
+                </p>
+              </div>
+            </div>
+
+            {/* Quick Contact Form */}
+            <div className="w-full p-4 bg-gray-800/50 rounded-xl border border-indigo-500/20">
+              <h3 className="text-lg font-semibold text-white mb-3 font-[var(--font-inter)]">Quick Message</h3>
+              <form className="space-y-3">
+                <input
+                  type="text"
+                  placeholder="Your name"
+                  className="w-full p-2 bg-gray-700/50 border border-gray-600/50 rounded-lg text-white placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+                <textarea
+                  placeholder="Your message"
+                  rows={3}
+                  className="w-full p-2 bg-gray-700/50 border border-gray-600/50 rounded-lg text-white placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+                <button
+                  type="submit"
+                  className="w-full py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold text-sm hover:from-indigo-500 hover:to-purple-500 transition-all"
+                >
+                  Send Quick Message
+                </button>
+              </form>
+            </div>
+
+          
           </motion.div>
         </div>
       </div>
