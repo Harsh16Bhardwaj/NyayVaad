@@ -15,7 +15,7 @@ const initialCaseData: CaseData = {
   evidence: null,
   agreements_pre_steps: null,
   impact_intent: null,
-  output: false, // Added output field
+  output: false, 
 };
 
 export default function ChatPage() {

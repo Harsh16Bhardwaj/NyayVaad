@@ -32,7 +32,7 @@ interface Todo {
   title: string;
   description: string;
   deadline: Date;
-  status: 'pending' | 'in-progress' | 'done';
+  status: 'pending' | 'ongoing' | 'done';
   subtasks?: Subtask[];
 }
 
@@ -71,7 +71,25 @@ export default function DashboardPage() {
       title: 'Gather Property Documents',
       description: 'Collect all relevant property ownership papers',
       deadline: new Date('2024-03-20'),
-      status: 'in-progress',
+      status: 'ongoing',
+    },
+    {
+      id: '3',
+      title: 'Hire a Property Lawyer',
+      description: 'Find and consult with a property dispute specialist',
+      deadline: new Date('2024-03-15'),
+      status: 'pending',
+      subtasks: [
+        { id: '1-1', title: 'Research local property lawyers', completed: false },
+        { id: '1-2', title: 'Schedule initial consultations', completed: false },
+      ]
+    },
+    {
+      id: '4',
+      title: 'Gather Property Documents',
+      description: 'Collect all relevant property ownership papers',
+      deadline: new Date('2024-03-20'),
+      status: 'ongoing',
     }
   ]);
 
@@ -247,7 +265,7 @@ export default function DashboardPage() {
                           variant="outline"
                           size="sm"
                           onClick={handleAddTodo}
-                          className="bg-transparent border-purple-500/30 text-purple-400 hover:bg-purple-500/10 hover:text-purple-300"
+                          className="bg-transparent border-purple-500/30 cursor-pointer text-purple-400 hover:bg-purple-500/10 hover:text-purple-300"
                         >
                           <Plus className="w-4 h-4 mr-2" />
                           Add Task
@@ -286,7 +304,7 @@ export default function DashboardPage() {
                       <h2 className="text-xl font-semibold text-white font-[var(--font-josefin-sans)]">Case Summary</h2>
                       <Button
                         variant="outline"
-                        className="bg-transparent border-purple-500/30 text-purple-400 hover:bg-purple-500/10 hover:text-purple-300"
+                        className="bg-gradient-to-r from-[#610010] to-[#6d0113] via-[#b9132f] border-gray-500/30 cursor-pointer text-gray-300 hover:bg-purple-500/10 hover:text-white hover:scale-102 hover:shadow-lg hover:shadow-gray-500/20 hover:shadow-inner hover:duration-200  duration-150 ease-in-out"
                       >
                         <Download className="w-4 h-4 mr-2" />
                         Download Summary
@@ -331,7 +349,22 @@ export default function DashboardPage() {
 
                 {/* Right Column - Case Progress and Legal Word */}
                 <div className="space-y-8">
-                  {/* Case Progress */}
+                  {/* CTA*/}
+                  <div className="bg-gradient-to-tr from-[#0F2027] to-[##2C5364] via-[#203A43] backdrop-blur-sm flex flex-col items-center justify-center rounded-xl p-6 border border-white/5">
+                    <h2 className="text-xl text-left font-semibold text-white font-[var(--font-josefin-sans)] mb-1">Start A Conversation Now</h2>
+                    <p className="text-sm text-center text-neutral-400 font-[var(--font-inter)] mb-2">
+                      Get Solution to your legal problems within minutes.
+                    </p>
+                    <Button
+                      variant="outline"
+                      className="bg-transparent mt-2 bg-gradient-to-r border-0 from-[#610010] to-[#6d0113] via-[#b9132f]  text-gray-200 hover:bg-purple-500/10 hover:text-white cursor-pointer hover:scale-102 hover:shadow-lg hover:shadow-gray-500/20 hover:shadow-inner hover:duration-200  duration-150 ease-in-out"
+                    >
+                      <MessageSquare className="w-4 h-4 mr-2" />
+                      Start Conversation
+                    </Button>
+                  </div>
+
+
                   <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/5">
                     <h2 className="text-xl font-semibold text-white font-[var(--font-josefin-sans)] mb-4">Case Progress</h2>
                     <div className="space-y-4">
@@ -398,10 +431,11 @@ export default function DashboardPage() {
                   </div>
 
                   {/* Legal Word of the Day */}
-                  <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/5">
+                  <Link href="/fun">
+                  <div className="bg-gradient-to-r from-[#0F2027] to-[##2C5364] via-[#203A43] backdrop-blur-sm rounded-xl p-6 border border-white/5">
                     <div className="flex items-center space-x-3 mb-4">
-                      <BookOpen className="w-6 h-6 text-purple-400" />
-                      <h2 className="text-xl font-semibold text-white font-[var(--font-josefin-sans)]">Legal Word of the Day</h2>
+                      <BookOpen className="w-6 h-6 text-gray-400" />
+                      <h2 className="text-xl font-semibold font-semibold text-white font-[var(--font-josefin-sans)]">Legal Word of the Day</h2>
                     </div>
                     <div className="space-y-2">
                       <h3 className="text-lg text-purple-400 font-[var(--font-space)]">Estoppel</h3>
@@ -410,6 +444,7 @@ export default function DashboardPage() {
                       </p>
                     </div>
                   </div>
+                  </Link>
                 </div>
               </div>
             </div>

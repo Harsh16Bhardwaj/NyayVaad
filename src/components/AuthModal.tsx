@@ -136,7 +136,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         <div className="space-y-6">
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
             <SignInButton mode="modal">
-              <button className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300">
+              <button className="w-full cursor-pointer bg-gradient-to-r duration-100 ease-in-out from-purple-900 via-purple-700 to-indigo-900 hover:from-purple-900 hover:via-purple-700 hover:to-indigo-900 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300">
                 Sign In
               </button>
             </SignInButton>
@@ -153,7 +153,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
             <SignUpButton mode="modal">
-              <button className="w-full border border-purple-600 text-purple-400 hover:bg-purple-600/20 font-medium py-3 px-4 rounded-lg transition-all duration-300">
+              <button className="w-full cursor-pointer border border-purple-600 text-purple-400 hover:bg-purple-600/20 font-medium py-3 px-4 rounded-lg transition-all duration-300">
                 Create Account
               </button>
             </SignUpButton>

@@ -8,12 +8,12 @@ export default function AuthButtons() {
     <div className="flex items-center gap-4">
       {!isSignedIn ? (
         <>
-          <SignInButton mode="modal">
+          <SignInButton mode="modal" forceRedirectUrl='/dashboard' >
             <button className="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
               Sign In
             </button>
           </SignInButton>
-          <SignUpButton mode="modal">
+          <SignUpButton mode="modal" forceRedirectUrl='/onboarding'>
             <button className="px-4 py-2 text-sm font-medium text-purple-600 bg-white rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
               Sign Up
             </button>

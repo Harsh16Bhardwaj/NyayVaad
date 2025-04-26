@@ -6,6 +6,8 @@ import { BookOpen, X, ExternalLink, Sparkles, FileText, Scale, Gavel } from 'luc
 import Image from 'next/image';
 import Link from 'next/link';
 import SanSam from '@/../public/san-sam.png';
+import { Tilt } from 'react-tilt';
+import { ArrowRight } from 'lucide-react';
 
 interface LegalTerm {
   word: string;
@@ -20,8 +22,8 @@ const legalTerms: LegalTerm[] = [
     word: 'Estoppel',
     description: 'A principle preventing someone from contradicting prior actions or statements.',
     usage: [
-      'Estoppel barred the tenant from denying the lease’s validity.',
-      'The court used estoppel to prevent the defendant’s contradictory claim.'
+      'Estoppel barred the tenant from denying the leases validity.',
+      'The court used estoppel to prevent the defendants contradictory claim.'
     ],
     category: 'civil',
     source: 'https://indiankanoon.org/doc/123456/',
@@ -56,9 +58,9 @@ const legalTerms: LegalTerm[] = [
   },
   {
     word: 'Ultra Vires',
-    description: 'Actions beyond one’s legal authority.',
+    description: 'Actions beyond one s legal authority.',
     usage: [
-      'The board’s ultra vires decision was voided.',
+      'The board s ultra vires decision was voided.',
       'The contract was ultra vires and unenforceable.'
     ],
     category: 'corporate',
@@ -77,7 +79,7 @@ const legalTerms: LegalTerm[] = [
     description: 'The right to bring an action or appear in court.',
     usage: [
       'The petitioner lacked locus standi to challenge the law.',
-      'The court confirmed the NGO’s locus standi.'
+      'The court confirmed the NGO s locus standi.'
     ],
     category: 'constitutional',
   },
@@ -133,8 +135,8 @@ export default function FunPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 pt-24 pb-12">
-      <div className="max-w-7xl mx-auto px-4 space-y-16">
+    <div className="min-h-screen bg-gradient-to-r from-[#0a1014] to-[#0c1317] via-[#142030] pt-24 pb-12">
+      <div className="max-w-7xl mx-auto px-4 flex flex-col items-center space-y-16">
         {/* Hero Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -155,22 +157,22 @@ export default function FunPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-8 border border-purple-800/30 shadow-lg"
+          className="bg-gradient-to-br from-[#0F2027] to-[##2C5364] via-[#203A43] w-1/2 backdrop-blur-sm rounded-2xl p-8 border border-gray-300/30 shadow-lg"
         >
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-semibold text-gray-100 font-[var(--font-inter)] flex items-center">
-              <Sparkles className="w-6 h-6 mr-2 text-purple-400" />
+              <Sparkles className="w-6 h-6 mr-2 text-gray-400" />
               Word of the Day
             </h2>
             <span className="text-gray-500 text-sm font-[var(--font-inter)]">
               {new Date().toLocaleDateString()}
             </span>
           </div>
-          <h3 className="text-3xl font-bold text-purple-400 font-[var(--font-inter)] mb-4">
+          <h3 className="text-4xl font-bold text-red-400 font-[var(--font-inter)] mb-2">
             {wordOfTheDay.word}
           </h3>
           <p className="text-gray-300 mb-6 font-[var(--font-inter)]">{wordOfTheDay.description}</p>
-          <div className="space-y-3">
+          <div className="space-y-1">
             {wordOfTheDay.usage.map((example, index) => (
               <p key={index} className="text-sm text-gray-400 italic font-[var(--font-inter)]">
                 "{example}"
@@ -178,8 +180,8 @@ export default function FunPage() {
             ))}
           </div>
           {wordOfTheDay.source && (
-            <Link href={wordOfTheDay.source} target="_blank" className="text-indigo-400 text-sm flex items-center mt-4 hover:text-indigo-300">
-              Learn more on Indian Kanoon <ExternalLink className="w-4 h-4 ml-1" />
+            <Link href="https://harsh16bhardwaj.github.io/San_Sam/Judiciary.html" target="_blank" className="text-red-200   text-sm flex items-center mt-5 hover:text-indigo-300">
+              Learn more on San-Sam Website <ExternalLink className="w-4 h-4 ml-1" />
             </Link>
           )}
         </motion.div>
@@ -250,6 +252,157 @@ export default function FunPage() {
               <Link href="https://harsh16bhardwaj.github.io/San_Sam/" target="_blank" className="text-indigo-400 text-sm flex items-center hover:text-indigo-300">
                 Visit San Sam <ExternalLink className="w-4 h-4 ml-1" />
               </Link>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Website Showcase Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.8 }}
+          className="w-full bg-gray-900/50 backdrop-blur-sm rounded-2xl p-8 border border-purple-800/30 shadow-lg"
+        >
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-3xl text-gray-200 font-bold  flex items-center">
+              <Sparkles className="w-6 h-6 mr-2 text-gray-400" />
+              Explore More Legal Fun
+            </h2>
+            <Link 
+              href="https://harsh16bhardwaj.github.io/San_Sam/" 
+              target="_blank"
+              className="text-indigo-400 text-sm flex items-center hover:text-indigo-300 transition-colors"
+            >
+              Visit Website <ExternalLink className="w-4 h-4 ml-1" />
+            </Link>
+          </div>
+
+          <div className="flex flex-col gap-y-6">
+            <Tilt
+              className="Tilt flex justify-center items-center my-3"
+              options={{ 
+                max: 15, 
+                scale: 1.02, 
+                speed: 300,
+                transition: true,
+                easing: "cubic-bezier(.03,.98,.52,.99)",
+                perspective: 1000,
+                reset: true
+              }}
+            >
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                className="relative w-4/5 group rounded-xl overflow-hidden border border-purple-500/20"
+              >
+                <Image
+                  src={SanSam}
+                  alt="San Sam Legal Website"
+                  className="h-auto transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="absolute bottom-0 left-0 right-0 p-6">
+                    <h3 className="text-xl font-semibold text-white mb-2">San Sam Legal</h3>
+                    <p className="text-gray-300 text-sm mb-4">
+                      A comprehensive legal platform with interactive tools, case studies, and legal resources.
+                    </p>
+                    <div className="flex items-center space-x-4">
+                      <span className="text-purple-400 text-sm">Interactive Tools</span>
+                      <span className="text-blue-400 text-sm">Case Studies</span>
+                      <span className="text-teal-400 text-sm">Legal Resources</span>
+                    </div>
+                    <Link 
+                      href="https://harsh16bhardwaj.github.io/San_Sam/" 
+                      target="_blank"
+                      className="absolute bottom-6 right-6 bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-purple-700 transition-colors"
+                    >
+                      <span>Visit Now</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </div>
+                </div>
+              </motion.div>
+            </Tilt>
+
+            <div className="flex gap-x-4">
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.9 }}
+                className="bg-gray-800/50 w-1/3 rounded-xl p-6 border border-purple-500/20"
+              >
+                <h3 className="text-lg font-semibold text-white mb-3">Key Features</h3>
+                <ul className="space-y-3">
+                  <li className="flex items-center space-x-2 text-gray-300">
+                    <div className="w-2 h-2 rounded-full bg-purple-500" />
+                    <span>Interactive Legal Tools</span>
+                  </li>
+                  <li className="flex items-center space-x-2 text-gray-300">
+                    <div className="w-2 h-2 rounded-full bg-blue-500" />
+                    <span>Comprehensive Case Studies</span>
+                  </li>
+                  <li className="flex items-center space-x-2 text-gray-300">
+                    <div className="w-2 h-2 rounded-full bg-teal-500" />
+                    <span>Legal Document Templates</span>
+                  </li>
+                  <li className="flex items-center space-x-2 text-gray-300">
+                    <div className="w-2 h-2 rounded-full bg-indigo-500" />
+                    <span>Legal News & Updates</span>
+                  </li>
+                  <li className="flex items-center space-x-2 text-gray-300">
+                    <div className="w-2 h-2 rounded-full bg-amber-500" />
+                    <span>AI-Powered Legal Research</span>
+                  </li>
+                </ul>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 1 }}
+                className="bg-gray-800/50 w-1/3 rounded-xl p-6 border border-purple-500/20"
+              >
+                <h3 className="text-lg font-semibold text-white mb-3">Why Visit?</h3>
+                <p className="text-gray-300 text-sm mb-4">
+                  San Sam Legal provides a unique blend of educational content and practical tools for both legal professionals and individuals seeking legal knowledge.
+                </p>
+                <ul className="space-y-2">
+                  <li className="text-gray-300 text-sm">✓ Expert-curated legal resources</li>
+                  <li className="text-gray-300 text-sm">✓ Real-world case analysis</li>
+                  <li className="text-gray-300 text-sm">✓ Step-by-step legal guides</li>
+                  <li className="text-gray-300 text-sm">✓ Community discussions</li>
+                </ul>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 1.1 }}
+                className="bg-gray-800/50 w-1/3 rounded-xl p-6 border border-purple-500/20"
+              >
+                <h3 className="text-lg font-semibold text-white mb-3">Learning Resources</h3>
+                <ul className="space-y-3">
+                  <li className="flex items-center space-x-2 text-gray-300">
+                    <div className="w-2 h-2 rounded-full bg-green-500" />
+                    <span>Legal Terminology Guide</span>
+                  </li>
+                  <li className="flex items-center space-x-2 text-gray-300">
+                    <div className="w-2 h-2 rounded-full bg-pink-500" />
+                    <span>Court Procedure Tutorials</span>
+                  </li>
+                  <li className="flex items-center space-x-2 text-gray-300">
+                    <div className="w-2 h-2 rounded-full bg-orange-500" />
+                    <span>Legal Writing Tips</span>
+                  </li>
+                  <li className="flex items-center space-x-2 text-gray-300">
+                    <div className="w-2 h-2 rounded-full bg-cyan-500" />
+                    <span>Case Analysis Framework</span>
+                  </li>
+                  <li className="flex items-center space-x-2 text-gray-300">
+                    <div className="w-2 h-2 rounded-full bg-yellow-500" />
+                    <span>Legal Research Methods</span>
+                  </li>
+                </ul>
+              </motion.div>
             </div>
           </div>
         </motion.div>
@@ -327,8 +480,8 @@ export default function FunPage() {
                   ))}
                 </div>
                 {selectedTerm.source && (
-                  <Link href={selectedTerm.source} target="_blank" className="text-indigo-400 text-sm flex items-center mt-4 hover:text-indigo-300">
-                    Learn more on Indian Kanoon <ExternalLink className="w-4 h-4 ml-1" />
+                  <Link href="https://harsh16bhardwaj.github.io/San_Sam/Judiciary.html" target="_blank" className="text-indigo-400 text-sm flex items-center mt-4 hover:text-indigo-300">
+                    Learn more on San-Sam Website <ExternalLink className="w-4 h-4 ml-1" />
                   </Link>
                 )}
               </motion.div>
