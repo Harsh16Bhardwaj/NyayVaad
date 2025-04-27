@@ -4,8 +4,15 @@ export interface Todo {
   id: string;
   title: string;
   description: string;
-  deadline: Date;
-  status: 'pending' | 'ongoing' | 'done';
+  dueAt: Date;
+  status: 'PENDING' | 'ONGOING' | 'DONE';
+  caseId: string;
+  case?: {
+    id: string;
+    title: string;
+    description: string;
+  };
+  createdAt: Date;
   subtasks?: {
     id: string;
     title: string;

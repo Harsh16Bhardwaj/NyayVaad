@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@/generated/prisma';
 import { extractSections } from './extractSections';
 
 const prisma = new PrismaClient();
@@ -111,9 +111,8 @@ export async function POST(request: Request) {
         processedDocs.push({
           docId: existingDoc.docId,
           title: existingDoc.title,
-          aiSummary: existingDoc.aiSummary,
         });
-        continue; // Skip to next document
+        continue;
       }
 
       // Fetch document content from Indian Kanoon
@@ -174,13 +173,13 @@ export async function POST(request: Request) {
         continue; // Skip to next document
       }
 
-      const { docId: summaryDocId, title: summaryTitle, aiSummary } = summaryResponse;
-      console.log("[18] Backend - Parsed summary:", { summaryDocId, summaryTitle });
+      const {  title: summaryTitle, aiSummary } = summaryResponse;
+      console.log("[18] Backend - Parsed summary:", { docId, summaryTitle });
 
       // Step 5: Save to Prisma database
       try {
         const savedDoc = await prisma.extractedDoc.upsert({
-          where: { docId: summaryDocId },
+          where: { docId: docId },
           update: {
             title: summaryTitle,
             rawContent,
@@ -188,7 +187,7 @@ export async function POST(request: Request) {
             caseId,
           },
           create: {
-            docId: summaryDocId,
+            docId: docId,
             title: summaryTitle,
             rawContent,
             aiSummary,
@@ -196,7 +195,7 @@ export async function POST(request: Request) {
           },
         });
         console.log("[19] Backend - Saved document to database:", savedDoc);
-        processedDocs.push({ docId: summaryDocId, title: summaryTitle, aiSummary });
+        processedDocs.push({ docId: docId, title: summaryTitle, aiSummary });
       } catch (prismaError) {
         console.error("[20] Backend - Prisma save error:", prismaError);
         continue; // Skip to next document

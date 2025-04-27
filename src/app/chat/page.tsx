@@ -3,9 +3,14 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
-import { Scale, Sparkles, RefreshCw } from 'lucide-react';
+import { Scale, Sparkles, RefreshCw, CheckCircle2, X, Download } from 'lucide-react';
 import { ChatMessage } from '@/types/case';
 import ProtectedPage from '@/components/ProtectedPage';
+import { Button } from "@/components/ui/button";
+import { useDispatch } from 'react-redux';
+import { addTodo } from '@/app/store/slices/todoSlice';
+import { AppDispatch } from '@/app/store';
+import jsPDF from 'jspdf';
 
 type CaseData = {
   description: string | null;
@@ -13,6 +18,37 @@ type CaseData = {
   timeline: string[] | null;
   evidence: boolean | null;
   agreement: boolean | null;
+};
+
+type ConclusionData = {
+  caseFinalAnalysis: {
+    userCaseSummary: string;
+    lawsInvolved: string[];
+    relevantCaseDetails: Array<{
+      title: string;
+      caseBrief: string;
+      lawsAssessed: string[];
+      courtReasoning: string[];
+      conclusion: string;
+    }>;
+    learnings: string[];
+    utilization: string[];
+    actionPlan: Array<{
+      step: string;
+      priority: string;
+      resource?: string;
+    }>;
+    primaryRecommendation: string;
+    risksAndMitigations: Array<{
+      risk: string;
+      mitigation: string;
+    }>;
+    longTermStrategy: string[];
+  };
+  todos: Array<{
+    title: string;
+    description: string;
+  }>;
 };
 
 const initialCaseData: CaseData = {
@@ -33,6 +69,9 @@ export default function ChatPage() {
   const [sessionId] = useState<string>(`user_${Date.now()}`);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isAnalysisEnabled, setIsAnalysisEnabled] = useState(false);
+  const [isConcluding, setIsConcluding] = useState(false);
+  const [conclusionData, setConclusionData] = useState<ConclusionData | null>(null);
+  const dispatch = useDispatch<AppDispatch>();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -118,6 +157,24 @@ export default function ChatPage() {
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, aiMessage]);
+
+      for (const todo of data.todos) {
+        const backendResponse = await fetch('/api/todos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: todo.title,
+            description: todo.description,
+            deadline: new Date(),
+            status: 'pending',
+          }),
+        });
+
+        if (backendResponse.ok) {
+          const createdTodo = await backendResponse.json();
+          dispatch(addTodo(createdTodo));
+        }
+      }
     } catch (error) {
       setMessages((prev) => [
         ...prev,
@@ -156,7 +213,6 @@ export default function ChatPage() {
         },
       });
 
-      // Case Summary
       setMessages((prev) => [
         ...prev,
         {
@@ -167,7 +223,6 @@ export default function ChatPage() {
         },
       ]);
 
-      // Relevant Laws
       if (data.lawsInvolved?.length) {
         setMessages((prev) => [
           ...prev,
@@ -184,7 +239,7 @@ export default function ChatPage() {
                       <h4 class="text-white font-medium">${law.name}</h4>
                       <p class="text-gray-300 text-sm mt-1">${law.description}</p>
                     </div>
-                  `
+                  `,
                     )
                     .join('')}
                 </div>
@@ -196,7 +251,6 @@ export default function ChatPage() {
         ]);
       }
 
-      // Action Plan
       if (data.todos?.length) {
         setMessages((prev) => [
           ...prev,
@@ -211,9 +265,9 @@ export default function ChatPage() {
                       (todo: any) => `
                     <div class="bg-white/5 p-3 rounded-lg">
                       <h4 class="text-white font-medium">${todo.title}</h4>
-                      <p class="text-gray-300 text-sm mt-1">${todo.description}</p>
+                      <p className="text-gray-300 text-sm mt-1">${todo.description}</p>
                     </div>
-                  `
+                  `,
                     )
                     .join('')}
                 </div>
@@ -242,12 +296,196 @@ export default function ChatPage() {
   const handleReset = () => {
     setCaseData(initialCaseData);
     setMessages([]);
+    setConclusionData(null);
+  };
+
+  const handleConclude = async () => {
+    setIsConcluding(true);
+    try {
+      const response = await fetch('/api/chat/conclude', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ caseData: messages }),
+      });
+      const data = await response.json();
+      setConclusionData(data);
+
+      for (const todo of data.todos) {
+        const backendResponse = await fetch('/api/todos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: todo.title,
+            description: todo.description,
+            deadline: new Date(),
+            status: 'pending',
+          }),
+        });
+
+        if (backendResponse.ok) {
+          const createdTodo = await backendResponse.json();
+          dispatch(addTodo(createdTodo));
+        }
+      }
+    } catch (error) {
+      console.error('Error concluding case:', error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: (Date.now() + 1).toString(),
+          content: 'Error concluding case. Please try again.',
+          sender: 'ai',
+          timestamp: new Date(),
+        },
+      ]);
+    } finally {
+      setIsConcluding(false);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setConclusionData(null);
+  };
+
+  const handleDownloadPDF = () => {
+    if (!conclusionData) return;
+
+    const doc = new jsPDF();
+    let yOffset = 20;
+
+    const addText = (text: string, x: number, y: number, size: number, isBold = false) => {
+      doc.setFontSize(size);
+      doc.setFont('helvetica', isBold ? 'bold' : 'normal');
+      doc.text(text, x, y);
+      return y + size * 0.5;
+    };
+
+    const addSection = (title: string, items: string[], x: number, startY: number) => {
+      yOffset = addText(title, x, startY, 14, true);
+      items.forEach((item) => {
+        const splitText = doc.splitTextToSize(item, 180);
+        splitText.forEach((line: string) => {
+          if (yOffset > 280) {
+            doc.addPage();
+            yOffset = 20;
+          }
+          yOffset = addText(line, x + 5, yOffset, 10);
+        });
+        yOffset += 2;
+      });
+      return yOffset;
+    };
+
+    doc.setFontSize(16);
+    doc.text('Case Analysis Report', 20, yOffset);
+    yOffset += 10;
+
+    yOffset = addText('Case Summary', 20, yOffset, 14, true);
+    const summaryLines = doc.splitTextToSize(conclusionData.caseFinalAnalysis.userCaseSummary, 170);
+    summaryLines.forEach((line: string) => {
+      if (yOffset > 280) {
+        doc.addPage();
+        yOffset = 20;
+      }
+      yOffset = addText(line, 25, yOffset, 10);
+    });
+    yOffset += 5;
+
+    yOffset = addSection('Laws Involved', conclusionData.caseFinalAnalysis.lawsInvolved, 20, yOffset);
+
+    conclusionData.caseFinalAnalysis.relevantCaseDetails.forEach((detail) => {
+      yOffset = addText(detail.title, 20, yOffset, 12, true);
+      yOffset = addText('Case Brief:', 25, yOffset, 10, true);
+      const briefLines = doc.splitTextToSize(detail.caseBrief, 160);
+      briefLines.forEach((line: string) => {
+        if (yOffset > 280) {
+          doc.addPage();
+          yOffset = 20;
+        }
+        yOffset = addText(line, 30, yOffset, 10);
+      });
+      yOffset = addSection('Laws Assessed', detail.lawsAssessed, 25, yOffset);
+      yOffset = addSection('Court Reasoning', detail.courtReasoning, 25, yOffset);
+      yOffset = addText('Conclusion:', 25, yOffset, 10, true);
+      const conclusionLines = doc.splitTextToSize(detail.conclusion, 160);
+      conclusionLines.forEach((line: string) => {
+        if (yOffset > 280) {
+          doc.addPage();
+          yOffset = 20;
+        }
+        yOffset = addText(line, 30, yOffset, 10);
+      });
+      yOffset += 5;
+    });
+
+    yOffset = addSection('Learnings', conclusionData.caseFinalAnalysis.learnings, 20, yOffset);
+    yOffset = addSection('Utilization', conclusionData.caseFinalAnalysis.utilization, 20, yOffset);
+
+    yOffset = addText('Action Plan', 20, yOffset, 14, true);
+    conclusionData.caseFinalAnalysis.actionPlan.forEach((step) => {
+      if (yOffset > 280) {
+        doc.addPage();
+        yOffset = 20;
+      }
+      yOffset = addText(step.step, 25, yOffset, 10);
+      if (step.resource) {
+        yOffset = addText(`Resource: ${step.resource}`, 30, yOffset, 10);
+      }
+      yOffset = addText(`Priority: ${step.priority}`, 30, yOffset, 10);
+      yOffset += 2;
+    });
+
+    yOffset = addText('Primary Recommendation', 20, yOffset, 14, true);
+    const recLines = doc.splitTextToSize(conclusionData.caseFinalAnalysis.primaryRecommendation, 170);
+    recLines.forEach((line: string) => {
+      if (yOffset > 280) {
+        doc.addPage();
+        yOffset = 20;
+      }
+      yOffset = addText(line, 25, yOffset, 10);
+    });
+    yOffset += 5;
+
+    yOffset = addText('Risks and Mitigations', 20, yOffset, 14, true);
+    conclusionData.caseFinalAnalysis.risksAndMitigations.forEach((item) => {
+      if (yOffset > 280) {
+        doc.addPage();
+        yOffset = 20;
+      }
+      yOffset = addText(`Risk: ${item.risk}`, 25, yOffset, 10);
+      yOffset = addText(`Mitigation: ${item.mitigation}`, 25, yOffset, 10);
+      yOffset += 2;
+    });
+
+    yOffset = addSection('Long Term Strategy', conclusionData.caseFinalAnalysis.longTermStrategy, 20, yOffset);
+
+    yOffset = addText('Todos', 20, yOffset, 14, true);
+    conclusionData.todos.forEach((todo) => {
+      if (yOffset > 280) {
+        doc.addPage();
+        yOffset = 20;
+      }
+      yOffset = addText(todo.title, 25, yOffset, 10, true);
+      const todoLines = doc.splitTextToSize(todo.description, 160);
+      todoLines.forEach((line: string) => {
+        if (yOffset > 280) {
+          doc.addPage();
+          yOffset = 20;
+        }
+        yOffset = addText(line, 30, yOffset, 10);
+      });
+      yOffset += 2;
+    });
+
+    doc.save('case_analysis_report.pdf');
   };
 
   return (
     <ProtectedPage>
       <div className="min-h-screen bg-neutral-900 pt-10">
-        <div className="mx-auto px-2">
+        <div className="mx-auto ">
           <h1 className="text-2xl font-bold text-white flex items-center justify-between">
             Chat
             <motion.button
@@ -260,8 +498,10 @@ export default function ChatPage() {
               <span>Reset Case</span>
             </motion.button>
           </h1>
-          <div className="flex h-[calc(100vh-6rem)] bg-gradient-to-br from-gray-950 to-gray-950">
-            <div className="w-80 bg-black/60 border-r border-white/10 p-4 overflow-y-auto">
+          <div className="flex h-[calc(100vh-5rem)] rounded-xl bg-gradient-to-br  from-gray-950 to-gray-950">
+            <div className="w
+
+-80 bg-black/60 border-r border-white/10 p-4 overflow-y-auto">
               <div className="flex items-center space-x-3 mb-6">
                 <Scale className="w-5 h-5 text-purple-400" />
                 <h2 className="text-lg font-semibold text-white">Case Details</h2>
@@ -304,18 +544,26 @@ export default function ChatPage() {
                       {isAnalysisEnabled ? 'Case ready!' : 'Gathering case info'}
                     </p>
                   </div>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    disabled={!isAnalysisEnabled}
-                    className={`px-4 py-2 rounded-xl font-medium flex items-center space-x-2 ${
-                      isAnalysisEnabled ? 'bg-purple-600 text-white' : 'bg-gray-700 text-gray-400'
-                    }`}
-                    onClick={handleSuperAnalysis}
-                  >
-                    <Sparkles className="w-4 h-4" />
-                    <span>Super Analysis</span>
-                  </motion.button>
+                  <div className="flex justify-end space-x-4 mb-4">
+                    <Button
+                      variant="outline"
+                      className="bg-transparent cursor-pointer border-purple-500/30 text-purple-400 hover:bg-purple-500/10 hover:text-purple-300 transition-all duration-300 group"
+                      onClick={handleSuperAnalysis}
+                      disabled={isLoading}
+                    >
+                      <Sparkles className="w-4 h-4 mr-2 cursor-pointer group-hover:scale-110 transition-transform duration-300" />
+                      {isLoading ? 'Processing...' : 'Start Processing'}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="bg-transparent cursor-pointer border-green-500/30 text-green-400 hover:bg-green-500/10 hover:text-green-300 transition-all duration-300 group"
+                      onClick={handleConclude}
+                      disabled={isConcluding}
+                    >
+                      <CheckCircle2 className="w-4 h-4 mr-2 group-hover:scale-110 cursor-pointer transition-transform duration-300" />
+                      {isConcluding ? 'Analyzing...' : 'Super Analyze'}
+                    </Button>
+                  </div>
                 </div>
               </div>
 
@@ -376,6 +624,207 @@ export default function ChatPage() {
             </div>
           </div>
         </div>
+
+        {/* Modal for Conclusion Data */}
+        <AnimatePresence>
+          {conclusionData && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/70  flex items-center justify-center z-50 p-4"
+            >
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                className="bg-gradient-to-br from-gray-900/90 mt-28 to-gray-800/90 backdrop-blur-md rounded-xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-white/10"
+              >
+                <div className="flex justify-between items-center mb-6 ">
+                  <h2 className="text-2xl font-bold text-white font-[var(--font-josefin-sans)]">Case Analysis Report</h2>
+                  <div className="flex space-x-4">
+                    <Button
+                      onClick={handleDownloadPDF}
+                      className="bg-purple-600 hover:bg-purple-700 cursor-pointer text-white"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Download PDF
+                    </Button>
+                    <button
+                      onClick={handleCloseModal}
+                      className="text-gray-400 hover:text-white transition-colors cursor-pointer hover:scale-105 hover:bg-gray-800/90 rounded-full p-2"
+                    >
+                      <X className="w-6 h-6" />
+                    </button>
+                  </div>
+                </div>
+                <div className="space-y-8">
+                  {/* Case Summary */}
+                  <div className="bg-gray-800/50 rounded-lg p-6">
+                    <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">Case Summary</h3>
+                    <p className="text-gray-300 text-sm">{conclusionData.caseFinalAnalysis.userCaseSummary}</p>
+                  </div>
+
+                  {/* Laws Involved */}
+                  <div className="bg-gray-800/50 rounded-lg p-6">
+                    <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">Laws Involved</h3>
+                    <ul className="space-y-3">
+                      {conclusionData.caseFinalAnalysis.lawsInvolved.map((law, index) => (
+                        <li key={index} className="flex items-start gap-3">
+                          <div className="mt-1.5">
+                            <div className="w-2 h-2 rounded-full bg-purple-500" />
+                          </div>
+                          <p className="text-gray-300 text-sm">{law}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Relevant Case Details */}
+                  <div className="bg-gray-800/50 rounded-lg p-6">
+                    <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">Relevant Case Details</h3>
+                    {conclusionData.caseFinalAnalysis.relevantCaseDetails.map((caseDetail, index) => (
+                      <div key={index} className="mb-6 last:mb-0">
+                        <h4 className="text-lg font-semibold text-purple-400 mb-2">{caseDetail.title}</h4>
+                        <p className="text-gray-300 text-sm mb-4">{caseDetail.caseBrief}</p>
+                        <div className="space-y-4">
+                          <div>
+                            <h5 className="text-sm font-medium text-purple-400 mb-2">Laws Assessed</h5>
+                            <ul className="space-y-2">
+                              {caseDetail.lawsAssessed.map((law, idx) => (
+                                <li key={idx} className="text-gray-300 text-sm">{law}</li>
+                              ))}
+                            </ul>
+                          </div>
+                          <div>
+                            <h5 className="text-sm font-medium text-purple-400 mb-2">Court Reasoning</h5>
+                            <ul className="space-y-2">
+                              {caseDetail.courtReasoning.map((reason, idx) => (
+                                <li key={idx} className="text-gray-300 text-sm">{reason}</li>
+                              ))}
+                            </ul>
+                          </div>
+                          <div>
+                            <h5 className="text-sm font-medium text-purple-400 mb-2">Conclusion</h5>
+                            <p className="text-gray-300 text-sm">{caseDetail.conclusion}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Learnings */}
+                  <div className="bg-gray-800/50 rounded-lg p-6">
+                    <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">Learnings</h3>
+                    <ul className="space-y-3">
+                      {conclusionData.caseFinalAnalysis.learnings.map((learning, index) => (
+                        <li key={index} className="flex items-start gap-3">
+                          <div className="mt-1.5">
+                            <div className="w-2 h-2 rounded-full bg-purple-500" />
+                          </div>
+                          <p className="text-gray-300 text-sm">{learning}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Utilization */}
+                  <div className="bg-gray-800/50 rounded-lg p-6">
+                    <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">Utilization</h3>
+                    <ul className="space-y-3">
+                      {conclusionData.caseFinalAnalysis.utilization.map((util, index) => (
+                        <li key={index} className="flex items-start gap-3">
+                          <div className="mt-1.5">
+                            <div className="w-2 h-2 rounded-full bg-purple-500" />
+                          </div>
+                          <p className="text-gray-300 text-sm">{util}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Action Plan */}
+                  <div className="bg-gray-800/50 rounded-lg p-6">
+                    <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">Action Plan</h3>
+                    <ul className="space-y-4">
+                      {conclusionData.caseFinalAnalysis.actionPlan.map((step, index) => (
+                        <li key={index} className="flex items-start gap-3">
+                          <div className="mt-1.5">
+                            <div className="w-2 h-2 rounded-full bg-purple-500" />
+                          </div>
+                          <div>
+                            <p className="text-gray-300 text-sm">{step.step}</p>
+                            <p className="text-xs text-gray-400 mt-1">Priority: {step.priority}</p>
+                            {step.resource && (
+                              <p className="text-xs text-purple-400 mt-1">{step.resource}</p>
+                            )}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Primary Recommendation */}
+                  <div className="bg-gray-800/50 rounded-lg p-6">
+                    <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">Primary Recommendation</h3>
+                    <p className="text-gray-300 text-sm">{conclusionData.caseFinalAnalysis.primaryRecommendation}</p>
+                  </div>
+
+                  {/* Risks and Mitigations */}
+                  <div className="bg-gray-800/50 rounded-lg p-6">
+                    <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">Risks and Mitigations</h3>
+                    <ul className="space-y-4">
+                      {conclusionData.caseFinalAnalysis.risksAndMitigations.map((item, index) => (
+                        <li key={index} className="flex items-start gap-3">
+                          <div className="mt-1.5">
+                            <div className="w-2 h-2 rounded-full bg-purple-500" />
+                          </div>
+                          <div>
+                            <p className="text-gray-300 text-sm font-medium">Risk: {item.risk}</p>
+                            <p className="text-gray-400 text-sm mt-1">Mitigation: {item.mitigation}</p>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Long Term Strategy */}
+                  <div className="bg-gray-800/50 rounded-lg p-6">
+                    <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">Long Term Strategy</h3>
+                    <ul className="space-y-3">
+                      {conclusionData.caseFinalAnalysis.longTermStrategy.map((strategy, index) => (
+                        <li key={index} className="flex items-start gap-3">
+                          <div className="mt-1.5">
+                            <div className="w-2 h-2 rounded-full bg-purple-500" />
+                          </div>
+                          <p className="text-gray-300 text-sm">{strategy}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Todos */}
+                  <div className="bg-gray-800/50 rounded-lg p-6">
+                    <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">Todos</h3>
+                    <ul className="space-y-4">
+                      {conclusionData.todos.map((todo, index) => (
+                        <li key={index} className="flex items-start gap-3">
+                          <div className="mt-1.5">
+                            <div className="w-2 h-2 rounded-full bg-purple-500" />
+                          </div>
+                          <div>
+                            <p className="text-gray-300 text-sm font-medium">{todo.title}</p>
+                            <p className="text-gray-400 text-sm mt-1">{todo.description}</p>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </ProtectedPage>
   );

@@ -44,8 +44,6 @@ model Case {
   timeline      String[]
   evidence      Boolean
   agreement     Boolean
-  impact        String?
-  intent        String?
   involvedLaws  EnhancedLaw[]
   todos         Todo[]
   extractedDocs ExtractedDoc[]
