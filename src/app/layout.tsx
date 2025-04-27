@@ -5,6 +5,7 @@ import Header from "@/components/header";
 import "./globals.css";
 import { ClerkProvider } from '@clerk/nextjs';
 import { dark } from '@clerk/themes';
+import ReduxProvider from '@/components/ReduxProvider';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -50,9 +51,11 @@ export default function RootLayout({
         <body
           className={`${poppins.variable} ${josefinSans.variable} antialiased bg-neutral-950`}
         >
-          <Header />
-          {children}
-          <Footer />
+          <ReduxProvider>
+            <Header />
+            {children}
+            <Footer />
+          </ReduxProvider>
         </body>
       </html>
     </ClerkProvider>

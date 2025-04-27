@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Calendar, 
@@ -26,161 +26,103 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import ProtectedPage from "@/components/ProtectedPage";
 import CalendarView from '@/components/CalendarView';
-
-interface Todo {
-  id: string;
-  title: string;
-  description: string;
-  deadline: Date;
-  status: 'pending' | 'ongoing' | 'done';
-  subtasks?: Subtask[];
-}
-
-interface Subtask {
-  id: string;
-  title: string;
-  completed: boolean;
-}
-
-interface CaseSummary {
-  id: string;
-  title: string;
-  date: Date;
-  summary: string;
-  legalPoints: string[];
-  fields: string[];
-  advice: string[];
-  nextSteps: string[];
-}
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/app/store';
+import { fetchTodos, addTodo, updateTodo, deleteTodo } from '@/app/store/slices/todoSlice';
+import { fetchCaseSummary } from '@/app/store/slices/caseSummarySlice';
+import { Todo } from '@/app/store/slices/todoSlice';
+import { CaseSummary } from '@/app/store/slices/caseSummarySlice';
 
 export default function DashboardPage() {
-  const [todos, setTodos] = useState<Todo[]>([
-    {
-      id: '1',
-      title: 'Hire a Property Lawyer',
-      description: 'Find and consult with a property dispute specialist',
-      deadline: new Date('2024-03-15'),
-      status: 'pending',
-      subtasks: [
-        { id: '1-1', title: 'Research local property lawyers', completed: false },
-        { id: '1-2', title: 'Schedule initial consultations', completed: false },
-      ]
-    },
-    {
-      id: '2',
-      title: 'Gather Property Documents',
-      description: 'Collect all relevant property ownership papers',
-      deadline: new Date('2024-03-20'),
-      status: 'ongoing',
-    },
-    {
-      id: '3',
-      title: 'Hire a Property Lawyer',
-      description: 'Find and consult with a property dispute specialist',
-      deadline: new Date('2024-03-15'),
-      status: 'pending',
-      subtasks: [
-        { id: '1-1', title: 'Research local property lawyers', completed: false },
-        { id: '1-2', title: 'Schedule initial consultations', completed: false },
-      ]
-    },
-    {
-      id: '4',
-      title: 'Gather Property Documents',
-      description: 'Collect all relevant property ownership papers',
-      deadline: new Date('2024-03-20'),
-      status: 'ongoing',
+  const dispatch = useDispatch<AppDispatch>();
+  const { todos, loading: todosLoading, error: todosError } = useSelector((state: RootState) => state.todos);
+  const { summary, loading: summaryLoading, error: summaryError } = useSelector((state: RootState) => state.caseSummary);
+
+  useEffect(() => {
+    dispatch(fetchTodos());
+    dispatch(fetchCaseSummary());
+  }, [dispatch]);
+
+  const handleTodoStatusChange = (id: string, status: 'pending' | 'ongoing' | 'done') => {
+    const todo = todos.find((t: Todo) => t.id === id);
+    if (todo) {
+      dispatch(updateTodo({ ...todo, status }));
     }
-  ]);
-
-  const [summaries, setSummaries] = useState<CaseSummary[]>([
-    {
-      id: '1',
-      title: 'Initial Property Dispute Consultation',
-      date: new Date('2024-03-10'),
-      summary: 'Initial consultation regarding property boundary dispute',
-      legalPoints: ['Property Rights', 'Boundary Laws'],
-      fields: ['Property Details', 'Dispute Nature'],
-      advice: ['Document all communications', 'Maintain property records'],
-      nextSteps: ['Hire lawyer', 'Gather documents']
-    }
-  ]);
-
-  const [selectedTodos, setSelectedTodos] = useState<string[]>([]);
-  const [isBulkSelecting, setIsBulkSelecting] = useState(false);
-  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-
-  const handleTodoStatusChange = (id: string, status: Todo['status']) => {
-    setTodos(prev => prev.map(todo => 
-      todo.id === id ? { ...todo, status } : todo
-    ));
-  };
-
-  const handleBulkDelete = () => {
-    setTodos(prev => prev.filter(todo => !selectedTodos.includes(todo.id)));
-    setSelectedTodos([]);
-    setIsBulkSelecting(false);
   };
 
   const handleDateChange = (id: string, date: Date) => {
-    setTodos(prev => prev.map(todo => 
-      todo.id === id ? { ...todo, deadline: date } : todo
-    ));
+    const todo = todos.find((t: Todo) => t.id === id);
+    if (todo) {
+      dispatch(updateTodo({ ...todo, deadline: date }));
+    }
   };
 
   const handleTitleChange = (id: string, title: string) => {
-    setTodos(prev => prev.map(todo => 
-      todo.id === id ? { ...todo, title } : todo
-    ));
+    const todo = todos.find((t: Todo) => t.id === id);
+    if (todo) {
+      dispatch(updateTodo({ ...todo, title }));
+    }
   };
 
   const handleSubtaskToggle = (todoId: string, subtaskId: string) => {
-    setTodos(prev => prev.map(todo => {
-      if (todo.id === todoId && todo.subtasks) {
-        return {
-          ...todo,
-          subtasks: todo.subtasks.map(subtask =>
-            subtask.id === subtaskId
-              ? { ...subtask, completed: !subtask.completed }
-              : subtask
-          )
-        };
-      }
-      return todo;
-    }));
+    const todo = todos.find((t: Todo) => t.id === todoId);
+    if (todo && todo.subtasks) {
+      const updatedSubtasks = todo.subtasks.map((subtask: { id: string; completed: boolean }) =>
+        subtask.id === subtaskId
+          ? { ...subtask, completed: !subtask.completed }
+          : subtask
+      );
+      dispatch(updateTodo({ ...todo, subtasks: updatedSubtasks }));
+    }
   };
 
   const handleSubtaskAdd = (todoId: string, title: string) => {
-    setTodos(prev => prev.map(todo => {
-      if (todo.id === todoId) {
-        const newSubtask = {
-          id: `${todoId}-${Date.now()}`,
-          title,
-          completed: false
-        };
-        return {
-          ...todo,
-          subtasks: [...(todo.subtasks || []), newSubtask]
-        };
-      }
-      return todo;
-    }));
+    const todo = todos.find((t: Todo) => t.id === todoId);
+    if (todo) {
+      const newSubtask = {
+        id: `${todoId}-${Date.now()}`,
+        title,
+        description: '',
+        completed: false
+      };
+      const updatedSubtasks = [...(todo.subtasks || []), newSubtask];
+      dispatch(updateTodo({ ...todo, subtasks: updatedSubtasks }));
+    }
   };
 
   const handleDeleteTodo = (id: string) => {
-    setTodos(prev => prev.filter(todo => todo.id !== id));
+    dispatch(deleteTodo(id));
   };
 
   const handleAddTodo = () => {
     const newTodo = {
-      id: Date.now().toString(),
       title: 'New Task',
       description: 'Click to edit description',
       deadline: new Date(),
       status: 'pending' as const,
       subtasks: []
     };
-    setTodos(prev => [...prev, newTodo]);
+    dispatch(addTodo(newTodo));
+  };
+
+  const [selectedTodos, setSelectedTodos] = useState<string[]>([]);
+  const [isBulkSelecting, setIsBulkSelecting] = useState(false);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+
+  const handleBulkDelete = () => {
+    selectedTodos.forEach((id: string) => dispatch(deleteTodo(id)));
+    setSelectedTodos([]);
+    setIsBulkSelecting(false);
+  };
+
+  const handleTodoSelect = (id: string) => {
+    if (isBulkSelecting) {
+      setSelectedTodos(prev =>
+        prev.includes(id)
+          ? prev.filter(todoId => todoId !== id)
+          : [...prev, id]
+      );
+    }
   };
 
   const handleLawyerSearch = () => {
@@ -190,27 +132,29 @@ export default function DashboardPage() {
 
   // Add calendar events from todos and summaries
   const calendarEvents = [
-    ...todos.map(todo => ({
+    ...todos.map((todo: Todo) => ({
       id: todo.id,
       title: todo.title,
       date: todo.deadline,
       type: 'deadline' as const
     })),
-    ...summaries.map(summary => ({
-      id: `summary-${summary.id}`,
-      title: summary.title,
-      date: summary.date,
-      type: 'hearing' as const
-    }))
+    ...(summary ? [
+      {
+        id: `summary-${summary.id}`,
+        title: summary.title,
+        date: summary.date,
+        type: 'hearing' as const
+      }
+    ] : []),
   ];
 
   return (
     <ProtectedPage>
-      <div className="min-h-screen h-auto -mb-9 bg-gradient-to-br from-gray-950 via-gray-800 to-gray-950 pt-24">
+      <div className="min-h-screen h-auto pb-10  bg-gradient-to-br from-gray-950 via-gray-800 to-gray-950 pt-24">
         <div className="max-w-7xl  mx-auto px-4 sm:px-6 lg:px-8">
           {/* Add your dashboard content here */}
-          <div className="min-h-screen mt-10 rounded-2xl bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950">
-            <div className="max-w-7xl mx-auto px-8 py-8 space-y-8">
+          <div className="min-h-screen h-auto mt-10  rounded-2xl bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950">
+            <div className="max-w-7xl h-auto mx-auto px-8 py-8 space-y-8">
               {/* Header */}
               <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-bold text-white font-[var(--font-josefin-sans)]">Case Dashboard</h1>
@@ -273,29 +217,75 @@ export default function DashboardPage() {
                       </div>
                     </div>
 
-                    <div className="space-y-4">
-                      {todos.map((todo) => (
-                        <TodoItem
-                          key={todo.id}
-                          todo={todo}
-                          onStatusChange={handleTodoStatusChange}
-                          onDateChange={handleDateChange}
-                          onTitleChange={handleTitleChange}
-                          onSubtaskToggle={handleSubtaskToggle}
-                          onSubtaskAdd={handleSubtaskAdd}
-                          onDelete={handleDeleteTodo}
-                          isSelected={selectedTodos.includes(todo.id)}
-                          onSelect={(id) => {
-                            if (selectedTodos.includes(id)) {
-                              setSelectedTodos(selectedTodos.filter(todoId => todoId !== id));
-                            } else {
-                              setSelectedTodos([...selectedTodos, id]);
-                            }
-                          }}
-                          isBulkSelecting={isBulkSelecting}
-                        />
-                      ))}
-                    </div>
+                    {todosLoading ? (
+                      <div className="flex justify-center items-center h-32">
+                        <Loader2 className="w-8 h-8 text-purple-400 animate-spin" />
+                      </div>
+                    ) : todosError ? (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 backdrop-blur-sm rounded-xl p-8 border border-white/5 min-h-[250px] flex flex-col items-center justify-center text-center relative overflow-hidden"
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent" />
+                        <div className="relative z-10">
+                          <div className="w-16 h-16 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <MessageSquare className="w-5 h-5 text-purple-400" />
+                          </div>
+                          <h3 className="text-2xl font-bold text-gray-100 mb-2 font-[var(--font-josefin-sans)]">No Tasks Yet</h3>
+                          <p className="text-gray-400 text-md mb-6 max-w-md mx-auto">Start a conversation to get your case tasks and stay organized!</p>
+                          <Button
+                            variant="outline"
+                            className="bg-transparent border-purple-500/30 text-purple-400 hover:bg-purple-500/10 hover:text-purple-300 transition-all duration-300 group"
+                            onClick={() => window.location.href = '/chat'}
+                          >
+                            <MessageSquare className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform duration-300" />
+                            Start Conversation
+                          </Button>
+                        </div>
+                      </motion.div>
+                    ) : todos.length === 0 ? (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 backdrop-blur-sm rounded-xl p-8 border border-white/5 min-h-[250px] flex flex-col items-center justify-center text-center relative overflow-hidden"
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent" />
+                        <div className="relative z-10">
+                          <div className="w-16 h-16 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <MessageSquare className="w-8 h-8 text-purple-400" />
+                          </div>
+                          <h3 className="text-2xl font-bold text-white mb-3 font-[var(--font-josefin-sans)]">No Tasks Yet</h3>
+                          <p className="text-gray-400 mb-6 max-w-md mx-auto">Start a conversation to get your case tasks and stay organized!</p>
+                          <Button
+                            variant="outline"
+                            className="bg-transparent border-purple-500/30 text-purple-400 hover:bg-purple-500/10 hover:text-purple-300 transition-all duration-300 group"
+                            onClick={() => window.location.href = '/chat'}
+                          >
+                            <MessageSquare className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform duration-300" />
+                            Start Conversation
+                          </Button>
+                        </div>
+                      </motion.div>
+                    ) : (
+                      <div className="space-y-4">
+                        {todos.map((todo: Todo) => (
+                          <TodoItem
+                            key={todo.id}
+                            todo={todo}
+                            onStatusChange={handleTodoStatusChange}
+                            onDateChange={handleDateChange}
+                            onTitleChange={handleTitleChange}
+                            onSubtaskToggle={handleSubtaskToggle}
+                            onSubtaskAdd={handleSubtaskAdd}
+                            onDelete={handleDeleteTodo}
+                            isSelected={selectedTodos.includes(todo.id)}
+                            onSelect={handleTodoSelect}
+                            isBulkSelecting={isBulkSelecting}
+                          />
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   {/* Case Summary Section */}
@@ -310,40 +300,115 @@ export default function DashboardPage() {
                         Download Summary
                       </Button>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-4">
-                        <div className="bg-gray-800/50 rounded-lg p-4">
-                          <h3 className="text-sm font-medium text-purple-400 font-[var(--font-space)] mb-2">Case Overview</h3>
-                          <p className="text-sm text-gray-300 font-[var(--font-inter)]">
-                            Property dispute case involving boundary issues and ownership claims.
-                          </p>
+
+                    {summaryLoading ? (
+                      <div className="flex justify-center items-center h-32">
+                        <Loader2 className="w-8 h-8 text-purple-400 animate-spin" />
+                      </div>
+                    ) : summaryError ? (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 backdrop-blur-sm rounded-xl p-8 border border-white/5 min-h-[350px] flex flex-col items-center justify-center text-center relative overflow-hidden"
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent" />
+                        <div className="relative z-10">
+                          <div className="w-16 h-16 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <Sparkles className="w-8 h-8 text-purple-400" />
+                          </div>
+                          <h3 className="text-2xl font-bold text-white mb-3 font-[var(--font-josefin-sans)]">No Case Summary Yet</h3>
+                          <p className="text-gray-400 mb-6 max-w-md mx-auto">Start a conversation to get your case analyzed and receive a detailed summary!</p>
+                          <Button
+                            variant="outline"
+                            className="bg-transparent border-purple-500/30 text-purple-400 hover:bg-purple-500/10 hover:text-purple-300 transition-all duration-300 group"
+                            onClick={() => window.location.href = '/chat'}
+                          >
+                            <MessageSquare className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform duration-300" />
+                            Start Conversation
+                          </Button>
                         </div>
-                        <div className="bg-gray-800/50 rounded-lg p-4">
-                          <h3 className="text-sm font-medium text-purple-400 font-[var(--font-space)] mb-2">Key Legal Points</h3>
-                          <ul className="space-y-1">
-                            <li className="text-sm text-gray-300 font-[var(--font-inter)]">• Property Rights</li>
-                            <li className="text-sm text-gray-300 font-[var(--font-inter)]">• Boundary Laws</li>
-                            <li className="text-sm text-gray-300 font-[var(--font-inter)]">• Ownership Documentation</li>
-                          </ul>
+                      </motion.div>
+                    ) : !summary ? (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 backdrop-blur-sm rounded-xl p-8 border border-white/5 min-h-[350px] flex flex-col items-center justify-center text-center relative overflow-hidden"
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent" />
+                        <div className="relative z-10">
+                          <div className="w-16 h-16 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <Sparkles className="w-4 h-4 text-purple-400" />
+                          </div>
+                          <h3 className="text-2xl font-bold text-white   font-[var(--font-josefin-sans)]">No Case Summary Yet</h3>
+                          <p className="text-gray-400 mb-6 max-w-md mx-auto">Start a conversation to get your case analyzed and receive a detailed summary!</p>
+                          <Button
+                            variant="outline"
+                            className="bg-transparent border-purple-500/30 text-purple-400 hover:bg-purple-500/10 hover:text-purple-300 transition-all duration-300 group"
+                            onClick={() => window.location.href = '/chat'}
+                          >
+                            <MessageSquare className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform duration-300" />
+                            Start Conversation
+                          </Button>
+                        </div>
+                      </motion.div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-4">
+                          <div className="bg-gray-800/50 rounded-lg p-4">
+                            <h3 className="text-sm font-medium text-purple-400 font-[var(--font-space)] mb-2">Case Overview</h3>
+                            <p className="text-sm text-gray-300 font-[var(--font-inter)]">
+                              {summary.summary}
+                            </p>
+                          </div>
+                          <div className="bg-gray-800/50 rounded-lg p-4">
+                            <h3 className="text-sm font-medium text-purple-400 font-[var(--font-space)] mb-2">Key Legal Points</h3>
+                            <ul className="space-y-1">
+                              {summary.legalPoints.map((point: string, index: number) => (
+                                <motion.div
+                                  key={index}
+                                  initial={{ opacity: 0, y: 20 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ delay: index * 0.1 }}
+                                  className="flex items-start gap-3"
+                                >
+                                  <div className="mt-1.5">
+                                    <div className="w-2 h-2 rounded-full bg-primary" />
+                                  </div>
+                                  <p className="text-sm text-muted-foreground">{point}</p>
+                                </motion.div>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                        <div className="space-y-4">
+                          <div className="bg-gray-800/50 rounded-lg p-4">
+                            <h3 className="text-sm font-medium text-purple-400 font-[var(--font-space)] mb-2">Next Steps</h3>
+                            <ul className="space-y-1">
+                              {summary.nextSteps.map((step: string, index: number) => (
+                                <motion.div
+                                  key={index}
+                                  initial={{ opacity: 0, y: 20 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ delay: index * 0.1 }}
+                                  className="flex items-start gap-3"
+                                >
+                                  <div className="mt-1.5">
+                                    <div className="w-2 h-2 rounded-full bg-primary" />
+                                  </div>
+                                  <p className="text-sm text-muted-foreground">{step}</p>
+                                </motion.div>
+                              ))}
+                            </ul>
+                          </div>
+                          <div className="bg-gray-800/50 rounded-lg p-4">
+                            <h3 className="text-sm font-medium text-purple-400 font-[var(--font-space)] mb-2">Timeline</h3>
+                            <p className="text-sm text-gray-300 font-[var(--font-inter)]">
+                              {new Date(summary.date).toLocaleDateString()}
+                            </p>
+                          </div>
                         </div>
                       </div>
-                      <div className="space-y-4">
-                        <div className="bg-gray-800/50 rounded-lg p-4">
-                          <h3 className="text-sm font-medium text-purple-400 font-[var(--font-space)] mb-2">Next Steps</h3>
-                          <ul className="space-y-1">
-                            <li className="text-sm text-gray-300 font-[var(--font-inter)]">• Hire property lawyer</li>
-                            <li className="text-sm text-gray-300 font-[var(--font-inter)]">• Gather property documents</li>
-                            <li className="text-sm text-gray-300 font-[var(--font-inter)]">• Schedule mediation</li>
-                          </ul>
-                        </div>
-                        <div className="bg-gray-800/50 rounded-lg p-4">
-                          <h3 className="text-sm font-medium text-purple-400 font-[var(--font-space)] mb-2">Timeline</h3>
-                          <p className="text-sm text-gray-300 font-[var(--font-inter)]">
-                            Initial consultation completed. Next hearing scheduled for April 15, 2024.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
+                    )}
                   </div>
                 </div>
 

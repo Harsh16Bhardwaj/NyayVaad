@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { getAuth } from '@clerk/nextjs/server';
-import { PrismaClient } from '@/generated/prisma';
 
-const prisma = new PrismaClient();
 const LANGFLOW_API_URL = 'https://api.langflow.astra.datastax.com/lf/043396b0-e82a-4e0f-aca3-ad6828b04b34/api/v1/run/c9b26fed-99bd-4301-969f-3ff28a0a606e';
 const LANGFLOW_TOKEN = process.env.LANGFLOW_TOKEN;
 
@@ -20,28 +18,28 @@ export async function POST(request: NextRequest) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    const { message, sessionId, analysis, nextField } = await request.json();
-    console.log('Backend - Received chat request:', { message, sessionId });
+    const { caseData } = await request.json();
+    console.log('Backend - Received analysis request:', { caseData });
 
-    if (!message || !sessionId) {
-      console.error('Backend - Missing required fields');
+    if (!caseData) {
+      console.error('Backend - Missing case data');
       return NextResponse.json(
-        { error: 'Missing required fields', response: 'Please provide both message and sessionId.' },
+        { error: 'Missing case data', response: 'Please provide case data for analysis.' },
         { status: 400 }
       );
     }
 
-    // Send request to Langflow
+    // Send request to Langflow for analysis
     const payload = {
-      input_value: message,
+      input_value: 'Analyze case',
       output_type: 'chat',
       input_type: 'chat',
-      nextField: nextField,
-      analysis: false,
-      session_id: sessionId,
+      session_id: `analysis_${Date.now()}`,
+      analysis: true,
+      case_data: caseData,
     };
 
-    console.log('Backend - Sending request to Langflow:', payload);
+    console.log('Backend - Sending analysis request to Langflow:', payload);
 
     const response = await fetch(LANGFLOW_API_URL, {
       method: 'POST',
@@ -72,9 +70,9 @@ export async function POST(request: NextRequest) {
       parsedResponse = JSON.parse(cleanJson);
       console.log('Backend - Parsed Langflow response:', parsedResponse);
 
-      if (!parsedResponse.response) {
-        console.error('Backend - Missing response field in Langflow response');
-        throw new Error('Missing response field in Langflow response');
+      if (!parsedResponse.case_summary || !parsedResponse.laws_involved || !parsedResponse.todos) {
+        console.error('Backend - Incomplete analysis response:', parsedResponse);
+        throw new Error('Incomplete Langflow analysis response');
       }
     } catch (error) {
       console.error('Backend - Error parsing Langflow response:', error);
@@ -87,30 +85,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Commented out case creation for now
-    /*
-    const caseRecord = await prisma.case.create({
-      data: {
-        id: `case_${Date.now()}`,
-        title: 'New Case',
-        description: message,
-        status: 'OPEN',
-        userId: userId,
-      },
-    });
-    */
-
     return NextResponse.json({
-      response: parsedResponse.response,
+      response: parsedResponse.response || langflowMessage,
       updatedField: parsedResponse.updated_field || null,
       updatedValue: parsedResponse.updated_value || null,
+      caseSummary: parsedResponse.case_summary,
+      lawsInvolved: parsedResponse.laws_involved,
+      todos: parsedResponse.todos,
     });
   } catch (error) {
-    console.error('Backend - Error in chat handler:', error);
+    console.error('Backend - Error in analysis handler:', error);
     return NextResponse.json(
       {
         error: 'Internal server error',
-        response: 'Sorry, there was an error processing your request. Please try again.',
+        response: 'Sorry, there was an error analyzing your case. Please try again.',
       },
       { status: 500 }
     );
