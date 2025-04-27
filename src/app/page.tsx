@@ -4,19 +4,48 @@ import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ArrowRight, Brain, BookOpen, Shield, List, FileText, Lock, Star, MessageSquare, LayoutDashboard } from 'lucide-react';
-import { Tilt } from 'react-tilt';
+import { ArrowRight, Brain, BookOpen, Shield, List, FileText, Lock, MessageSquare, LayoutDashboard, Code, Database, Workflow } from 'lucide-react';
 import Link from 'next/link';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const features = [
-  { title: 'AI Pipeline', desc: 'Multi-layered AI for razor-sharp insights.', icon: <Brain className="w-10 h-10 text-teal-400" />, offset: 'ml-4 mt-2' },
-  { title: 'Law Lookup', desc: 'Real-time global precedents at your fingertips.', icon: <BookOpen className="w-10 h-10 text-teal-400" />, offset: 'mr-6 mb-3' },
-  { title: 'Case Dashboard', desc: 'Interactive hub to track your legal game.', icon: <LayoutDashboard className="w-10 h-10 text-teal-400" />, offset: 'ml-8 mt-5' },
-  { title: 'To-Do Generator', desc: 'Personalized tasks to keep you on top.', icon: <List className="w-10 h-10 text-teal-400" />, offset: 'mr-4 mb-2' },
-  { title: 'Structured Reports', desc: 'Downloadable insights for courtroom wins.', icon: <FileText className="w-10 h-10 text-teal-400" />, offset: 'ml-3 mt-4' },
-  { title: 'Secure Auth', desc: 'Clerk-backed login for ironclad safety.', icon: <Lock className="w-10 h-10 text-teal-400" />, offset: 'mr-7 mb-5' },
+  { 
+    title: 'AI Pipeline', 
+    desc: 'Our multi-layered AI pipeline leverages Gemini’s 32k token model to dissect complex legal cases, delivering precise insights tailored to your needs.', 
+    icon: <Brain className="w-10 h-10" />, 
+    color: 'bg-teal-600/20 border-teal-400/30 text-teal-400' 
+  },
+  { 
+    title: 'Law Lookup', 
+    desc: 'Access real-time global precedents through Indian Kanoon’s vast database, ensuring you have the latest legal references at your fingertips.', 
+    icon: <BookOpen className="w-10 h-10" />, 
+    color: 'bg-amber-600/20 border-amber-400/30 text-amber-400' 
+  },
+  { 
+    title: 'Case Dashboard', 
+    desc: 'An interactive hub to visualize case progress, track deadlines, and manage documents—all in one centralized, user-friendly interface.', 
+    icon: <LayoutDashboard className="w-10 h-10" />, 
+    color: 'bg-purple-600/20 border-purple-400/30 text-purple-400' 
+  },
+  { 
+    title: 'To-Do Generator', 
+    desc: 'Get personalized, AI-driven task lists based on your case’s unique requirements, keeping you organized and ahead of the game.', 
+    icon: <List className="w-10 h-10" />, 
+    color: 'bg-blue-600/20 border-blue-400/30 text-blue-400' 
+  },
+  { 
+    title: 'Structured Reports', 
+    desc: 'Generate downloadable, court-ready reports with structured insights, citations, and summaries to strengthen your legal arguments.', 
+    icon: <FileText className="w-10 h-10" />, 
+    color: 'bg-coral-600/20 border-coral-400/30 text-coral-400' 
+  },
+  { 
+    title: 'Secure Auth', 
+    desc: 'Clerk-backed authentication ensures your data is protected with enterprise-grade security, giving you peace of mind.', 
+    icon: <Lock className="w-10 h-10" />, 
+    color: 'bg-green-600/20 border-green-400/30 text-green-400' 
+  },
 ];
 
 const onboardingSteps = [
@@ -27,13 +56,13 @@ const onboardingSteps = [
   { title: 'Download Reports', desc: 'Win with structured insights.', icon: <FileText className="w-8 h-8 text-teal-400" />, img: '/placeholder-step5.png' },
 ];
 
-const testimonials = [
-  { name: 'Priya S.', quote: 'San Sam’s AI turned my case into a slam dunk!', role: 'Law Student', rating: 5, width: 2, height: 'h-64', tilt: -3 },
-  { name: 'Rohan K.', quote: 'Real-time law lookup? Absolute game-changer.', role: 'Advocate', rating: 5, width: 1, height: 'h-48', tilt: 2 },
-  { name: 'Anita M.', quote: 'Structured reports won my case in days!', role: 'Entrepreneur', rating: 4, width: 3, height: 'h-72', tilt: -1 },
-  { name: 'Vikram T.', quote: 'The dashboard is my legal co-pilot.', role: 'Corporate Lawyer', rating: 5, width: 1, height: 'h-56', tilt: 4 },
-  { name: 'Sneha P.', quote: 'Secure and intuitive—love the AI pipeline!', role: 'Legal Researcher', rating: 4, width: 2, height: 'h-60', tilt: -2 },
-  { name: 'Arjun D.', quote: 'This is the future of legal prep.', role: 'Freelance Consultant', rating: 5, width: 2, height: 'h-52', tilt: 1 },
+const howWeWorkPoints = [
+  { text: 'Summarize cases into one-liners with Langflow API.', icon: <Workflow className="w-8 h-8" /> },
+  { text: 'Retrieve precedents from Indian Kanoon’s database.', icon: <Database className="w-8 h-8" /> },
+  { text: 'Refine data with ChatGPT for deeper insights.', icon: <MessageSquare className="w-8 h-8" /> },
+  { text: 'Analyze with Gemini’s 32k token model.', icon: <Brain className="w-8 h-8" /> },
+  { text: 'Secure data with Supabase and Clerk auth.', icon: <Lock className="w-8 h-8" /> },
+  { text: 'Deliver structured outputs via HTML parsing.', icon: <Code className="w-8 h-8" /> },
 ];
 
 const fadeIn = {
@@ -71,7 +100,7 @@ const LandingPage = () => {
   const toggleDarkMode = () => setDarkMode(!darkMode);
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-[#1F1F1F]' : 'bg-[#F8F9FA]'} mt-20 font-inter transition-colors duration-300 overflow-x-hidden`} style={{ '--gradient-start': '#3B0764', '--gradient-end': '#1CEFFF' } as any}>
+    <div className={`min-h-screen ${darkMode ? 'bg-[#1F1F1F]' : 'bg-[#F8F9FA]'} font-inter transition-colors duration-300 overflow-x-hidden`} style={{ '--gradient-start': '#3B0764', '--gradient-end': '#1CEFFF', '--coral-600': '#FF6B6B', '--coral-400': '#FF8787' } as any}>
       <main>
         {/* Hero Section */}
         <motion.section
@@ -157,23 +186,22 @@ const LandingPage = () => {
             >
               Why Choose Us
             </motion.h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {features.map((feature, index) => (
-                <Tilt key={index} options={{ max: 15, scale: 1.05, speed: 400 }}>
-                  <motion.div
-                    className={`bg-${darkMode ? '[#1a2632]/80' : '[#FFFFFF]'} p-6 rounded-xl border ${darkMode ? 'border-teal-800/30' : 'border-gray-200'} ${feature.offset}`}
-                    initial={{ opacity: 0, y: 50 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: index * 0.2 }}
-                    whileHover={{ scale: 1.05 }}
-                    role="article"
-                    aria-labelledby={`feature-${index}`}
-                  >
-                    <div className="mb-4">{feature.icon}</div>
-                    <h3 id={`feature-${index}`} className={`text-xl font-semibold ${darkMode ? 'text-teal-400' : 'text-teal-600'} mb-2`}>{feature.title}</h3>
-                    <p className={darkMode ? 'text-gray-300' : 'text-gray-600'}>{feature.desc}</p>
-                  </motion.div>
-                </Tilt>
+                <motion.div
+                  key={index}
+                  className={`p-6 rounded-xl border ${feature.color}`}
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.2 }}
+                  whileHover={{ scale: 1.05 }}
+                  role="article"
+                  aria-labelledby={`feature-${index}`}
+                >
+                  <div className="mb-4">{feature.icon}</div>
+                  <h3 id={`feature-${index}`} className={`text-xl font-semibold mb-2`}>{feature.title}</h3>
+                  <p className={darkMode ? 'text-gray-300' : 'text-gray-600'}>{feature.desc}</p>
+                </motion.div>
               ))}
             </div>
           </div>
@@ -328,7 +356,7 @@ const LandingPage = () => {
           </div>
         </motion.section>
 
-        {/* Testimonials Section */}
+        {/* How We Work Section */}
         <motion.section
           ref={(el) => (sectionRefs.current[5] = el)}
           className={`min-h-screen flex items-center justify-center ${darkMode ? 'bg-[#1F1F1F]' : 'bg-[#F8F9FA]'} py-16`}
@@ -336,53 +364,46 @@ const LandingPage = () => {
           whileInView="visible"
           viewport={{ once: false, amount: 0.3 }}
           variants={fadeIn}
-          aria-labelledby="testimonials-heading"
+          aria-labelledby="how-we-work-heading"
         >
-          <div className="max-w-7xl mx-auto px-4">
+          <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row gap-8">
             <motion.h2
-              id="testimonials-heading"
-              className="text-5xl md:text-6xl font-bold text-[#1CEFFF] font-inter text-center mb-16"
+              id="how-we-work-heading"
+              className="text-5xl md:text-6xl font-bold text-[#1CEFFF] font-inter mb-8 md:mb-0"
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              Voices of Victory
+              What We Do
             </motion.h2>
-            <div className="grid grid-cols-6 gap-6 auto-rows-min">
-              {testimonials.map((testimonial, index) => (
-                <Tilt key={index} options={{ max: 15, scale: 1.05, speed: 400 }}>
+            <div className="flex-1">
+              <div className="grid grid-cols-2 gap-6">
+                {howWeWorkPoints.map((point, index) => (
                   <motion.div
-                    className={`bg-${darkMode ? '[#1a2632]/80' : '[#FFFFFF]'} p-6 rounded-xl border ${darkMode ? 'border-teal-800/30' : 'border-gray-200'} col-span-${testimonial.width} ${testimonial.height}`}
-                    style={{ transform: `rotate(${testimonial.tilt}deg)` }}
-                    initial={{ opacity: 0, y: 50 }}
+                    key={index}
+                    className={`bg-${darkMode ? '[#1a2632]/80' : '[#FFFFFF]'} p-4 rounded-xl border ${darkMode ? 'border-teal-800/30' : 'border-gray-200'}`}
+                    initial={{ opacity: 0, y: index % 2 === 0 ? 20 : -20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: index * 0.2 }}
-                    whileHover={{ scale: 1.05, rotate: 0 }}
-                    role="article"
-                    aria-labelledby={`testimonial-${index}`}
+                    role="listitem"
+                    aria-label={`Step ${index + 1}: ${point.text}`}
                   >
-                    <div className="flex items-center gap-4 mb-4">
-                      <img src="/avatar-placeholder.png" alt={`${testimonial.name} avatar`} className="w-12 h-12 rounded-full" />
-                      <div>
-                        <h3 id={`testimonial-${index}`} className={`text-lg font-semibold ${darkMode ? 'text-teal-400' : 'text-teal-600'}`}>{testimonial.name}</h3>
-                        <p className={darkMode ? 'text-gray-400' : 'text-gray-500'}>{testimonial.role}</p>
-                      </div>
+                    <div className="flex items-center gap-2">
+                      {point.icon}
+                      <span className={darkMode ? 'text-teal-400' : 'text-teal-600'}>{point.text}</span>
                     </div>
-                    <p className={`font-mono ${darkMode ? 'text-gray-300' : 'text-gray-600'} mb-4`}>{testimonial.quote}</p>
-                    <motion.div
-                      className="flex gap-1"
-                      initial={{ opacity: 0 }}
-                      whileHover={{ opacity: 1 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      {Array(testimonial.rating).fill(0).map((_, i) => (
-                        <Star key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
-                      ))}
-                    </motion.div>
                   </motion.div>
-                </Tilt>
-              ))}
+                ))}
+              </div>
             </div>
+            <motion.div
+              className="flex-1"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 1.2 }}
+            >
+              <img src="/flowchart.png" alt="San Sam Legal workflow diagram showing the process from user inputs to final AI case analysis using Langflow API, Indian Kanoon, ChatGPT, Gemini, and vector databases." className="w-full rounded-lg" />
+            </motion.div>
           </div>
         </motion.section>
 
