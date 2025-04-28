@@ -18,6 +18,7 @@
     "@radix-ui/react-slot": "^1.2.0",
     "@reduxjs/toolkit": "^2.7.0",
     "@supabase/supabase-js": "^2.49.4",
+    "@types/nodemailer": "^6.4.17",
     "axios": "^1.8.4",
     "cheerio": "^1.0.0",
     "class-variance-authority": "^0.7.1",
