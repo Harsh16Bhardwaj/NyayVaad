@@ -1,36 +1,168 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NyaayVaad 🏛️
 
-## Getting Started
+A Modern Legal Case Management System built with Next.js, TypeScript, and Supabase.
 
-First, run the development server:
+## Overview 🌟
 
+NyaayVaad is a sophisticated legal case management platform designed to streamline legal workflows, enhance collaboration, and improve case tracking efficiency. Built with modern web technologies, it offers a robust, scalable, and user-friendly interface for legal professionals.
+
+## Features 🚀
+
+### Core Functionalities
+- 📝 **Case Management**
+  - Comprehensive case tracking
+  - Document management
+  - Timeline visualization
+  - Status monitoring
+
+- 🤝 **Collaboration Tools**
+  - Team-based case assignments
+  - Real-time updates
+  - Comment threads
+  - Document sharing
+
+- 📊 **Analytics Dashboard**
+  - Case progress tracking
+  - Performance metrics
+  - Custom reports
+  - Data visualization
+
+### Technical Features
+- ⚡ **Performance Optimized**
+  - Server-side rendering
+  - Code splitting
+  - Lazy loading
+  - Memoized components
+
+- 🔒 **Security**
+  - Role-based access control
+  - End-to-end encryption
+  - Audit logging
+  - Secure authentication
+
+## Tech Stack 🛠️
+
+### Frontend
+- **Framework**: Next.js 14
+- **Language**: TypeScript
+- **UI Library**: React
+- **State Management**: Redux
+- **Styling**: Tailwind CSS
+- **Animation**: Framer Motion
+
+### Backend
+- **Database**: Supabase
+- **Authentication**: Supabase Auth
+- **Storage**: Supabase Storage
+- **Real-time**: Supabase Realtime
+
+### Development Tools
+- **Package Manager**: npm
+- **Linting**: ESLint
+- **Formatting**: Prettier
+- **Testing**: Jest
+- **CI/CD**: GitHub Actions
+
+## Getting Started 🏁
+
+### Prerequisites
+- Node.js (v18 or higher)
+- npm (v9 or higher)
+- Supabase account
+
+### Installation
+
+1. Clone the repository
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/yourusername/nyaayvaad.git
+cd nyaayvaad
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Set up environment variables
+```bash
+cp .env.example .env.local
+# Fill in your Supabase credentials
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Run the development server
+```bash
+npm run dev
+```
 
-## Learn More
+5. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-To learn more about Next.js, take a look at the following resources:
+## Project Structure 📁
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+nyaayvaad/
+├── src/
+│   ├── app/              # Next.js app router
+│   ├── components/       # Reusable components
+│   ├── lib/             # Utility functions
+│   ├── types/           # TypeScript types
+│   └── generated/       # Generated types
+├── public/              # Static assets
+├── prisma/             # Database schema
+└── supabase/           # Supabase configuration
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Architecture 🏗️
 
-## Deploy on Vercel
+### Frontend Architecture
+- **Component-Based**: Modular, reusable components
+- **State Management**: Centralized state with Redux
+- **Routing**: Next.js App Router
+- **API Integration**: RESTful endpoints with Supabase
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Backend Architecture
+- **Database**: PostgreSQL with Supabase
+- **Authentication**: JWT-based auth
+- **Real-time Updates**: WebSocket connections
+- **File Storage**: Secure cloud storage
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Performance Optimizations ⚡
+
+### Code-Level Optimizations
+- Memoized components with `useCallback` and `useMemo`
+- Dynamic imports for code splitting
+- Image optimization with Next.js
+- Efficient state management
+
+### Infrastructure Optimizations
+- Edge caching
+- CDN integration
+- Database indexing
+- Query optimization
+
+## Contributing 🤝
+
+We welcome contributions! Please follow these steps:
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License 📄
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Support 💬
+
+For support, email support@nyaayvaad.com or join our [Discord community](https://discord.gg/nyaayvaad).
+
+## Acknowledgments 🙏
+
+- Next.js team for the amazing framework
+- Supabase for the backend infrastructure
+- All contributors who have helped shape this project
+
+---
+
+Built with ❤️ by the NyaayVaad Team
