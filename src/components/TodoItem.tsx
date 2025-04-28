@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, memo } from "react";
 import { motion } from "framer-motion";
 import {
   CheckCircle2,
@@ -50,6 +50,40 @@ interface TodoItemProps {
   isBulkSelecting?: boolean;
 }
 
+// Extract SubtaskList component
+const SubtaskList = memo(({ 
+  subtasks, 
+  onToggle, 
+  todoId 
+}: { 
+  subtasks: { id: string; title: string; completed: boolean }[]; 
+  onToggle: (subtaskId: string) => void;
+  todoId: string;
+}) => {
+  return (
+    <div className="mt-2 space-y-1">
+      {subtasks?.map((subtask) => (
+        <div
+          key={subtask.id}
+          className="flex items-center gap-2 text-sm text-gray-600"
+        >
+          <input
+            type="checkbox"
+            checked={subtask.completed}
+            onChange={() => onToggle(subtask.id)}
+            className="h-4 w-4 rounded border-gray-300"
+          />
+          <span className={cn(subtask.completed && "line-through")}>
+            {subtask.title}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+});
+
+SubtaskList.displayName = 'SubtaskList';
+
 export default function TodoItem({
   todo,
   onStatusChange,
@@ -64,7 +98,7 @@ export default function TodoItem({
 }: TodoItemProps) {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [newSubtask, setNewSubtask] = useState("");
+  const [newSubtaskTitle, setNewSubtaskTitle] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
 
   const statusColors = {
@@ -73,30 +107,31 @@ export default function TodoItem({
     done: "bg-green-500/20 text-green-400",
   };
 
-  const handleSubtaskAdd = () => {
-    if (newSubtask.trim()) {
-      onSubtaskAdd(todo.id, newSubtask.trim());
-      setNewSubtask("");
+  // Memoize handlers
+  const handleSubtaskAdd = useCallback(() => {
+    if (newSubtaskTitle.trim()) {
+      onSubtaskAdd(todo.id, newSubtaskTitle);
+      setNewSubtaskTitle("");
     }
-  };
+  }, [newSubtaskTitle, todo.id, onSubtaskAdd]);
 
-  const handleItemClick = (e: React.MouseEvent) => {
+  const handleItemClick = useCallback((e: React.MouseEvent) => {
     if (isBulkSelecting && onSelect) {
-      // Ignore clicks on interactive elements
-      const target = e.target as HTMLElement;
-      const interactiveElements = ["BUTTON", "INPUT", "SELECT", "TEXTAREA", "A"];
-      if (!interactiveElements.includes(target.tagName)) {
-        onSelect(todo.id);
-      }
+      e.stopPropagation();
+      onSelect(todo.id);
     }
-  };
+  }, [isBulkSelecting, onSelect, todo.id]);
 
-  const handleTitleClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleTitleClick = useCallback((e: React.MouseEvent) => {
     if (!isBulkSelecting) {
-      setIsEditing(true);
+      e.stopPropagation();
+      setIsExpanded(!isExpanded);
     }
-  };
+  }, [isBulkSelecting, isExpanded]);
+
+  const handleSubtaskToggle = useCallback((subtaskId: string) => {
+    onSubtaskToggle(todo.id, subtaskId);
+  }, [todo.id, onSubtaskToggle]);
 
   return (
     <motion.div
@@ -174,62 +209,11 @@ export default function TodoItem({
             </p>
 
             {todo.subtasks && isExpanded && (
-              <div className="mt-2 space-y-1">
-                {todo.subtasks.map((subtask) => (
-                  <div key={subtask.id} className="flex items-center space-x-2">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onSubtaskToggle(todo.id, subtask.id);
-                      }}
-                      className={cn(
-                        "w-4 h-4 rounded border transition-colors",
-                        subtask.completed
-                          ? "bg-purple-500 border-purple-500"
-                          : "border-gray-600 hover:border-purple-500"
-                      )}
-                    >
-                      {subtask.completed && (
-                        <svg
-                          className="w-3 h-3 mx-auto text-white"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            fill="currentColor"
-                            d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"
-                          />
-                        </svg>
-                      )}
-                    </button>
-                    <span className="text-sm text-gray-300 font-[var(--font-inter)]">
-                      {subtask.title}
-                    </span>
-                  </div>
-                ))}
-
-                {!isBulkSelecting && (
-                  <div className="flex items-center space-x-2 mt-2">
-                    <Input
-                      value={newSubtask}
-                      onChange={(e) => setNewSubtask(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSubtaskAdd()}
-                      placeholder="Add subtask..."
-                      className="h-8 bg-gray-800/50 border-gray-700 text-sm"
-                    />
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleSubtaskAdd();
-                      }}
-                      className="h-8 w-8 text-gray-400 hover:text-white hover:bg-white/10"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </Button>
-                  </div>
-                )}
-              </div>
+              <SubtaskList
+                subtasks={todo.subtasks}
+                onToggle={handleSubtaskToggle}
+                todoId={todo.id}
+              />
             )}
           </div>
         </div>
