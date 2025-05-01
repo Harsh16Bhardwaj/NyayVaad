@@ -104,7 +104,7 @@ const Navbar = () => {
 
   return (
     <motion.nav
-      className="bg-[#1b0020] fixed top-0 left-0 right-0 z-50 py-4 rounded-b-2xl px-6 shadow-lg"
+      className="bg-[#1b0020] fixed h-22 top-0 left-0 right-0 z-50 py-4 rounded-b-2xl px-6 shadow-lg"
       initial={{ opacity: 0, y: -50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: "easeOut" }}

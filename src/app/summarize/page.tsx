@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { motion } from 'framer-motion';
 import { Loader2, FileText, AlertCircle } from 'lucide-react';
+import HeroParallax from '@/components/ui/hero-parallax'; 
 
 export default function SummarisePage() {
   const [file, setFile] = useState<File | null>(null);
@@ -51,6 +52,7 @@ export default function SummarisePage() {
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
+          
           <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">
             PDF Summarizer
           </h1>

@@ -4,7 +4,8 @@ import { getAuth } from '@clerk/nextjs/server';
 import { PrismaClient } from '@/generated/prisma';
 
 const prisma = new PrismaClient();
-const LANGFLOW_API_URL = 'https://api.langflow.astra.datastax.com/lf/043396b0-e82a-4e0f-aca3-ad6828b04b34/api/v1/run/c9b26fed-99bd-4301-969f-3ff28a0a606e';
+// const LANGFLOW_API_URL = 'https://api.langflow.astra.datastax.com/lf/043396b0-e82a-4e0f-aca3-ad6828b04b34/api/v1/run/c9b26fed-99bd-4301-969f-3ff28a0a606e';
+const LANGFLOW_API_URL = 'https://api.langflow.astra.datastax.com/lf/f829f83f-e4c3-4742-89d5-9ddee4394fb0/api/v1/run/2c2058b5-dace-4a5c-b1f4-e5ee9fd8c3d3?stream=false';
 const LANGFLOW_TOKEN = process.env.LANGFLOW_TOKEN;
 
 export async function POST(request: NextRequest) {
@@ -36,10 +37,16 @@ export async function POST(request: NextRequest) {
       input_value: message,
       output_type: 'chat',
       input_type: 'chat',
-      nextField: nextField,
-      analysis: false,
       session_id: sessionId,
     };
+    // const payload = {
+    //   input_value: message,
+    //   output_type: 'chat',
+    //   input_type: 'chat',
+    //   nextField: nextField,
+    //   analysis: false,
+    //   session_id: sessionId,
+    // };
 
     console.log('Backend - Sending request to Langflow:', payload);
 
@@ -66,26 +73,26 @@ export async function POST(request: NextRequest) {
       throw new Error('Empty Langflow response');
     }
 
-    let parsedResponse;
-    try {
-      const cleanJson = langflowMessage.replace(/```json\n|\n```/g, '').trim();
-      parsedResponse = JSON.parse(cleanJson);
-      console.log('Backend - Parsed Langflow response:', parsedResponse);
+    // let parsedResponse;
+    // try {
+    //   const cleanJson = langflowMessage.replace(/```json\n|\n```/g, '').trim();
+    //   parsedResponse = JSON.parse(cleanJson);
+    //   console.log('Backend - Parsed Langflow response:', parsedResponse);
 
-      if (!parsedResponse.response) {
-        console.error('Backend - Missing response field in Langflow response');
-        throw new Error('Missing response field in Langflow response');
-      }
-    } catch (error) {
-      console.error('Backend - Error parsing Langflow response:', error);
-      return NextResponse.json(
-        {
-          error: 'Invalid Langflow response',
-          response: 'There was an issue processing the AI response. Please try again.',
-        },
-        { status: 500 }
-      );
-    }
+    //   if (!parsedResponse.response) {
+    //     console.error('Backend - Missing response field in Langflow response');
+    //     throw new Error('Missing response field in Langflow response');
+    //   }
+    // } catch (error) {
+    //   console.error('Backend - Error parsing Langflow response:', error);
+    //   return NextResponse.json(
+    //     {
+    //       error: 'Invalid Langflow response',
+    //       response: 'There was an issue processing the AI response. Please try again.',
+    //     },
+    //     { status: 500 }
+    //   );
+    // }
 
     // Commented out case creation for now
     /*
@@ -101,10 +108,13 @@ export async function POST(request: NextRequest) {
     */
 
     return NextResponse.json({
-      response: parsedResponse.response,
-      updatedField: parsedResponse.updated_field || null,
-      updatedValue: parsedResponse.updated_value || null,
+      response: langflowMessage,
     });
+    // return NextResponse.json({
+    //   response: parsedResponse.response,
+    //   updatedField: parsedResponse.updated_field || null,
+    //   updatedValue: parsedResponse.updated_value || null,
+    // });
   } catch (error) {
     console.error('Backend - Error in chat handler:', error);
     return NextResponse.json(
