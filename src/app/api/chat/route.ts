@@ -73,26 +73,41 @@ export async function POST(request: NextRequest) {
       throw new Error('Empty Langflow response');
     }
 
-    // let parsedResponse;
-    // try {
-    //   const cleanJson = langflowMessage.replace(/```json\n|\n```/g, '').trim();
-    //   parsedResponse = JSON.parse(cleanJson);
-    //   console.log('Backend - Parsed Langflow response:', parsedResponse);
+    let parsedResponse;
+    try {
+      const cleanJson = langflowMessage.replace(/```json\n|\n```/g, '').trim();
+      parsedResponse = JSON.parse(cleanJson);
+      console.log('Backend - Parsed Langflow response:', parsedResponse);
 
-    //   if (!parsedResponse.response) {
-    //     console.error('Backend - Missing response field in Langflow response');
-    //     throw new Error('Missing response field in Langflow response');
-    //   }
-    // } catch (error) {
-    //   console.error('Backend - Error parsing Langflow response:', error);
-    //   return NextResponse.json(
-    //     {
-    //       error: 'Invalid Langflow response',
-    //       response: 'There was an issue processing the AI response. Please try again.',
-    //     },
-    //     { status: 500 }
-    //   );
-    // }
+      // Destructure all possible fields from the response
+      const {
+        description,
+        opponent,
+        timeline,
+        evidence,
+        agreement,
+        ai_next_response
+      } = parsedResponse;
+
+      // Return structured response with all available fields
+      return NextResponse.json({
+        description: description || null,
+        opponent: opponent || null,
+        timeline: timeline || null,
+        evidence: evidence || null,
+        agreement: agreement || null,
+        ai_next_response: ai_next_response || null,
+      });
+    } catch (error) {
+      console.error('Backend - Error parsing Langflow response:', error);
+      return NextResponse.json(
+        {
+          error: 'Invalid Langflow response',
+          response: 'There was an issue processing the AI response. Please try again.',
+        },
+        { status: 500 }
+      );
+    }
 
     // Commented out case creation for now
     /*
@@ -105,11 +120,8 @@ export async function POST(request: NextRequest) {
         userId: userId,
       },
     });
-    */
+    */  
 
-    return NextResponse.json({
-      response: langflowMessage,
-    });
     // return NextResponse.json({
     //   response: parsedResponse.response,
     //   updatedField: parsedResponse.updated_field || null,

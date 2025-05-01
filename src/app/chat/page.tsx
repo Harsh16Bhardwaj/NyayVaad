@@ -168,7 +168,7 @@ export default function ChatPage() {
             deadline: new Date(),
             status: 'pending',
           }),
-        });
+        }); 
 
         if (backendResponse.ok) {
           const createdTodo = await backendResponse.json();
