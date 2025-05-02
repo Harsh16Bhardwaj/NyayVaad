@@ -87,50 +87,42 @@ const offerings = [
   },
 ];
 
-
-
 const items = [
   {
     title: "Sign Up",
     desc: "Create an account in under 30 seconds.",
-    image:
-      "/signup.png",
+    image: "/signup.png",
     className: "absolute top-10 left-[30%] rotate-[-5deg]",
   },
   {
     title: "Fill OnBoarding",
     desc: "Dive into relevant precedents instantly.",
-    image:
-      "/onboarding.png",
+    image: "/onboarding.png",
     className: "absolute top-5 left-[30%] rotate-[-8deg]",
   },
   {
     title: "Analyze Cases",
     desc: "Dive into relevant precedents instantly.",
-    image:
-      "/analyze.png",
+    image: "/analyze.png",
     className: "absolute top-5 left-[40%] rotate-[8deg]",
   },
   {
     title: "Explore Tools",
     desc: "Access powerful AI-driven legal tools.",
-    image:
-      "/tools.jpg",
+    image: "/tools.jpg",
     className: "absolute top-32 left-[25%] rotate-[-7deg]",
   },
 
   {
     title: "Track Progress",
     desc: "Stay organized with real-time updates.",
-    image:
-      "/todos.jpg",
+    image: "/todos.jpg",
     className: "absolute top-32 left-[40%] rotate-[10deg]",
   },
   {
     title: "Download Reports",
     desc: "Generate structured, court-ready reports.",
-    image:
-      "/reports.jpg",
+    image: "/reports.jpg",
     className: "absolute top-20 right-[35%] rotate-[2deg]",
   },
 ];
@@ -166,7 +158,6 @@ const fadeIn = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
 };
-
 
 const LandingPage = () => {
   const [darkMode, setDarkMode] = useState(true);
@@ -206,25 +197,25 @@ const LandingPage = () => {
       {/* Fixed Header */}
 
       {/* Main Content */}
-      <main className="pt-20">
+      <main className="pt-8 md:pt-20">
         <ParallaxFeatures features={features} offerings={offerings} />
 
         {/* Trust Section */}
-        <section className="py-40 bg-gradient-to-r from-[#0a0e17] via-[#192c43] to-[#0a1017] text-white">
-          <div className="max-w-6xl mx-auto px-4 text-center">
+        <section className="py-12 md:py-40 bg-gradient-to-r from-[#0a0e17] via-[#192c43] to-[#0a1017] text-white">
+          <div className="max-w-6xl mx-auto px-4 md:px-8 text-center">
             <motion.h2
-              className="text-3xl  md:text-5xl underline decoration-white underline-offset-8 decoration-2 font-bold mb-4"
+              className="text-2xl md:text-5xl underline decoration-white underline-offset-8 decoration-2 font-bold mb-4"
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, amount: 0.3 }}
               variants={fadeIn}
             >
               Empowered by{" "}
-              <span className="text-red-400 text-6xl"> Reliability</span> and{" "}
-              <span className="text-blue-400 text-6xl">Creativity</span>
+              <span className="text-red-400 text-4xl md:text-6xl"> Reliability</span> and{" "}
+              <span className="text-blue-400 text-4xl md:text-6xl">Creativity</span>
             </motion.h2>
             <motion.p
-              className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-36"
+              className="text-base md:text-xl text-gray-300 max-w-3xl mx-auto mb-12 md:mb-36"
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, amount: 0.3 }}
@@ -323,17 +314,15 @@ const LandingPage = () => {
           </div>
         </section>
 
-        
-
         {/* Onboarding Section */}
         <section
-          className={` pt-32 bg-gradient-to-r from-black via-gray-800 to-gray-950`}
+          className="pt-16 md:pt-32 bg-gradient-to-r from-black via-gray-800 to-gray-950"
           aria-labelledby="onboarding-heading"
         >
-          <div className="max-w-6xl mx-auto px-4">
+          <div className="max-w-6xl mx-auto px-2 md:px-4">
             <motion.h2
               id="onboarding-heading"
-              className="text-4xl underline decoration-teal-400 underline-offset-8 decoration-1 md:text-5xl font-bold text-gray-100 text-center mb-4"
+              className="text-2xl md:text-5xl underline decoration-teal-400 underline-offset-8 decoration-1 font-bold text-gray-100 text-center mb-2 md:mb-4"
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, amount: 0.3 }}
@@ -343,7 +332,7 @@ const LandingPage = () => {
             </motion.h2>
             <motion.h3
               id="onboarding-heading"
-              className="text-xl   font-bold text-gray-400 animate-bounce text-center mb-12"
+              className="text-base md:text-xl font-bold text-gray-400 animate-bounce text-center mb-6 md:mb-12"
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, amount: 0.3 }}
@@ -352,8 +341,8 @@ const LandingPage = () => {
               Drag the cards to see further steps
             </motion.h3>
 
-            <DraggableCardContainer className="relative h-[800px] w-full">
-              <p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 mx-auto max-w-sm text-center text-2xl font-black text-neutral-400 md:text-4xl dark:text-neutral-800">
+            <DraggableCardContainer className="relative h-[400px] md:h-[800px] w-full">
+              <p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 mx-auto max-w-xs md:max-w-sm text-center text-lg md:text-2xl font-black text-neutral-400 md:text-4xl dark:text-neutral-800">
                 That's it!! You are all set to go.
               </p>
               {items.map((item, index) => (
@@ -364,12 +353,12 @@ const LandingPage = () => {
                   <img
                     src={item.image}
                     alt={item.title}
-                    className="pointer-events-none relative z-10 h-60 w-80 object-cover"
+                    className="pointer-events-none relative z-10 w-full max-w-xs md:h-60 md:w-80 object-cover"
                   />
-                  <h3 className="mt-4 text-center text-2xl font-bold text-neutral-200 dark:text-neutral-300">
+                  <h3 className="mt-4 text-center text-lg md:text-2xl font-bold text-neutral-200 dark:text-neutral-300">
                     {item.title}
                   </h3>
-                  <p className="mt-2 text-center text-gray-400 dark:text-gray-400">
+                  <p className="mt-2 text-center text-gray-400 dark:text-gray-400 text-sm md:text-base">
                     {item.desc}
                   </p>
                 </DraggableCardBody>
@@ -379,117 +368,63 @@ const LandingPage = () => {
         </section>
 
         {/* How We Work Section */}
-        {/* <section
-          className={`py-20 ${darkMode ? "bg-gray-800" : "bg-white"}`}
-          aria-labelledby="how-we-work-heading"
-        >
-          <div className="max-w-6xl mx-auto px-4">
-            <motion.h2
-              id="how-we-work-heading"
-              className="text-3xl md:text-4xl font-bold text-teal-400 text-center mb-12"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-              variants={fadeIn}
-            >
-              How We Work
-            </motion.h2>
-            <div className="flex flex-col md:flex-row gap-8">
-              <motion.div
-                className="flex-1"
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, amount: 0.3 }}
-                variants={fadeIn}
-              >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {howWeWorkPoints.map((point, index) => (
-                    <div
-                      key={index}
-                      className={`p-4 rounded-lg border border-teal-400/20 bg-${
-                        darkMode ? "gray-700/50" : "gray-50"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        {point.icon}
-                        <span
-                          className={
-                            darkMode ? "text-gray-300" : "text-gray-600"
-                          }
-                        >
-                          {point.text}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-              <motion.div
-                className="flex-1"
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, amount: 0.3 }}
-                variants={fadeIn}
-              >
-                <img
-                  src="/flow.jpg"
-                  alt="NyayVaad workflow diagram"
-                  className="h-[20rem] bg-cover object-cover contain-content rounded-lg"
-                />
-              </motion.div>
-            </div>
-          </div>
-        </section> */}
-  <HowWeWork darkMode={darkMode}></HowWeWork>
+        <HowWeWork darkMode={darkMode} />
         {/* Pricing Section */}
         <Pricing />
 
         {/* Final CTA Section */}
-        <section className="py-20 bg-gradient-to-br from-teal-900 to-gray-800 text-white">
-          <div className="max-w-6xl mx-auto px-4 text-center">
+        <section className="relative py-16 md:py-32 bg-gradient-to-br from-violet-900 via-teal-900 to-black overflow-hidden">
+          {/* Animated background blobs */}
+          <div className="absolute -top-16 md:-top-32 -left-16 md:-left-32 w-[15rem] h-[15rem] md:w-[40rem] md:h-[40rem] bg-violet-600/30 rounded-full blur-xl md:blur-3xl animate-pulse" />
+          <div className="absolute -bottom-16 md:-bottom-32 right-0 w-[10rem] h-[10rem] md:w-[30rem] md:h-[30rem] bg-teal-400/20 rounded-full blur-md md:blur-2xl animate-pulse" />
+          <div className="relative z-10 max-w-md md:max-w-3xl mx-auto text-center px-4">
             <motion.h2
-              className="text-3xl md:text-4xl font-bold mb-8"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-              variants={fadeIn}
+              className="text-3xl md:text-6xl font-extrabold bg-gradient-to-r from-teal-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-4 md:mb-6 drop-shadow-lg"
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.5 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
             >
               Ready to Transform Your Legal Journey?
             </motion.h2>
             <motion.p
-              className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-8"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-              variants={fadeIn}
+              className="text-base md:text-2xl text-gray-200 mb-8 md:mb-12"
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.5 }}
+              transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
             >
-              Start with no hidden fees and unlock AI-powered legal solutions
-              today.
+              Start for free and unlock AI-powered legal solutions today. No hidden fees, just clarity and results.
             </motion.p>
-            <motion.div
-              className="flex justify-center gap-4"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-              variants={fadeIn}
-            >
-              <Link href="/dashboard">
-                <button
-                  className="bg-teal-500 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-teal-600 transition-all shadow-lg"
-                  aria-label="Start your free analysis"
+            <div className="flex flex-col md:flex-row gap-4 md:gap-6 justify-center items-center w-full">
+              {[
+                {
+                  label: "Start Free Analysis",
+                  href: "/dashboard",
+                  style:
+                    "w-full md:w-auto bg-gradient-to-r from-teal-500 to-purple-500 text-white px-6 md:px-10 py-4 md:py-5 rounded-xl text-base md:text-lg font-bold shadow-lg hover:scale-105 transition-transform",
+                },
+                {
+                  label: "See Pricing",
+                  href: "#pricing",
+                  style:
+                    "w-full md:w-auto border-2 border-teal-400 text-teal-300 px-6 md:px-10 py-4 md:py-5 rounded-xl text-base md:text-lg font-bold bg-white/5 hover:bg-teal-400/10 shadow-lg hover:scale-105 transition-transform",
+                },
+              ].map((btn, i) => (
+                <motion.div
+                  key={btn.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.5 }}
+                  transition={{ delay: 0.4 + i * 0.15, duration: 0.5, ease: "easeOut" }}
+                  className="w-full md:w-auto"
                 >
-                  Start Free Analysis
-                </button>
-              </Link>
-              <Link href="/pricing">
-                <button
-                  className="border border-teal-400 text-teal-400 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-teal-400/10 transition-all"
-                  aria-label="See pricing"
-                >
-                  See Pricing
-                </button>
-              </Link>
-            </motion.div>
+                  <a href={btn.href}>
+                    <button className={btn.style}>{btn.label}</button>
+                  </a>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </section>
       </main>

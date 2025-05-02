@@ -69,6 +69,7 @@ const Pricing: React.FC = () => {
       <div className="container mx-auto px-4 ">
         <div className="text-center mb-16">
           <motion.h2
+            id="pricing"
             className="text-3xl md:text-4xl font-bold text-white mb-4"
             initial="hidden"
             whileInView="visible"
