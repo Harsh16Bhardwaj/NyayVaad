@@ -1,4 +1,4 @@
-import { inter, josefinSans, spaceGrotesk } from '../fonts';
+import { inter, josefinSans, spaceGrotesk } from '../../fonts';
 
 export default function ChatLayout({
   children,

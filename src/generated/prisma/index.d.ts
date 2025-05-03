@@ -24,6 +24,11 @@ export type User = $Result.DefaultSelection<Prisma.$UserPayload>
  */
 export type Case = $Result.DefaultSelection<Prisma.$CasePayload>
 /**
+ * Model Session
+ * 
+ */
+export type Session = $Result.DefaultSelection<Prisma.$SessionPayload>
+/**
  * Model ExtractedDoc
  * 
  */
@@ -38,11 +43,6 @@ export type Todo = $Result.DefaultSelection<Prisma.$TodoPayload>
  * 
  */
 export type LegalTerm = $Result.DefaultSelection<Prisma.$LegalTermPayload>
-/**
- * Model EnhancedLaw
- * 
- */
-export type EnhancedLaw = $Result.DefaultSelection<Prisma.$EnhancedLawPayload>
 
 /**
  * Enums
@@ -235,6 +235,16 @@ export class PrismaClient<
   get case(): Prisma.CaseDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.session`: Exposes CRUD operations for the **Session** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Sessions
+    * const sessions = await prisma.session.findMany()
+    * ```
+    */
+  get session(): Prisma.SessionDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.extractedDoc`: Exposes CRUD operations for the **ExtractedDoc** model.
     * Example usage:
     * ```ts
@@ -263,16 +273,6 @@ export class PrismaClient<
     * ```
     */
   get legalTerm(): Prisma.LegalTermDelegate<ExtArgs, ClientOptions>;
-
-  /**
-   * `prisma.enhancedLaw`: Exposes CRUD operations for the **EnhancedLaw** model.
-    * Example usage:
-    * ```ts
-    * // Fetch zero or more EnhancedLaws
-    * const enhancedLaws = await prisma.enhancedLaw.findMany()
-    * ```
-    */
-  get enhancedLaw(): Prisma.EnhancedLawDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -715,10 +715,10 @@ export namespace Prisma {
   export const ModelName: {
     User: 'User',
     Case: 'Case',
+    Session: 'Session',
     ExtractedDoc: 'ExtractedDoc',
     Todo: 'Todo',
-    LegalTerm: 'LegalTerm',
-    EnhancedLaw: 'EnhancedLaw'
+    LegalTerm: 'LegalTerm'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -737,7 +737,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "case" | "extractedDoc" | "todo" | "legalTerm" | "enhancedLaw"
+      modelProps: "user" | "case" | "session" | "extractedDoc" | "todo" | "legalTerm"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -886,6 +886,80 @@ export namespace Prisma {
           count: {
             args: Prisma.CaseCountArgs<ExtArgs>
             result: $Utils.Optional<CaseCountAggregateOutputType> | number
+          }
+        }
+      }
+      Session: {
+        payload: Prisma.$SessionPayload<ExtArgs>
+        fields: Prisma.SessionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SessionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SessionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SessionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SessionPayload>
+          }
+          findFirst: {
+            args: Prisma.SessionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SessionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SessionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SessionPayload>
+          }
+          findMany: {
+            args: Prisma.SessionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SessionPayload>[]
+          }
+          create: {
+            args: Prisma.SessionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SessionPayload>
+          }
+          createMany: {
+            args: Prisma.SessionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SessionCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SessionPayload>[]
+          }
+          delete: {
+            args: Prisma.SessionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SessionPayload>
+          }
+          update: {
+            args: Prisma.SessionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SessionPayload>
+          }
+          deleteMany: {
+            args: Prisma.SessionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SessionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SessionUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SessionPayload>[]
+          }
+          upsert: {
+            args: Prisma.SessionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SessionPayload>
+          }
+          aggregate: {
+            args: Prisma.SessionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSession>
+          }
+          groupBy: {
+            args: Prisma.SessionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SessionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SessionCountArgs<ExtArgs>
+            result: $Utils.Optional<SessionCountAggregateOutputType> | number
           }
         }
       }
@@ -1111,80 +1185,6 @@ export namespace Prisma {
           }
         }
       }
-      EnhancedLaw: {
-        payload: Prisma.$EnhancedLawPayload<ExtArgs>
-        fields: Prisma.EnhancedLawFieldRefs
-        operations: {
-          findUnique: {
-            args: Prisma.EnhancedLawFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$EnhancedLawPayload> | null
-          }
-          findUniqueOrThrow: {
-            args: Prisma.EnhancedLawFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$EnhancedLawPayload>
-          }
-          findFirst: {
-            args: Prisma.EnhancedLawFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$EnhancedLawPayload> | null
-          }
-          findFirstOrThrow: {
-            args: Prisma.EnhancedLawFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$EnhancedLawPayload>
-          }
-          findMany: {
-            args: Prisma.EnhancedLawFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$EnhancedLawPayload>[]
-          }
-          create: {
-            args: Prisma.EnhancedLawCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$EnhancedLawPayload>
-          }
-          createMany: {
-            args: Prisma.EnhancedLawCreateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          createManyAndReturn: {
-            args: Prisma.EnhancedLawCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$EnhancedLawPayload>[]
-          }
-          delete: {
-            args: Prisma.EnhancedLawDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$EnhancedLawPayload>
-          }
-          update: {
-            args: Prisma.EnhancedLawUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$EnhancedLawPayload>
-          }
-          deleteMany: {
-            args: Prisma.EnhancedLawDeleteManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateMany: {
-            args: Prisma.EnhancedLawUpdateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateManyAndReturn: {
-            args: Prisma.EnhancedLawUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$EnhancedLawPayload>[]
-          }
-          upsert: {
-            args: Prisma.EnhancedLawUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$EnhancedLawPayload>
-          }
-          aggregate: {
-            args: Prisma.EnhancedLawAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateEnhancedLaw>
-          }
-          groupBy: {
-            args: Prisma.EnhancedLawGroupByArgs<ExtArgs>
-            result: $Utils.Optional<EnhancedLawGroupByOutputType>[]
-          }
-          count: {
-            args: Prisma.EnhancedLawCountArgs<ExtArgs>
-            result: $Utils.Optional<EnhancedLawCountAggregateOutputType> | number
-          }
-        }
-      }
     }
   } & {
     other: {
@@ -1271,10 +1271,10 @@ export namespace Prisma {
   export type GlobalOmitConfig = {
     user?: UserOmit
     case?: CaseOmit
+    session?: SessionOmit
     extractedDoc?: ExtractedDocOmit
     todo?: TodoOmit
     legalTerm?: LegalTermOmit
-    enhancedLaw?: EnhancedLawOmit
   }
 
   /* Types for Logging */
@@ -1400,13 +1400,11 @@ export namespace Prisma {
    */
 
   export type CaseCountOutputType = {
-    involvedLaws: number
     todos: number
     extractedDocs: number
   }
 
   export type CaseCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    involvedLaws?: boolean | CaseCountOutputTypeCountInvolvedLawsArgs
     todos?: boolean | CaseCountOutputTypeCountTodosArgs
     extractedDocs?: boolean | CaseCountOutputTypeCountExtractedDocsArgs
   }
@@ -1420,13 +1418,6 @@ export namespace Prisma {
      * Select specific fields to fetch from the CaseCountOutputType
      */
     select?: CaseCountOutputTypeSelect<ExtArgs> | null
-  }
-
-  /**
-   * CaseCountOutputType without action
-   */
-  export type CaseCountOutputTypeCountInvolvedLawsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: EnhancedLawWhereInput
   }
 
   /**
@@ -2847,9 +2838,9 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
-    involvedLaws?: boolean | Case$involvedLawsArgs<ExtArgs>
     todos?: boolean | Case$todosArgs<ExtArgs>
     extractedDocs?: boolean | Case$extractedDocsArgs<ExtArgs>
+    session?: boolean | Case$sessionArgs<ExtArgs>
     _count?: boolean | CaseCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["case"]>
 
@@ -2903,9 +2894,9 @@ export namespace Prisma {
   export type CaseOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "title" | "description" | "status" | "opponent" | "timeline" | "evidence" | "agreement" | "finalAnalysis" | "createdAt" | "updatedAt", ExtArgs["result"]["case"]>
   export type CaseInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
-    involvedLaws?: boolean | Case$involvedLawsArgs<ExtArgs>
     todos?: boolean | Case$todosArgs<ExtArgs>
     extractedDocs?: boolean | Case$extractedDocsArgs<ExtArgs>
+    session?: boolean | Case$sessionArgs<ExtArgs>
     _count?: boolean | CaseCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type CaseIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2919,9 +2910,9 @@ export namespace Prisma {
     name: "Case"
     objects: {
       user: Prisma.$UserPayload<ExtArgs>
-      involvedLaws: Prisma.$EnhancedLawPayload<ExtArgs>[]
       todos: Prisma.$TodoPayload<ExtArgs>[]
       extractedDocs: Prisma.$ExtractedDocPayload<ExtArgs>[]
+      session: Prisma.$SessionPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -3331,9 +3322,9 @@ export namespace Prisma {
   export interface Prisma__CaseClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    involvedLaws<T extends Case$involvedLawsArgs<ExtArgs> = {}>(args?: Subset<T, Case$involvedLawsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EnhancedLawPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     todos<T extends Case$todosArgs<ExtArgs> = {}>(args?: Subset<T, Case$todosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TodoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     extractedDocs<T extends Case$extractedDocsArgs<ExtArgs> = {}>(args?: Subset<T, Case$extractedDocsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExtractedDocPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    session<T extends Case$sessionArgs<ExtArgs> = {}>(args?: Subset<T, Case$sessionArgs<ExtArgs>>): Prisma__SessionClient<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3771,30 +3762,6 @@ export namespace Prisma {
   }
 
   /**
-   * Case.involvedLaws
-   */
-  export type Case$involvedLawsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the EnhancedLaw
-     */
-    select?: EnhancedLawSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the EnhancedLaw
-     */
-    omit?: EnhancedLawOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: EnhancedLawInclude<ExtArgs> | null
-    where?: EnhancedLawWhereInput
-    orderBy?: EnhancedLawOrderByWithRelationInput | EnhancedLawOrderByWithRelationInput[]
-    cursor?: EnhancedLawWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: EnhancedLawScalarFieldEnum | EnhancedLawScalarFieldEnum[]
-  }
-
-  /**
    * Case.todos
    */
   export type Case$todosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3843,6 +3810,25 @@ export namespace Prisma {
   }
 
   /**
+   * Case.session
+   */
+  export type Case$sessionArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Session
+     */
+    select?: SessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Session
+     */
+    omit?: SessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SessionInclude<ExtArgs> | null
+    where?: SessionWhereInput
+  }
+
+  /**
    * Case without action
    */
   export type CaseDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3858,6 +3844,1079 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: CaseInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model Session
+   */
+
+  export type AggregateSession = {
+    _count: SessionCountAggregateOutputType | null
+    _min: SessionMinAggregateOutputType | null
+    _max: SessionMaxAggregateOutputType | null
+  }
+
+  export type SessionMinAggregateOutputType = {
+    sessionId: string | null
+    caseId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SessionMaxAggregateOutputType = {
+    sessionId: string | null
+    caseId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SessionCountAggregateOutputType = {
+    sessionId: number
+    caseId: number
+    messages: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type SessionMinAggregateInputType = {
+    sessionId?: true
+    caseId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SessionMaxAggregateInputType = {
+    sessionId?: true
+    caseId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SessionCountAggregateInputType = {
+    sessionId?: true
+    caseId?: true
+    messages?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type SessionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Session to aggregate.
+     */
+    where?: SessionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Sessions to fetch.
+     */
+    orderBy?: SessionOrderByWithRelationInput | SessionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SessionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Sessions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Sessions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Sessions
+    **/
+    _count?: true | SessionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SessionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SessionMaxAggregateInputType
+  }
+
+  export type GetSessionAggregateType<T extends SessionAggregateArgs> = {
+        [P in keyof T & keyof AggregateSession]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSession[P]>
+      : GetScalarType<T[P], AggregateSession[P]>
+  }
+
+
+
+
+  export type SessionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SessionWhereInput
+    orderBy?: SessionOrderByWithAggregationInput | SessionOrderByWithAggregationInput[]
+    by: SessionScalarFieldEnum[] | SessionScalarFieldEnum
+    having?: SessionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SessionCountAggregateInputType | true
+    _min?: SessionMinAggregateInputType
+    _max?: SessionMaxAggregateInputType
+  }
+
+  export type SessionGroupByOutputType = {
+    sessionId: string
+    caseId: string
+    messages: JsonValue
+    createdAt: Date
+    updatedAt: Date
+    _count: SessionCountAggregateOutputType | null
+    _min: SessionMinAggregateOutputType | null
+    _max: SessionMaxAggregateOutputType | null
+  }
+
+  type GetSessionGroupByPayload<T extends SessionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SessionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SessionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SessionGroupByOutputType[P]>
+            : GetScalarType<T[P], SessionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SessionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    sessionId?: boolean
+    caseId?: boolean
+    messages?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    case?: boolean | Session$caseArgs<ExtArgs>
+  }, ExtArgs["result"]["session"]>
+
+  export type SessionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    sessionId?: boolean
+    caseId?: boolean
+    messages?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    case?: boolean | Session$caseArgs<ExtArgs>
+  }, ExtArgs["result"]["session"]>
+
+  export type SessionSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    sessionId?: boolean
+    caseId?: boolean
+    messages?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    case?: boolean | Session$caseArgs<ExtArgs>
+  }, ExtArgs["result"]["session"]>
+
+  export type SessionSelectScalar = {
+    sessionId?: boolean
+    caseId?: boolean
+    messages?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type SessionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"sessionId" | "caseId" | "messages" | "createdAt" | "updatedAt", ExtArgs["result"]["session"]>
+  export type SessionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    case?: boolean | Session$caseArgs<ExtArgs>
+  }
+  export type SessionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    case?: boolean | Session$caseArgs<ExtArgs>
+  }
+  export type SessionIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    case?: boolean | Session$caseArgs<ExtArgs>
+  }
+
+  export type $SessionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Session"
+    objects: {
+      case: Prisma.$CasePayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      sessionId: string
+      caseId: string
+      messages: Prisma.JsonValue
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["session"]>
+    composites: {}
+  }
+
+  type SessionGetPayload<S extends boolean | null | undefined | SessionDefaultArgs> = $Result.GetResult<Prisma.$SessionPayload, S>
+
+  type SessionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SessionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SessionCountAggregateInputType | true
+    }
+
+  export interface SessionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Session'], meta: { name: 'Session' } }
+    /**
+     * Find zero or one Session that matches the filter.
+     * @param {SessionFindUniqueArgs} args - Arguments to find a Session
+     * @example
+     * // Get one Session
+     * const session = await prisma.session.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SessionFindUniqueArgs>(args: SelectSubset<T, SessionFindUniqueArgs<ExtArgs>>): Prisma__SessionClient<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Session that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SessionFindUniqueOrThrowArgs} args - Arguments to find a Session
+     * @example
+     * // Get one Session
+     * const session = await prisma.session.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SessionFindUniqueOrThrowArgs>(args: SelectSubset<T, SessionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SessionClient<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Session that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SessionFindFirstArgs} args - Arguments to find a Session
+     * @example
+     * // Get one Session
+     * const session = await prisma.session.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SessionFindFirstArgs>(args?: SelectSubset<T, SessionFindFirstArgs<ExtArgs>>): Prisma__SessionClient<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Session that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SessionFindFirstOrThrowArgs} args - Arguments to find a Session
+     * @example
+     * // Get one Session
+     * const session = await prisma.session.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SessionFindFirstOrThrowArgs>(args?: SelectSubset<T, SessionFindFirstOrThrowArgs<ExtArgs>>): Prisma__SessionClient<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Sessions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SessionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Sessions
+     * const sessions = await prisma.session.findMany()
+     * 
+     * // Get first 10 Sessions
+     * const sessions = await prisma.session.findMany({ take: 10 })
+     * 
+     * // Only select the `sessionId`
+     * const sessionWithSessionIdOnly = await prisma.session.findMany({ select: { sessionId: true } })
+     * 
+     */
+    findMany<T extends SessionFindManyArgs>(args?: SelectSubset<T, SessionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Session.
+     * @param {SessionCreateArgs} args - Arguments to create a Session.
+     * @example
+     * // Create one Session
+     * const Session = await prisma.session.create({
+     *   data: {
+     *     // ... data to create a Session
+     *   }
+     * })
+     * 
+     */
+    create<T extends SessionCreateArgs>(args: SelectSubset<T, SessionCreateArgs<ExtArgs>>): Prisma__SessionClient<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Sessions.
+     * @param {SessionCreateManyArgs} args - Arguments to create many Sessions.
+     * @example
+     * // Create many Sessions
+     * const session = await prisma.session.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SessionCreateManyArgs>(args?: SelectSubset<T, SessionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Sessions and returns the data saved in the database.
+     * @param {SessionCreateManyAndReturnArgs} args - Arguments to create many Sessions.
+     * @example
+     * // Create many Sessions
+     * const session = await prisma.session.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Sessions and only return the `sessionId`
+     * const sessionWithSessionIdOnly = await prisma.session.createManyAndReturn({
+     *   select: { sessionId: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SessionCreateManyAndReturnArgs>(args?: SelectSubset<T, SessionCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Session.
+     * @param {SessionDeleteArgs} args - Arguments to delete one Session.
+     * @example
+     * // Delete one Session
+     * const Session = await prisma.session.delete({
+     *   where: {
+     *     // ... filter to delete one Session
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SessionDeleteArgs>(args: SelectSubset<T, SessionDeleteArgs<ExtArgs>>): Prisma__SessionClient<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Session.
+     * @param {SessionUpdateArgs} args - Arguments to update one Session.
+     * @example
+     * // Update one Session
+     * const session = await prisma.session.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SessionUpdateArgs>(args: SelectSubset<T, SessionUpdateArgs<ExtArgs>>): Prisma__SessionClient<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Sessions.
+     * @param {SessionDeleteManyArgs} args - Arguments to filter Sessions to delete.
+     * @example
+     * // Delete a few Sessions
+     * const { count } = await prisma.session.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SessionDeleteManyArgs>(args?: SelectSubset<T, SessionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Sessions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SessionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Sessions
+     * const session = await prisma.session.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SessionUpdateManyArgs>(args: SelectSubset<T, SessionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Sessions and returns the data updated in the database.
+     * @param {SessionUpdateManyAndReturnArgs} args - Arguments to update many Sessions.
+     * @example
+     * // Update many Sessions
+     * const session = await prisma.session.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Sessions and only return the `sessionId`
+     * const sessionWithSessionIdOnly = await prisma.session.updateManyAndReturn({
+     *   select: { sessionId: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SessionUpdateManyAndReturnArgs>(args: SelectSubset<T, SessionUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Session.
+     * @param {SessionUpsertArgs} args - Arguments to update or create a Session.
+     * @example
+     * // Update or create a Session
+     * const session = await prisma.session.upsert({
+     *   create: {
+     *     // ... data to create a Session
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Session we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SessionUpsertArgs>(args: SelectSubset<T, SessionUpsertArgs<ExtArgs>>): Prisma__SessionClient<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Sessions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SessionCountArgs} args - Arguments to filter Sessions to count.
+     * @example
+     * // Count the number of Sessions
+     * const count = await prisma.session.count({
+     *   where: {
+     *     // ... the filter for the Sessions we want to count
+     *   }
+     * })
+    **/
+    count<T extends SessionCountArgs>(
+      args?: Subset<T, SessionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SessionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Session.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SessionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SessionAggregateArgs>(args: Subset<T, SessionAggregateArgs>): Prisma.PrismaPromise<GetSessionAggregateType<T>>
+
+    /**
+     * Group by Session.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SessionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SessionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SessionGroupByArgs['orderBy'] }
+        : { orderBy?: SessionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SessionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSessionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Session model
+   */
+  readonly fields: SessionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Session.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SessionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    case<T extends Session$caseArgs<ExtArgs> = {}>(args?: Subset<T, Session$caseArgs<ExtArgs>>): Prisma__CaseClient<$Result.GetResult<Prisma.$CasePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Session model
+   */
+  interface SessionFieldRefs {
+    readonly sessionId: FieldRef<"Session", 'String'>
+    readonly caseId: FieldRef<"Session", 'String'>
+    readonly messages: FieldRef<"Session", 'Json'>
+    readonly createdAt: FieldRef<"Session", 'DateTime'>
+    readonly updatedAt: FieldRef<"Session", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Session findUnique
+   */
+  export type SessionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Session
+     */
+    select?: SessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Session
+     */
+    omit?: SessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SessionInclude<ExtArgs> | null
+    /**
+     * Filter, which Session to fetch.
+     */
+    where: SessionWhereUniqueInput
+  }
+
+  /**
+   * Session findUniqueOrThrow
+   */
+  export type SessionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Session
+     */
+    select?: SessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Session
+     */
+    omit?: SessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SessionInclude<ExtArgs> | null
+    /**
+     * Filter, which Session to fetch.
+     */
+    where: SessionWhereUniqueInput
+  }
+
+  /**
+   * Session findFirst
+   */
+  export type SessionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Session
+     */
+    select?: SessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Session
+     */
+    omit?: SessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SessionInclude<ExtArgs> | null
+    /**
+     * Filter, which Session to fetch.
+     */
+    where?: SessionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Sessions to fetch.
+     */
+    orderBy?: SessionOrderByWithRelationInput | SessionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Sessions.
+     */
+    cursor?: SessionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Sessions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Sessions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Sessions.
+     */
+    distinct?: SessionScalarFieldEnum | SessionScalarFieldEnum[]
+  }
+
+  /**
+   * Session findFirstOrThrow
+   */
+  export type SessionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Session
+     */
+    select?: SessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Session
+     */
+    omit?: SessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SessionInclude<ExtArgs> | null
+    /**
+     * Filter, which Session to fetch.
+     */
+    where?: SessionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Sessions to fetch.
+     */
+    orderBy?: SessionOrderByWithRelationInput | SessionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Sessions.
+     */
+    cursor?: SessionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Sessions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Sessions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Sessions.
+     */
+    distinct?: SessionScalarFieldEnum | SessionScalarFieldEnum[]
+  }
+
+  /**
+   * Session findMany
+   */
+  export type SessionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Session
+     */
+    select?: SessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Session
+     */
+    omit?: SessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SessionInclude<ExtArgs> | null
+    /**
+     * Filter, which Sessions to fetch.
+     */
+    where?: SessionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Sessions to fetch.
+     */
+    orderBy?: SessionOrderByWithRelationInput | SessionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Sessions.
+     */
+    cursor?: SessionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Sessions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Sessions.
+     */
+    skip?: number
+    distinct?: SessionScalarFieldEnum | SessionScalarFieldEnum[]
+  }
+
+  /**
+   * Session create
+   */
+  export type SessionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Session
+     */
+    select?: SessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Session
+     */
+    omit?: SessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SessionInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Session.
+     */
+    data: XOR<SessionCreateInput, SessionUncheckedCreateInput>
+  }
+
+  /**
+   * Session createMany
+   */
+  export type SessionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Sessions.
+     */
+    data: SessionCreateManyInput | SessionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Session createManyAndReturn
+   */
+  export type SessionCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Session
+     */
+    select?: SessionSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Session
+     */
+    omit?: SessionOmit<ExtArgs> | null
+    /**
+     * The data used to create many Sessions.
+     */
+    data: SessionCreateManyInput | SessionCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SessionIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Session update
+   */
+  export type SessionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Session
+     */
+    select?: SessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Session
+     */
+    omit?: SessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SessionInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Session.
+     */
+    data: XOR<SessionUpdateInput, SessionUncheckedUpdateInput>
+    /**
+     * Choose, which Session to update.
+     */
+    where: SessionWhereUniqueInput
+  }
+
+  /**
+   * Session updateMany
+   */
+  export type SessionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Sessions.
+     */
+    data: XOR<SessionUpdateManyMutationInput, SessionUncheckedUpdateManyInput>
+    /**
+     * Filter which Sessions to update
+     */
+    where?: SessionWhereInput
+    /**
+     * Limit how many Sessions to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Session updateManyAndReturn
+   */
+  export type SessionUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Session
+     */
+    select?: SessionSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Session
+     */
+    omit?: SessionOmit<ExtArgs> | null
+    /**
+     * The data used to update Sessions.
+     */
+    data: XOR<SessionUpdateManyMutationInput, SessionUncheckedUpdateManyInput>
+    /**
+     * Filter which Sessions to update
+     */
+    where?: SessionWhereInput
+    /**
+     * Limit how many Sessions to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SessionIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Session upsert
+   */
+  export type SessionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Session
+     */
+    select?: SessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Session
+     */
+    omit?: SessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SessionInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Session to update in case it exists.
+     */
+    where: SessionWhereUniqueInput
+    /**
+     * In case the Session found by the `where` argument doesn't exist, create a new Session with this data.
+     */
+    create: XOR<SessionCreateInput, SessionUncheckedCreateInput>
+    /**
+     * In case the Session was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SessionUpdateInput, SessionUncheckedUpdateInput>
+  }
+
+  /**
+   * Session delete
+   */
+  export type SessionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Session
+     */
+    select?: SessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Session
+     */
+    omit?: SessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SessionInclude<ExtArgs> | null
+    /**
+     * Filter which Session to delete.
+     */
+    where: SessionWhereUniqueInput
+  }
+
+  /**
+   * Session deleteMany
+   */
+  export type SessionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Sessions to delete
+     */
+    where?: SessionWhereInput
+    /**
+     * Limit how many Sessions to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Session.case
+   */
+  export type Session$caseArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Case
+     */
+    select?: CaseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Case
+     */
+    omit?: CaseOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CaseInclude<ExtArgs> | null
+    where?: CaseWhereInput
+  }
+
+  /**
+   * Session without action
+   */
+  export type SessionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Session
+     */
+    select?: SessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Session
+     */
+    omit?: SessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SessionInclude<ExtArgs> | null
   }
 
 
@@ -7047,1077 +8106,6 @@ export namespace Prisma {
 
 
   /**
-   * Model EnhancedLaw
-   */
-
-  export type AggregateEnhancedLaw = {
-    _count: EnhancedLawCountAggregateOutputType | null
-    _min: EnhancedLawMinAggregateOutputType | null
-    _max: EnhancedLawMaxAggregateOutputType | null
-  }
-
-  export type EnhancedLawMinAggregateOutputType = {
-    id: string | null
-    law: string | null
-    description: string | null
-    relevance: string | null
-    caseId: string | null
-    createdAt: Date | null
-  }
-
-  export type EnhancedLawMaxAggregateOutputType = {
-    id: string | null
-    law: string | null
-    description: string | null
-    relevance: string | null
-    caseId: string | null
-    createdAt: Date | null
-  }
-
-  export type EnhancedLawCountAggregateOutputType = {
-    id: number
-    law: number
-    description: number
-    relevance: number
-    caseId: number
-    createdAt: number
-    _all: number
-  }
-
-
-  export type EnhancedLawMinAggregateInputType = {
-    id?: true
-    law?: true
-    description?: true
-    relevance?: true
-    caseId?: true
-    createdAt?: true
-  }
-
-  export type EnhancedLawMaxAggregateInputType = {
-    id?: true
-    law?: true
-    description?: true
-    relevance?: true
-    caseId?: true
-    createdAt?: true
-  }
-
-  export type EnhancedLawCountAggregateInputType = {
-    id?: true
-    law?: true
-    description?: true
-    relevance?: true
-    caseId?: true
-    createdAt?: true
-    _all?: true
-  }
-
-  export type EnhancedLawAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which EnhancedLaw to aggregate.
-     */
-    where?: EnhancedLawWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of EnhancedLaws to fetch.
-     */
-    orderBy?: EnhancedLawOrderByWithRelationInput | EnhancedLawOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the start position
-     */
-    cursor?: EnhancedLawWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` EnhancedLaws from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` EnhancedLaws.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Count returned EnhancedLaws
-    **/
-    _count?: true | EnhancedLawCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the minimum value
-    **/
-    _min?: EnhancedLawMinAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the maximum value
-    **/
-    _max?: EnhancedLawMaxAggregateInputType
-  }
-
-  export type GetEnhancedLawAggregateType<T extends EnhancedLawAggregateArgs> = {
-        [P in keyof T & keyof AggregateEnhancedLaw]: P extends '_count' | 'count'
-      ? T[P] extends true
-        ? number
-        : GetScalarType<T[P], AggregateEnhancedLaw[P]>
-      : GetScalarType<T[P], AggregateEnhancedLaw[P]>
-  }
-
-
-
-
-  export type EnhancedLawGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: EnhancedLawWhereInput
-    orderBy?: EnhancedLawOrderByWithAggregationInput | EnhancedLawOrderByWithAggregationInput[]
-    by: EnhancedLawScalarFieldEnum[] | EnhancedLawScalarFieldEnum
-    having?: EnhancedLawScalarWhereWithAggregatesInput
-    take?: number
-    skip?: number
-    _count?: EnhancedLawCountAggregateInputType | true
-    _min?: EnhancedLawMinAggregateInputType
-    _max?: EnhancedLawMaxAggregateInputType
-  }
-
-  export type EnhancedLawGroupByOutputType = {
-    id: string
-    law: string
-    description: string
-    relevance: string
-    caseId: string
-    createdAt: Date
-    _count: EnhancedLawCountAggregateOutputType | null
-    _min: EnhancedLawMinAggregateOutputType | null
-    _max: EnhancedLawMaxAggregateOutputType | null
-  }
-
-  type GetEnhancedLawGroupByPayload<T extends EnhancedLawGroupByArgs> = Prisma.PrismaPromise<
-    Array<
-      PickEnumerable<EnhancedLawGroupByOutputType, T['by']> &
-        {
-          [P in ((keyof T) & (keyof EnhancedLawGroupByOutputType))]: P extends '_count'
-            ? T[P] extends boolean
-              ? number
-              : GetScalarType<T[P], EnhancedLawGroupByOutputType[P]>
-            : GetScalarType<T[P], EnhancedLawGroupByOutputType[P]>
-        }
-      >
-    >
-
-
-  export type EnhancedLawSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    law?: boolean
-    description?: boolean
-    relevance?: boolean
-    caseId?: boolean
-    createdAt?: boolean
-    case?: boolean | CaseDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["enhancedLaw"]>
-
-  export type EnhancedLawSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    law?: boolean
-    description?: boolean
-    relevance?: boolean
-    caseId?: boolean
-    createdAt?: boolean
-    case?: boolean | CaseDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["enhancedLaw"]>
-
-  export type EnhancedLawSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    law?: boolean
-    description?: boolean
-    relevance?: boolean
-    caseId?: boolean
-    createdAt?: boolean
-    case?: boolean | CaseDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["enhancedLaw"]>
-
-  export type EnhancedLawSelectScalar = {
-    id?: boolean
-    law?: boolean
-    description?: boolean
-    relevance?: boolean
-    caseId?: boolean
-    createdAt?: boolean
-  }
-
-  export type EnhancedLawOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "law" | "description" | "relevance" | "caseId" | "createdAt", ExtArgs["result"]["enhancedLaw"]>
-  export type EnhancedLawInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    case?: boolean | CaseDefaultArgs<ExtArgs>
-  }
-  export type EnhancedLawIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    case?: boolean | CaseDefaultArgs<ExtArgs>
-  }
-  export type EnhancedLawIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    case?: boolean | CaseDefaultArgs<ExtArgs>
-  }
-
-  export type $EnhancedLawPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "EnhancedLaw"
-    objects: {
-      case: Prisma.$CasePayload<ExtArgs>
-    }
-    scalars: $Extensions.GetPayloadResult<{
-      id: string
-      law: string
-      description: string
-      relevance: string
-      caseId: string
-      createdAt: Date
-    }, ExtArgs["result"]["enhancedLaw"]>
-    composites: {}
-  }
-
-  type EnhancedLawGetPayload<S extends boolean | null | undefined | EnhancedLawDefaultArgs> = $Result.GetResult<Prisma.$EnhancedLawPayload, S>
-
-  type EnhancedLawCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<EnhancedLawFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: EnhancedLawCountAggregateInputType | true
-    }
-
-  export interface EnhancedLawDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['EnhancedLaw'], meta: { name: 'EnhancedLaw' } }
-    /**
-     * Find zero or one EnhancedLaw that matches the filter.
-     * @param {EnhancedLawFindUniqueArgs} args - Arguments to find a EnhancedLaw
-     * @example
-     * // Get one EnhancedLaw
-     * const enhancedLaw = await prisma.enhancedLaw.findUnique({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUnique<T extends EnhancedLawFindUniqueArgs>(args: SelectSubset<T, EnhancedLawFindUniqueArgs<ExtArgs>>): Prisma__EnhancedLawClient<$Result.GetResult<Prisma.$EnhancedLawPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find one EnhancedLaw that matches the filter or throw an error with `error.code='P2025'`
-     * if no matches were found.
-     * @param {EnhancedLawFindUniqueOrThrowArgs} args - Arguments to find a EnhancedLaw
-     * @example
-     * // Get one EnhancedLaw
-     * const enhancedLaw = await prisma.enhancedLaw.findUniqueOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUniqueOrThrow<T extends EnhancedLawFindUniqueOrThrowArgs>(args: SelectSubset<T, EnhancedLawFindUniqueOrThrowArgs<ExtArgs>>): Prisma__EnhancedLawClient<$Result.GetResult<Prisma.$EnhancedLawPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first EnhancedLaw that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {EnhancedLawFindFirstArgs} args - Arguments to find a EnhancedLaw
-     * @example
-     * // Get one EnhancedLaw
-     * const enhancedLaw = await prisma.enhancedLaw.findFirst({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirst<T extends EnhancedLawFindFirstArgs>(args?: SelectSubset<T, EnhancedLawFindFirstArgs<ExtArgs>>): Prisma__EnhancedLawClient<$Result.GetResult<Prisma.$EnhancedLawPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first EnhancedLaw that matches the filter or
-     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {EnhancedLawFindFirstOrThrowArgs} args - Arguments to find a EnhancedLaw
-     * @example
-     * // Get one EnhancedLaw
-     * const enhancedLaw = await prisma.enhancedLaw.findFirstOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirstOrThrow<T extends EnhancedLawFindFirstOrThrowArgs>(args?: SelectSubset<T, EnhancedLawFindFirstOrThrowArgs<ExtArgs>>): Prisma__EnhancedLawClient<$Result.GetResult<Prisma.$EnhancedLawPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find zero or more EnhancedLaws that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {EnhancedLawFindManyArgs} args - Arguments to filter and select certain fields only.
-     * @example
-     * // Get all EnhancedLaws
-     * const enhancedLaws = await prisma.enhancedLaw.findMany()
-     * 
-     * // Get first 10 EnhancedLaws
-     * const enhancedLaws = await prisma.enhancedLaw.findMany({ take: 10 })
-     * 
-     * // Only select the `id`
-     * const enhancedLawWithIdOnly = await prisma.enhancedLaw.findMany({ select: { id: true } })
-     * 
-     */
-    findMany<T extends EnhancedLawFindManyArgs>(args?: SelectSubset<T, EnhancedLawFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EnhancedLawPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
-
-    /**
-     * Create a EnhancedLaw.
-     * @param {EnhancedLawCreateArgs} args - Arguments to create a EnhancedLaw.
-     * @example
-     * // Create one EnhancedLaw
-     * const EnhancedLaw = await prisma.enhancedLaw.create({
-     *   data: {
-     *     // ... data to create a EnhancedLaw
-     *   }
-     * })
-     * 
-     */
-    create<T extends EnhancedLawCreateArgs>(args: SelectSubset<T, EnhancedLawCreateArgs<ExtArgs>>): Prisma__EnhancedLawClient<$Result.GetResult<Prisma.$EnhancedLawPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Create many EnhancedLaws.
-     * @param {EnhancedLawCreateManyArgs} args - Arguments to create many EnhancedLaws.
-     * @example
-     * // Create many EnhancedLaws
-     * const enhancedLaw = await prisma.enhancedLaw.createMany({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     *     
-     */
-    createMany<T extends EnhancedLawCreateManyArgs>(args?: SelectSubset<T, EnhancedLawCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Create many EnhancedLaws and returns the data saved in the database.
-     * @param {EnhancedLawCreateManyAndReturnArgs} args - Arguments to create many EnhancedLaws.
-     * @example
-     * // Create many EnhancedLaws
-     * const enhancedLaw = await prisma.enhancedLaw.createManyAndReturn({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Create many EnhancedLaws and only return the `id`
-     * const enhancedLawWithIdOnly = await prisma.enhancedLaw.createManyAndReturn({
-     *   select: { id: true },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    createManyAndReturn<T extends EnhancedLawCreateManyAndReturnArgs>(args?: SelectSubset<T, EnhancedLawCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EnhancedLawPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Delete a EnhancedLaw.
-     * @param {EnhancedLawDeleteArgs} args - Arguments to delete one EnhancedLaw.
-     * @example
-     * // Delete one EnhancedLaw
-     * const EnhancedLaw = await prisma.enhancedLaw.delete({
-     *   where: {
-     *     // ... filter to delete one EnhancedLaw
-     *   }
-     * })
-     * 
-     */
-    delete<T extends EnhancedLawDeleteArgs>(args: SelectSubset<T, EnhancedLawDeleteArgs<ExtArgs>>): Prisma__EnhancedLawClient<$Result.GetResult<Prisma.$EnhancedLawPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Update one EnhancedLaw.
-     * @param {EnhancedLawUpdateArgs} args - Arguments to update one EnhancedLaw.
-     * @example
-     * // Update one EnhancedLaw
-     * const enhancedLaw = await prisma.enhancedLaw.update({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    update<T extends EnhancedLawUpdateArgs>(args: SelectSubset<T, EnhancedLawUpdateArgs<ExtArgs>>): Prisma__EnhancedLawClient<$Result.GetResult<Prisma.$EnhancedLawPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Delete zero or more EnhancedLaws.
-     * @param {EnhancedLawDeleteManyArgs} args - Arguments to filter EnhancedLaws to delete.
-     * @example
-     * // Delete a few EnhancedLaws
-     * const { count } = await prisma.enhancedLaw.deleteMany({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     * 
-     */
-    deleteMany<T extends EnhancedLawDeleteManyArgs>(args?: SelectSubset<T, EnhancedLawDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more EnhancedLaws.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {EnhancedLawUpdateManyArgs} args - Arguments to update one or more rows.
-     * @example
-     * // Update many EnhancedLaws
-     * const enhancedLaw = await prisma.enhancedLaw.updateMany({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    updateMany<T extends EnhancedLawUpdateManyArgs>(args: SelectSubset<T, EnhancedLawUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more EnhancedLaws and returns the data updated in the database.
-     * @param {EnhancedLawUpdateManyAndReturnArgs} args - Arguments to update many EnhancedLaws.
-     * @example
-     * // Update many EnhancedLaws
-     * const enhancedLaw = await prisma.enhancedLaw.updateManyAndReturn({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Update zero or more EnhancedLaws and only return the `id`
-     * const enhancedLawWithIdOnly = await prisma.enhancedLaw.updateManyAndReturn({
-     *   select: { id: true },
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    updateManyAndReturn<T extends EnhancedLawUpdateManyAndReturnArgs>(args: SelectSubset<T, EnhancedLawUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EnhancedLawPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Create or update one EnhancedLaw.
-     * @param {EnhancedLawUpsertArgs} args - Arguments to update or create a EnhancedLaw.
-     * @example
-     * // Update or create a EnhancedLaw
-     * const enhancedLaw = await prisma.enhancedLaw.upsert({
-     *   create: {
-     *     // ... data to create a EnhancedLaw
-     *   },
-     *   update: {
-     *     // ... in case it already exists, update
-     *   },
-     *   where: {
-     *     // ... the filter for the EnhancedLaw we want to update
-     *   }
-     * })
-     */
-    upsert<T extends EnhancedLawUpsertArgs>(args: SelectSubset<T, EnhancedLawUpsertArgs<ExtArgs>>): Prisma__EnhancedLawClient<$Result.GetResult<Prisma.$EnhancedLawPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-
-    /**
-     * Count the number of EnhancedLaws.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {EnhancedLawCountArgs} args - Arguments to filter EnhancedLaws to count.
-     * @example
-     * // Count the number of EnhancedLaws
-     * const count = await prisma.enhancedLaw.count({
-     *   where: {
-     *     // ... the filter for the EnhancedLaws we want to count
-     *   }
-     * })
-    **/
-    count<T extends EnhancedLawCountArgs>(
-      args?: Subset<T, EnhancedLawCountArgs>,
-    ): Prisma.PrismaPromise<
-      T extends $Utils.Record<'select', any>
-        ? T['select'] extends true
-          ? number
-          : GetScalarType<T['select'], EnhancedLawCountAggregateOutputType>
-        : number
-    >
-
-    /**
-     * Allows you to perform aggregations operations on a EnhancedLaw.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {EnhancedLawAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-     * @example
-     * // Ordered by age ascending
-     * // Where email contains prisma.io
-     * // Limited to the 10 users
-     * const aggregations = await prisma.user.aggregate({
-     *   _avg: {
-     *     age: true,
-     *   },
-     *   where: {
-     *     email: {
-     *       contains: "prisma.io",
-     *     },
-     *   },
-     *   orderBy: {
-     *     age: "asc",
-     *   },
-     *   take: 10,
-     * })
-    **/
-    aggregate<T extends EnhancedLawAggregateArgs>(args: Subset<T, EnhancedLawAggregateArgs>): Prisma.PrismaPromise<GetEnhancedLawAggregateType<T>>
-
-    /**
-     * Group by EnhancedLaw.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {EnhancedLawGroupByArgs} args - Group by arguments.
-     * @example
-     * // Group by city, order by createdAt, get count
-     * const result = await prisma.user.groupBy({
-     *   by: ['city', 'createdAt'],
-     *   orderBy: {
-     *     createdAt: true
-     *   },
-     *   _count: {
-     *     _all: true
-     *   },
-     * })
-     * 
-    **/
-    groupBy<
-      T extends EnhancedLawGroupByArgs,
-      HasSelectOrTake extends Or<
-        Extends<'skip', Keys<T>>,
-        Extends<'take', Keys<T>>
-      >,
-      OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: EnhancedLawGroupByArgs['orderBy'] }
-        : { orderBy?: EnhancedLawGroupByArgs['orderBy'] },
-      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-      ByFields extends MaybeTupleToUnion<T['by']>,
-      ByValid extends Has<ByFields, OrderFields>,
-      HavingFields extends GetHavingFields<T['having']>,
-      HavingValid extends Has<ByFields, HavingFields>,
-      ByEmpty extends T['by'] extends never[] ? True : False,
-      InputErrors extends ByEmpty extends True
-      ? `Error: "by" must not be empty.`
-      : HavingValid extends False
-      ? {
-          [P in HavingFields]: P extends ByFields
-            ? never
-            : P extends string
-            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-            : [
-                Error,
-                'Field ',
-                P,
-                ` in "having" needs to be provided in "by"`,
-              ]
-        }[HavingFields]
-      : 'take' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "take", you also need to provide "orderBy"'
-      : 'skip' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "skip", you also need to provide "orderBy"'
-      : ByValid extends True
-      ? {}
-      : {
-          [P in OrderFields]: P extends ByFields
-            ? never
-            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-        }[OrderFields]
-    >(args: SubsetIntersection<T, EnhancedLawGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetEnhancedLawGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-  /**
-   * Fields of the EnhancedLaw model
-   */
-  readonly fields: EnhancedLawFieldRefs;
-  }
-
-  /**
-   * The delegate class that acts as a "Promise-like" for EnhancedLaw.
-   * Why is this prefixed with `Prisma__`?
-   * Because we want to prevent naming conflicts as mentioned in
-   * https://github.com/prisma/prisma-client-js/issues/707
-   */
-  export interface Prisma__EnhancedLawClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
-    readonly [Symbol.toStringTag]: "PrismaPromise"
-    case<T extends CaseDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CaseDefaultArgs<ExtArgs>>): Prisma__CaseClient<$Result.GetResult<Prisma.$CasePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    /**
-     * Attaches callbacks for the resolution and/or rejection of the Promise.
-     * @param onfulfilled The callback to execute when the Promise is resolved.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of which ever callback is executed.
-     */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-    /**
-     * Attaches a callback for only the rejection of the Promise.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of the callback.
-     */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-    /**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
-     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns A Promise for the completion of the callback.
-     */
-    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-  }
-
-
-
-
-  /**
-   * Fields of the EnhancedLaw model
-   */
-  interface EnhancedLawFieldRefs {
-    readonly id: FieldRef<"EnhancedLaw", 'String'>
-    readonly law: FieldRef<"EnhancedLaw", 'String'>
-    readonly description: FieldRef<"EnhancedLaw", 'String'>
-    readonly relevance: FieldRef<"EnhancedLaw", 'String'>
-    readonly caseId: FieldRef<"EnhancedLaw", 'String'>
-    readonly createdAt: FieldRef<"EnhancedLaw", 'DateTime'>
-  }
-    
-
-  // Custom InputTypes
-  /**
-   * EnhancedLaw findUnique
-   */
-  export type EnhancedLawFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the EnhancedLaw
-     */
-    select?: EnhancedLawSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the EnhancedLaw
-     */
-    omit?: EnhancedLawOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: EnhancedLawInclude<ExtArgs> | null
-    /**
-     * Filter, which EnhancedLaw to fetch.
-     */
-    where: EnhancedLawWhereUniqueInput
-  }
-
-  /**
-   * EnhancedLaw findUniqueOrThrow
-   */
-  export type EnhancedLawFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the EnhancedLaw
-     */
-    select?: EnhancedLawSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the EnhancedLaw
-     */
-    omit?: EnhancedLawOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: EnhancedLawInclude<ExtArgs> | null
-    /**
-     * Filter, which EnhancedLaw to fetch.
-     */
-    where: EnhancedLawWhereUniqueInput
-  }
-
-  /**
-   * EnhancedLaw findFirst
-   */
-  export type EnhancedLawFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the EnhancedLaw
-     */
-    select?: EnhancedLawSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the EnhancedLaw
-     */
-    omit?: EnhancedLawOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: EnhancedLawInclude<ExtArgs> | null
-    /**
-     * Filter, which EnhancedLaw to fetch.
-     */
-    where?: EnhancedLawWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of EnhancedLaws to fetch.
-     */
-    orderBy?: EnhancedLawOrderByWithRelationInput | EnhancedLawOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for EnhancedLaws.
-     */
-    cursor?: EnhancedLawWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` EnhancedLaws from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` EnhancedLaws.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of EnhancedLaws.
-     */
-    distinct?: EnhancedLawScalarFieldEnum | EnhancedLawScalarFieldEnum[]
-  }
-
-  /**
-   * EnhancedLaw findFirstOrThrow
-   */
-  export type EnhancedLawFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the EnhancedLaw
-     */
-    select?: EnhancedLawSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the EnhancedLaw
-     */
-    omit?: EnhancedLawOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: EnhancedLawInclude<ExtArgs> | null
-    /**
-     * Filter, which EnhancedLaw to fetch.
-     */
-    where?: EnhancedLawWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of EnhancedLaws to fetch.
-     */
-    orderBy?: EnhancedLawOrderByWithRelationInput | EnhancedLawOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for EnhancedLaws.
-     */
-    cursor?: EnhancedLawWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` EnhancedLaws from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` EnhancedLaws.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of EnhancedLaws.
-     */
-    distinct?: EnhancedLawScalarFieldEnum | EnhancedLawScalarFieldEnum[]
-  }
-
-  /**
-   * EnhancedLaw findMany
-   */
-  export type EnhancedLawFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the EnhancedLaw
-     */
-    select?: EnhancedLawSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the EnhancedLaw
-     */
-    omit?: EnhancedLawOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: EnhancedLawInclude<ExtArgs> | null
-    /**
-     * Filter, which EnhancedLaws to fetch.
-     */
-    where?: EnhancedLawWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of EnhancedLaws to fetch.
-     */
-    orderBy?: EnhancedLawOrderByWithRelationInput | EnhancedLawOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for listing EnhancedLaws.
-     */
-    cursor?: EnhancedLawWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` EnhancedLaws from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` EnhancedLaws.
-     */
-    skip?: number
-    distinct?: EnhancedLawScalarFieldEnum | EnhancedLawScalarFieldEnum[]
-  }
-
-  /**
-   * EnhancedLaw create
-   */
-  export type EnhancedLawCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the EnhancedLaw
-     */
-    select?: EnhancedLawSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the EnhancedLaw
-     */
-    omit?: EnhancedLawOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: EnhancedLawInclude<ExtArgs> | null
-    /**
-     * The data needed to create a EnhancedLaw.
-     */
-    data: XOR<EnhancedLawCreateInput, EnhancedLawUncheckedCreateInput>
-  }
-
-  /**
-   * EnhancedLaw createMany
-   */
-  export type EnhancedLawCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many EnhancedLaws.
-     */
-    data: EnhancedLawCreateManyInput | EnhancedLawCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * EnhancedLaw createManyAndReturn
-   */
-  export type EnhancedLawCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the EnhancedLaw
-     */
-    select?: EnhancedLawSelectCreateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the EnhancedLaw
-     */
-    omit?: EnhancedLawOmit<ExtArgs> | null
-    /**
-     * The data used to create many EnhancedLaws.
-     */
-    data: EnhancedLawCreateManyInput | EnhancedLawCreateManyInput[]
-    skipDuplicates?: boolean
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: EnhancedLawIncludeCreateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * EnhancedLaw update
-   */
-  export type EnhancedLawUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the EnhancedLaw
-     */
-    select?: EnhancedLawSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the EnhancedLaw
-     */
-    omit?: EnhancedLawOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: EnhancedLawInclude<ExtArgs> | null
-    /**
-     * The data needed to update a EnhancedLaw.
-     */
-    data: XOR<EnhancedLawUpdateInput, EnhancedLawUncheckedUpdateInput>
-    /**
-     * Choose, which EnhancedLaw to update.
-     */
-    where: EnhancedLawWhereUniqueInput
-  }
-
-  /**
-   * EnhancedLaw updateMany
-   */
-  export type EnhancedLawUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to update EnhancedLaws.
-     */
-    data: XOR<EnhancedLawUpdateManyMutationInput, EnhancedLawUncheckedUpdateManyInput>
-    /**
-     * Filter which EnhancedLaws to update
-     */
-    where?: EnhancedLawWhereInput
-    /**
-     * Limit how many EnhancedLaws to update.
-     */
-    limit?: number
-  }
-
-  /**
-   * EnhancedLaw updateManyAndReturn
-   */
-  export type EnhancedLawUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the EnhancedLaw
-     */
-    select?: EnhancedLawSelectUpdateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the EnhancedLaw
-     */
-    omit?: EnhancedLawOmit<ExtArgs> | null
-    /**
-     * The data used to update EnhancedLaws.
-     */
-    data: XOR<EnhancedLawUpdateManyMutationInput, EnhancedLawUncheckedUpdateManyInput>
-    /**
-     * Filter which EnhancedLaws to update
-     */
-    where?: EnhancedLawWhereInput
-    /**
-     * Limit how many EnhancedLaws to update.
-     */
-    limit?: number
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: EnhancedLawIncludeUpdateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * EnhancedLaw upsert
-   */
-  export type EnhancedLawUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the EnhancedLaw
-     */
-    select?: EnhancedLawSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the EnhancedLaw
-     */
-    omit?: EnhancedLawOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: EnhancedLawInclude<ExtArgs> | null
-    /**
-     * The filter to search for the EnhancedLaw to update in case it exists.
-     */
-    where: EnhancedLawWhereUniqueInput
-    /**
-     * In case the EnhancedLaw found by the `where` argument doesn't exist, create a new EnhancedLaw with this data.
-     */
-    create: XOR<EnhancedLawCreateInput, EnhancedLawUncheckedCreateInput>
-    /**
-     * In case the EnhancedLaw was found with the provided `where` argument, update it with this data.
-     */
-    update: XOR<EnhancedLawUpdateInput, EnhancedLawUncheckedUpdateInput>
-  }
-
-  /**
-   * EnhancedLaw delete
-   */
-  export type EnhancedLawDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the EnhancedLaw
-     */
-    select?: EnhancedLawSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the EnhancedLaw
-     */
-    omit?: EnhancedLawOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: EnhancedLawInclude<ExtArgs> | null
-    /**
-     * Filter which EnhancedLaw to delete.
-     */
-    where: EnhancedLawWhereUniqueInput
-  }
-
-  /**
-   * EnhancedLaw deleteMany
-   */
-  export type EnhancedLawDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which EnhancedLaws to delete
-     */
-    where?: EnhancedLawWhereInput
-    /**
-     * Limit how many EnhancedLaws to delete.
-     */
-    limit?: number
-  }
-
-  /**
-   * EnhancedLaw without action
-   */
-  export type EnhancedLawDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the EnhancedLaw
-     */
-    select?: EnhancedLawSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the EnhancedLaw
-     */
-    omit?: EnhancedLawOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: EnhancedLawInclude<ExtArgs> | null
-  }
-
-
-  /**
    * Enums
    */
 
@@ -8166,6 +8154,17 @@ export namespace Prisma {
   export type CaseScalarFieldEnum = (typeof CaseScalarFieldEnum)[keyof typeof CaseScalarFieldEnum]
 
 
+  export const SessionScalarFieldEnum: {
+    sessionId: 'sessionId',
+    caseId: 'caseId',
+    messages: 'messages',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
+
+
   export const ExtractedDocScalarFieldEnum: {
     id: 'id',
     docId: 'docId',
@@ -8205,24 +8204,19 @@ export namespace Prisma {
   export type LegalTermScalarFieldEnum = (typeof LegalTermScalarFieldEnum)[keyof typeof LegalTermScalarFieldEnum]
 
 
-  export const EnhancedLawScalarFieldEnum: {
-    id: 'id',
-    law: 'law',
-    description: 'description',
-    relevance: 'relevance',
-    caseId: 'caseId',
-    createdAt: 'createdAt'
-  };
-
-  export type EnhancedLawScalarFieldEnum = (typeof EnhancedLawScalarFieldEnum)[keyof typeof EnhancedLawScalarFieldEnum]
-
-
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
   };
 
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+  export const JsonNullValueInput: {
+    JsonNull: typeof JsonNull
+  };
+
+  export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
   export const QueryMode: {
@@ -8239,6 +8233,15 @@ export namespace Prisma {
   };
 
   export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+  export const JsonNullValueFilter: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull,
+    AnyNull: typeof AnyNull
+  };
+
+  export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
   /**
@@ -8320,6 +8323,20 @@ export namespace Prisma {
    * Reference to a field of type 'Boolean'
    */
   export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'QueryMode'
+   */
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -8458,9 +8475,9 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Case"> | Date | string
     updatedAt?: DateTimeFilter<"Case"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
-    involvedLaws?: EnhancedLawListRelationFilter
     todos?: TodoListRelationFilter
     extractedDocs?: ExtractedDocListRelationFilter
+    session?: XOR<SessionNullableScalarRelationFilter, SessionWhereInput> | null
   }
 
   export type CaseOrderByWithRelationInput = {
@@ -8477,9 +8494,9 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
-    involvedLaws?: EnhancedLawOrderByRelationAggregateInput
     todos?: TodoOrderByRelationAggregateInput
     extractedDocs?: ExtractedDocOrderByRelationAggregateInput
+    session?: SessionOrderByWithRelationInput
   }
 
   export type CaseWhereUniqueInput = Prisma.AtLeast<{
@@ -8499,9 +8516,9 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Case"> | Date | string
     updatedAt?: DateTimeFilter<"Case"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
-    involvedLaws?: EnhancedLawListRelationFilter
     todos?: TodoListRelationFilter
     extractedDocs?: ExtractedDocListRelationFilter
+    session?: XOR<SessionNullableScalarRelationFilter, SessionWhereInput> | null
   }, "id">
 
   export type CaseOrderByWithAggregationInput = {
@@ -8538,6 +8555,61 @@ export namespace Prisma {
     finalAnalysis?: StringNullableWithAggregatesFilter<"Case"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Case"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Case"> | Date | string
+  }
+
+  export type SessionWhereInput = {
+    AND?: SessionWhereInput | SessionWhereInput[]
+    OR?: SessionWhereInput[]
+    NOT?: SessionWhereInput | SessionWhereInput[]
+    sessionId?: StringFilter<"Session"> | string
+    caseId?: StringFilter<"Session"> | string
+    messages?: JsonFilter<"Session">
+    createdAt?: DateTimeFilter<"Session"> | Date | string
+    updatedAt?: DateTimeFilter<"Session"> | Date | string
+    case?: XOR<CaseNullableScalarRelationFilter, CaseWhereInput> | null
+  }
+
+  export type SessionOrderByWithRelationInput = {
+    sessionId?: SortOrder
+    caseId?: SortOrder
+    messages?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    case?: CaseOrderByWithRelationInput
+  }
+
+  export type SessionWhereUniqueInput = Prisma.AtLeast<{
+    sessionId?: string
+    caseId?: string
+    AND?: SessionWhereInput | SessionWhereInput[]
+    OR?: SessionWhereInput[]
+    NOT?: SessionWhereInput | SessionWhereInput[]
+    messages?: JsonFilter<"Session">
+    createdAt?: DateTimeFilter<"Session"> | Date | string
+    updatedAt?: DateTimeFilter<"Session"> | Date | string
+    case?: XOR<CaseNullableScalarRelationFilter, CaseWhereInput> | null
+  }, "sessionId" | "caseId">
+
+  export type SessionOrderByWithAggregationInput = {
+    sessionId?: SortOrder
+    caseId?: SortOrder
+    messages?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: SessionCountOrderByAggregateInput
+    _max?: SessionMaxOrderByAggregateInput
+    _min?: SessionMinOrderByAggregateInput
+  }
+
+  export type SessionScalarWhereWithAggregatesInput = {
+    AND?: SessionScalarWhereWithAggregatesInput | SessionScalarWhereWithAggregatesInput[]
+    OR?: SessionScalarWhereWithAggregatesInput[]
+    NOT?: SessionScalarWhereWithAggregatesInput | SessionScalarWhereWithAggregatesInput[]
+    sessionId?: StringWithAggregatesFilter<"Session"> | string
+    caseId?: StringWithAggregatesFilter<"Session"> | string
+    messages?: JsonWithAggregatesFilter<"Session">
+    createdAt?: DateTimeWithAggregatesFilter<"Session"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Session"> | Date | string
   }
 
   export type ExtractedDocWhereInput = {
@@ -8732,66 +8804,6 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"LegalTerm"> | Date | string
   }
 
-  export type EnhancedLawWhereInput = {
-    AND?: EnhancedLawWhereInput | EnhancedLawWhereInput[]
-    OR?: EnhancedLawWhereInput[]
-    NOT?: EnhancedLawWhereInput | EnhancedLawWhereInput[]
-    id?: StringFilter<"EnhancedLaw"> | string
-    law?: StringFilter<"EnhancedLaw"> | string
-    description?: StringFilter<"EnhancedLaw"> | string
-    relevance?: StringFilter<"EnhancedLaw"> | string
-    caseId?: StringFilter<"EnhancedLaw"> | string
-    createdAt?: DateTimeFilter<"EnhancedLaw"> | Date | string
-    case?: XOR<CaseScalarRelationFilter, CaseWhereInput>
-  }
-
-  export type EnhancedLawOrderByWithRelationInput = {
-    id?: SortOrder
-    law?: SortOrder
-    description?: SortOrder
-    relevance?: SortOrder
-    caseId?: SortOrder
-    createdAt?: SortOrder
-    case?: CaseOrderByWithRelationInput
-  }
-
-  export type EnhancedLawWhereUniqueInput = Prisma.AtLeast<{
-    id?: string
-    AND?: EnhancedLawWhereInput | EnhancedLawWhereInput[]
-    OR?: EnhancedLawWhereInput[]
-    NOT?: EnhancedLawWhereInput | EnhancedLawWhereInput[]
-    law?: StringFilter<"EnhancedLaw"> | string
-    description?: StringFilter<"EnhancedLaw"> | string
-    relevance?: StringFilter<"EnhancedLaw"> | string
-    caseId?: StringFilter<"EnhancedLaw"> | string
-    createdAt?: DateTimeFilter<"EnhancedLaw"> | Date | string
-    case?: XOR<CaseScalarRelationFilter, CaseWhereInput>
-  }, "id">
-
-  export type EnhancedLawOrderByWithAggregationInput = {
-    id?: SortOrder
-    law?: SortOrder
-    description?: SortOrder
-    relevance?: SortOrder
-    caseId?: SortOrder
-    createdAt?: SortOrder
-    _count?: EnhancedLawCountOrderByAggregateInput
-    _max?: EnhancedLawMaxOrderByAggregateInput
-    _min?: EnhancedLawMinOrderByAggregateInput
-  }
-
-  export type EnhancedLawScalarWhereWithAggregatesInput = {
-    AND?: EnhancedLawScalarWhereWithAggregatesInput | EnhancedLawScalarWhereWithAggregatesInput[]
-    OR?: EnhancedLawScalarWhereWithAggregatesInput[]
-    NOT?: EnhancedLawScalarWhereWithAggregatesInput | EnhancedLawScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"EnhancedLaw"> | string
-    law?: StringWithAggregatesFilter<"EnhancedLaw"> | string
-    description?: StringWithAggregatesFilter<"EnhancedLaw"> | string
-    relevance?: StringWithAggregatesFilter<"EnhancedLaw"> | string
-    caseId?: StringWithAggregatesFilter<"EnhancedLaw"> | string
-    createdAt?: DateTimeWithAggregatesFilter<"EnhancedLaw"> | Date | string
-  }
-
   export type UserCreateInput = {
     id?: string
     clerkId: string
@@ -8907,9 +8919,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutCasesInput
-    involvedLaws?: EnhancedLawCreateNestedManyWithoutCaseInput
     todos?: TodoCreateNestedManyWithoutCaseInput
     extractedDocs?: ExtractedDocCreateNestedManyWithoutCaseInput
+    session?: SessionCreateNestedOneWithoutCaseInput
   }
 
   export type CaseUncheckedCreateInput = {
@@ -8925,9 +8937,9 @@ export namespace Prisma {
     finalAnalysis?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    involvedLaws?: EnhancedLawUncheckedCreateNestedManyWithoutCaseInput
     todos?: TodoUncheckedCreateNestedManyWithoutCaseInput
     extractedDocs?: ExtractedDocUncheckedCreateNestedManyWithoutCaseInput
+    session?: SessionUncheckedCreateNestedOneWithoutCaseInput
   }
 
   export type CaseUpdateInput = {
@@ -8943,9 +8955,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutCasesNestedInput
-    involvedLaws?: EnhancedLawUpdateManyWithoutCaseNestedInput
     todos?: TodoUpdateManyWithoutCaseNestedInput
     extractedDocs?: ExtractedDocUpdateManyWithoutCaseNestedInput
+    session?: SessionUpdateOneWithoutCaseNestedInput
   }
 
   export type CaseUncheckedUpdateInput = {
@@ -8961,9 +8973,9 @@ export namespace Prisma {
     finalAnalysis?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    involvedLaws?: EnhancedLawUncheckedUpdateManyWithoutCaseNestedInput
     todos?: TodoUncheckedUpdateManyWithoutCaseNestedInput
     extractedDocs?: ExtractedDocUncheckedUpdateManyWithoutCaseNestedInput
+    session?: SessionUncheckedUpdateOneWithoutCaseNestedInput
   }
 
   export type CaseCreateManyInput = {
@@ -9006,6 +9018,61 @@ export namespace Prisma {
     evidence?: BoolFieldUpdateOperationsInput | boolean
     agreement?: BoolFieldUpdateOperationsInput | boolean
     finalAnalysis?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SessionCreateInput = {
+    sessionId: string
+    messages: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    case?: CaseCreateNestedOneWithoutSessionInput
+  }
+
+  export type SessionUncheckedCreateInput = {
+    sessionId: string
+    caseId: string
+    messages: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SessionUpdateInput = {
+    sessionId?: StringFieldUpdateOperationsInput | string
+    messages?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    case?: CaseUpdateOneWithoutSessionNestedInput
+  }
+
+  export type SessionUncheckedUpdateInput = {
+    sessionId?: StringFieldUpdateOperationsInput | string
+    caseId?: StringFieldUpdateOperationsInput | string
+    messages?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SessionCreateManyInput = {
+    sessionId: string
+    caseId: string
+    messages: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SessionUpdateManyMutationInput = {
+    sessionId?: StringFieldUpdateOperationsInput | string
+    messages?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SessionUncheckedUpdateManyInput = {
+    sessionId?: StringFieldUpdateOperationsInput | string
+    caseId?: StringFieldUpdateOperationsInput | string
+    messages?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -9215,68 +9282,6 @@ export namespace Prisma {
     usage?: LegalTermUpdateusageInput | string[]
     category?: StringFieldUpdateOperationsInput | string
     source?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type EnhancedLawCreateInput = {
-    id?: string
-    law: string
-    description: string
-    relevance: string
-    createdAt?: Date | string
-    case: CaseCreateNestedOneWithoutInvolvedLawsInput
-  }
-
-  export type EnhancedLawUncheckedCreateInput = {
-    id?: string
-    law: string
-    description: string
-    relevance: string
-    caseId: string
-    createdAt?: Date | string
-  }
-
-  export type EnhancedLawUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    law?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
-    relevance?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    case?: CaseUpdateOneRequiredWithoutInvolvedLawsNestedInput
-  }
-
-  export type EnhancedLawUncheckedUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    law?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
-    relevance?: StringFieldUpdateOperationsInput | string
-    caseId?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type EnhancedLawCreateManyInput = {
-    id?: string
-    law: string
-    description: string
-    relevance: string
-    caseId: string
-    createdAt?: Date | string
-  }
-
-  export type EnhancedLawUpdateManyMutationInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    law?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
-    relevance?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type EnhancedLawUncheckedUpdateManyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    law?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
-    relevance?: StringFieldUpdateOperationsInput | string
-    caseId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -9505,12 +9510,6 @@ export namespace Prisma {
     isNot?: UserWhereInput
   }
 
-  export type EnhancedLawListRelationFilter = {
-    every?: EnhancedLawWhereInput
-    some?: EnhancedLawWhereInput
-    none?: EnhancedLawWhereInput
-  }
-
   export type TodoListRelationFilter = {
     every?: TodoWhereInput
     some?: TodoWhereInput
@@ -9523,8 +9522,9 @@ export namespace Prisma {
     none?: ExtractedDocWhereInput
   }
 
-  export type EnhancedLawOrderByRelationAggregateInput = {
-    _count?: SortOrder
+  export type SessionNullableScalarRelationFilter = {
+    is?: SessionWhereInput | null
+    isNot?: SessionWhereInput | null
   }
 
   export type TodoOrderByRelationAggregateInput = {
@@ -9594,6 +9594,82 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
+  }
+  export type JsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type CaseNullableScalarRelationFilter = {
+    is?: CaseWhereInput | null
+    isNot?: CaseWhereInput | null
+  }
+
+  export type SessionCountOrderByAggregateInput = {
+    sessionId?: SortOrder
+    caseId?: SortOrder
+    messages?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SessionMaxOrderByAggregateInput = {
+    sessionId?: SortOrder
+    caseId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SessionMinOrderByAggregateInput = {
+    sessionId?: SortOrder
+    caseId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+  export type JsonWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedJsonFilter<$PrismaModel>
+    _max?: NestedJsonFilter<$PrismaModel>
   }
 
   export type CaseScalarRelationFilter = {
@@ -9731,33 +9807,6 @@ export namespace Prisma {
     createdAt?: SortOrder
   }
 
-  export type EnhancedLawCountOrderByAggregateInput = {
-    id?: SortOrder
-    law?: SortOrder
-    description?: SortOrder
-    relevance?: SortOrder
-    caseId?: SortOrder
-    createdAt?: SortOrder
-  }
-
-  export type EnhancedLawMaxOrderByAggregateInput = {
-    id?: SortOrder
-    law?: SortOrder
-    description?: SortOrder
-    relevance?: SortOrder
-    caseId?: SortOrder
-    createdAt?: SortOrder
-  }
-
-  export type EnhancedLawMinOrderByAggregateInput = {
-    id?: SortOrder
-    law?: SortOrder
-    description?: SortOrder
-    relevance?: SortOrder
-    caseId?: SortOrder
-    createdAt?: SortOrder
-  }
-
   export type CaseCreateNestedManyWithoutUserInput = {
     create?: XOR<CaseCreateWithoutUserInput, CaseUncheckedCreateWithoutUserInput> | CaseCreateWithoutUserInput[] | CaseUncheckedCreateWithoutUserInput[]
     connectOrCreate?: CaseCreateOrConnectWithoutUserInput | CaseCreateOrConnectWithoutUserInput[]
@@ -9834,13 +9883,6 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
-  export type EnhancedLawCreateNestedManyWithoutCaseInput = {
-    create?: XOR<EnhancedLawCreateWithoutCaseInput, EnhancedLawUncheckedCreateWithoutCaseInput> | EnhancedLawCreateWithoutCaseInput[] | EnhancedLawUncheckedCreateWithoutCaseInput[]
-    connectOrCreate?: EnhancedLawCreateOrConnectWithoutCaseInput | EnhancedLawCreateOrConnectWithoutCaseInput[]
-    createMany?: EnhancedLawCreateManyCaseInputEnvelope
-    connect?: EnhancedLawWhereUniqueInput | EnhancedLawWhereUniqueInput[]
-  }
-
   export type TodoCreateNestedManyWithoutCaseInput = {
     create?: XOR<TodoCreateWithoutCaseInput, TodoUncheckedCreateWithoutCaseInput> | TodoCreateWithoutCaseInput[] | TodoUncheckedCreateWithoutCaseInput[]
     connectOrCreate?: TodoCreateOrConnectWithoutCaseInput | TodoCreateOrConnectWithoutCaseInput[]
@@ -9855,11 +9897,10 @@ export namespace Prisma {
     connect?: ExtractedDocWhereUniqueInput | ExtractedDocWhereUniqueInput[]
   }
 
-  export type EnhancedLawUncheckedCreateNestedManyWithoutCaseInput = {
-    create?: XOR<EnhancedLawCreateWithoutCaseInput, EnhancedLawUncheckedCreateWithoutCaseInput> | EnhancedLawCreateWithoutCaseInput[] | EnhancedLawUncheckedCreateWithoutCaseInput[]
-    connectOrCreate?: EnhancedLawCreateOrConnectWithoutCaseInput | EnhancedLawCreateOrConnectWithoutCaseInput[]
-    createMany?: EnhancedLawCreateManyCaseInputEnvelope
-    connect?: EnhancedLawWhereUniqueInput | EnhancedLawWhereUniqueInput[]
+  export type SessionCreateNestedOneWithoutCaseInput = {
+    create?: XOR<SessionCreateWithoutCaseInput, SessionUncheckedCreateWithoutCaseInput>
+    connectOrCreate?: SessionCreateOrConnectWithoutCaseInput
+    connect?: SessionWhereUniqueInput
   }
 
   export type TodoUncheckedCreateNestedManyWithoutCaseInput = {
@@ -9874,6 +9915,12 @@ export namespace Prisma {
     connectOrCreate?: ExtractedDocCreateOrConnectWithoutCaseInput | ExtractedDocCreateOrConnectWithoutCaseInput[]
     createMany?: ExtractedDocCreateManyCaseInputEnvelope
     connect?: ExtractedDocWhereUniqueInput | ExtractedDocWhereUniqueInput[]
+  }
+
+  export type SessionUncheckedCreateNestedOneWithoutCaseInput = {
+    create?: XOR<SessionCreateWithoutCaseInput, SessionUncheckedCreateWithoutCaseInput>
+    connectOrCreate?: SessionCreateOrConnectWithoutCaseInput
+    connect?: SessionWhereUniqueInput
   }
 
   export type EnumCaseStatusFieldUpdateOperationsInput = {
@@ -9895,20 +9942,6 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutCasesInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutCasesInput, UserUpdateWithoutCasesInput>, UserUncheckedUpdateWithoutCasesInput>
-  }
-
-  export type EnhancedLawUpdateManyWithoutCaseNestedInput = {
-    create?: XOR<EnhancedLawCreateWithoutCaseInput, EnhancedLawUncheckedCreateWithoutCaseInput> | EnhancedLawCreateWithoutCaseInput[] | EnhancedLawUncheckedCreateWithoutCaseInput[]
-    connectOrCreate?: EnhancedLawCreateOrConnectWithoutCaseInput | EnhancedLawCreateOrConnectWithoutCaseInput[]
-    upsert?: EnhancedLawUpsertWithWhereUniqueWithoutCaseInput | EnhancedLawUpsertWithWhereUniqueWithoutCaseInput[]
-    createMany?: EnhancedLawCreateManyCaseInputEnvelope
-    set?: EnhancedLawWhereUniqueInput | EnhancedLawWhereUniqueInput[]
-    disconnect?: EnhancedLawWhereUniqueInput | EnhancedLawWhereUniqueInput[]
-    delete?: EnhancedLawWhereUniqueInput | EnhancedLawWhereUniqueInput[]
-    connect?: EnhancedLawWhereUniqueInput | EnhancedLawWhereUniqueInput[]
-    update?: EnhancedLawUpdateWithWhereUniqueWithoutCaseInput | EnhancedLawUpdateWithWhereUniqueWithoutCaseInput[]
-    updateMany?: EnhancedLawUpdateManyWithWhereWithoutCaseInput | EnhancedLawUpdateManyWithWhereWithoutCaseInput[]
-    deleteMany?: EnhancedLawScalarWhereInput | EnhancedLawScalarWhereInput[]
   }
 
   export type TodoUpdateManyWithoutCaseNestedInput = {
@@ -9939,18 +9972,14 @@ export namespace Prisma {
     deleteMany?: ExtractedDocScalarWhereInput | ExtractedDocScalarWhereInput[]
   }
 
-  export type EnhancedLawUncheckedUpdateManyWithoutCaseNestedInput = {
-    create?: XOR<EnhancedLawCreateWithoutCaseInput, EnhancedLawUncheckedCreateWithoutCaseInput> | EnhancedLawCreateWithoutCaseInput[] | EnhancedLawUncheckedCreateWithoutCaseInput[]
-    connectOrCreate?: EnhancedLawCreateOrConnectWithoutCaseInput | EnhancedLawCreateOrConnectWithoutCaseInput[]
-    upsert?: EnhancedLawUpsertWithWhereUniqueWithoutCaseInput | EnhancedLawUpsertWithWhereUniqueWithoutCaseInput[]
-    createMany?: EnhancedLawCreateManyCaseInputEnvelope
-    set?: EnhancedLawWhereUniqueInput | EnhancedLawWhereUniqueInput[]
-    disconnect?: EnhancedLawWhereUniqueInput | EnhancedLawWhereUniqueInput[]
-    delete?: EnhancedLawWhereUniqueInput | EnhancedLawWhereUniqueInput[]
-    connect?: EnhancedLawWhereUniqueInput | EnhancedLawWhereUniqueInput[]
-    update?: EnhancedLawUpdateWithWhereUniqueWithoutCaseInput | EnhancedLawUpdateWithWhereUniqueWithoutCaseInput[]
-    updateMany?: EnhancedLawUpdateManyWithWhereWithoutCaseInput | EnhancedLawUpdateManyWithWhereWithoutCaseInput[]
-    deleteMany?: EnhancedLawScalarWhereInput | EnhancedLawScalarWhereInput[]
+  export type SessionUpdateOneWithoutCaseNestedInput = {
+    create?: XOR<SessionCreateWithoutCaseInput, SessionUncheckedCreateWithoutCaseInput>
+    connectOrCreate?: SessionCreateOrConnectWithoutCaseInput
+    upsert?: SessionUpsertWithoutCaseInput
+    disconnect?: SessionWhereInput | boolean
+    delete?: SessionWhereInput | boolean
+    connect?: SessionWhereUniqueInput
+    update?: XOR<XOR<SessionUpdateToOneWithWhereWithoutCaseInput, SessionUpdateWithoutCaseInput>, SessionUncheckedUpdateWithoutCaseInput>
   }
 
   export type TodoUncheckedUpdateManyWithoutCaseNestedInput = {
@@ -9979,6 +10008,32 @@ export namespace Prisma {
     update?: ExtractedDocUpdateWithWhereUniqueWithoutCaseInput | ExtractedDocUpdateWithWhereUniqueWithoutCaseInput[]
     updateMany?: ExtractedDocUpdateManyWithWhereWithoutCaseInput | ExtractedDocUpdateManyWithWhereWithoutCaseInput[]
     deleteMany?: ExtractedDocScalarWhereInput | ExtractedDocScalarWhereInput[]
+  }
+
+  export type SessionUncheckedUpdateOneWithoutCaseNestedInput = {
+    create?: XOR<SessionCreateWithoutCaseInput, SessionUncheckedCreateWithoutCaseInput>
+    connectOrCreate?: SessionCreateOrConnectWithoutCaseInput
+    upsert?: SessionUpsertWithoutCaseInput
+    disconnect?: SessionWhereInput | boolean
+    delete?: SessionWhereInput | boolean
+    connect?: SessionWhereUniqueInput
+    update?: XOR<XOR<SessionUpdateToOneWithWhereWithoutCaseInput, SessionUpdateWithoutCaseInput>, SessionUncheckedUpdateWithoutCaseInput>
+  }
+
+  export type CaseCreateNestedOneWithoutSessionInput = {
+    create?: XOR<CaseCreateWithoutSessionInput, CaseUncheckedCreateWithoutSessionInput>
+    connectOrCreate?: CaseCreateOrConnectWithoutSessionInput
+    connect?: CaseWhereUniqueInput
+  }
+
+  export type CaseUpdateOneWithoutSessionNestedInput = {
+    create?: XOR<CaseCreateWithoutSessionInput, CaseUncheckedCreateWithoutSessionInput>
+    connectOrCreate?: CaseCreateOrConnectWithoutSessionInput
+    upsert?: CaseUpsertWithoutSessionInput
+    disconnect?: CaseWhereInput | boolean
+    delete?: CaseWhereInput | boolean
+    connect?: CaseWhereUniqueInput
+    update?: XOR<XOR<CaseUpdateToOneWithWhereWithoutSessionInput, CaseUpdateWithoutSessionInput>, CaseUncheckedUpdateWithoutSessionInput>
   }
 
   export type CaseCreateNestedOneWithoutExtractedDocsInput = {
@@ -10024,20 +10079,6 @@ export namespace Prisma {
   export type LegalTermUpdateusageInput = {
     set?: string[]
     push?: string | string[]
-  }
-
-  export type CaseCreateNestedOneWithoutInvolvedLawsInput = {
-    create?: XOR<CaseCreateWithoutInvolvedLawsInput, CaseUncheckedCreateWithoutInvolvedLawsInput>
-    connectOrCreate?: CaseCreateOrConnectWithoutInvolvedLawsInput
-    connect?: CaseWhereUniqueInput
-  }
-
-  export type CaseUpdateOneRequiredWithoutInvolvedLawsNestedInput = {
-    create?: XOR<CaseCreateWithoutInvolvedLawsInput, CaseUncheckedCreateWithoutInvolvedLawsInput>
-    connectOrCreate?: CaseCreateOrConnectWithoutInvolvedLawsInput
-    upsert?: CaseUpsertWithoutInvolvedLawsInput
-    connect?: CaseWhereUniqueInput
-    update?: XOR<XOR<CaseUpdateToOneWithWhereWithoutInvolvedLawsInput, CaseUpdateWithoutInvolvedLawsInput>, CaseUncheckedUpdateWithoutInvolvedLawsInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -10222,6 +10263,29 @@ export namespace Prisma {
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
   }
+  export type NestedJsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
@@ -10277,9 +10341,9 @@ export namespace Prisma {
     finalAnalysis?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    involvedLaws?: EnhancedLawCreateNestedManyWithoutCaseInput
     todos?: TodoCreateNestedManyWithoutCaseInput
     extractedDocs?: ExtractedDocCreateNestedManyWithoutCaseInput
+    session?: SessionCreateNestedOneWithoutCaseInput
   }
 
   export type CaseUncheckedCreateWithoutUserInput = {
@@ -10294,9 +10358,9 @@ export namespace Prisma {
     finalAnalysis?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    involvedLaws?: EnhancedLawUncheckedCreateNestedManyWithoutCaseInput
     todos?: TodoUncheckedCreateNestedManyWithoutCaseInput
     extractedDocs?: ExtractedDocUncheckedCreateNestedManyWithoutCaseInput
+    session?: SessionUncheckedCreateNestedOneWithoutCaseInput
   }
 
   export type CaseCreateOrConnectWithoutUserInput = {
@@ -10376,32 +10440,6 @@ export namespace Prisma {
     create: XOR<UserCreateWithoutCasesInput, UserUncheckedCreateWithoutCasesInput>
   }
 
-  export type EnhancedLawCreateWithoutCaseInput = {
-    id?: string
-    law: string
-    description: string
-    relevance: string
-    createdAt?: Date | string
-  }
-
-  export type EnhancedLawUncheckedCreateWithoutCaseInput = {
-    id?: string
-    law: string
-    description: string
-    relevance: string
-    createdAt?: Date | string
-  }
-
-  export type EnhancedLawCreateOrConnectWithoutCaseInput = {
-    where: EnhancedLawWhereUniqueInput
-    create: XOR<EnhancedLawCreateWithoutCaseInput, EnhancedLawUncheckedCreateWithoutCaseInput>
-  }
-
-  export type EnhancedLawCreateManyCaseInputEnvelope = {
-    data: EnhancedLawCreateManyCaseInput | EnhancedLawCreateManyCaseInput[]
-    skipDuplicates?: boolean
-  }
-
   export type TodoCreateWithoutCaseInput = {
     id?: string
     title: string
@@ -10458,6 +10496,25 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type SessionCreateWithoutCaseInput = {
+    sessionId: string
+    messages: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SessionUncheckedCreateWithoutCaseInput = {
+    sessionId: string
+    messages: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SessionCreateOrConnectWithoutCaseInput = {
+    where: SessionWhereUniqueInput
+    create: XOR<SessionCreateWithoutCaseInput, SessionUncheckedCreateWithoutCaseInput>
+  }
+
   export type UserUpsertWithoutCasesInput = {
     update: XOR<UserUpdateWithoutCasesInput, UserUncheckedUpdateWithoutCasesInput>
     create: XOR<UserCreateWithoutCasesInput, UserUncheckedCreateWithoutCasesInput>
@@ -10495,34 +10552,6 @@ export namespace Prisma {
     pendingCaseType?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type EnhancedLawUpsertWithWhereUniqueWithoutCaseInput = {
-    where: EnhancedLawWhereUniqueInput
-    update: XOR<EnhancedLawUpdateWithoutCaseInput, EnhancedLawUncheckedUpdateWithoutCaseInput>
-    create: XOR<EnhancedLawCreateWithoutCaseInput, EnhancedLawUncheckedCreateWithoutCaseInput>
-  }
-
-  export type EnhancedLawUpdateWithWhereUniqueWithoutCaseInput = {
-    where: EnhancedLawWhereUniqueInput
-    data: XOR<EnhancedLawUpdateWithoutCaseInput, EnhancedLawUncheckedUpdateWithoutCaseInput>
-  }
-
-  export type EnhancedLawUpdateManyWithWhereWithoutCaseInput = {
-    where: EnhancedLawScalarWhereInput
-    data: XOR<EnhancedLawUpdateManyMutationInput, EnhancedLawUncheckedUpdateManyWithoutCaseInput>
-  }
-
-  export type EnhancedLawScalarWhereInput = {
-    AND?: EnhancedLawScalarWhereInput | EnhancedLawScalarWhereInput[]
-    OR?: EnhancedLawScalarWhereInput[]
-    NOT?: EnhancedLawScalarWhereInput | EnhancedLawScalarWhereInput[]
-    id?: StringFilter<"EnhancedLaw"> | string
-    law?: StringFilter<"EnhancedLaw"> | string
-    description?: StringFilter<"EnhancedLaw"> | string
-    relevance?: StringFilter<"EnhancedLaw"> | string
-    caseId?: StringFilter<"EnhancedLaw"> | string
-    createdAt?: DateTimeFilter<"EnhancedLaw"> | Date | string
   }
 
   export type TodoUpsertWithWhereUniqueWithoutCaseInput = {
@@ -10583,6 +10612,115 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"ExtractedDoc"> | Date | string
   }
 
+  export type SessionUpsertWithoutCaseInput = {
+    update: XOR<SessionUpdateWithoutCaseInput, SessionUncheckedUpdateWithoutCaseInput>
+    create: XOR<SessionCreateWithoutCaseInput, SessionUncheckedCreateWithoutCaseInput>
+    where?: SessionWhereInput
+  }
+
+  export type SessionUpdateToOneWithWhereWithoutCaseInput = {
+    where?: SessionWhereInput
+    data: XOR<SessionUpdateWithoutCaseInput, SessionUncheckedUpdateWithoutCaseInput>
+  }
+
+  export type SessionUpdateWithoutCaseInput = {
+    sessionId?: StringFieldUpdateOperationsInput | string
+    messages?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SessionUncheckedUpdateWithoutCaseInput = {
+    sessionId?: StringFieldUpdateOperationsInput | string
+    messages?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CaseCreateWithoutSessionInput = {
+    id?: string
+    title: string
+    description: string
+    status?: $Enums.CaseStatus
+    opponent?: string | null
+    timeline?: CaseCreatetimelineInput | string[]
+    evidence: boolean
+    agreement: boolean
+    finalAnalysis?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutCasesInput
+    todos?: TodoCreateNestedManyWithoutCaseInput
+    extractedDocs?: ExtractedDocCreateNestedManyWithoutCaseInput
+  }
+
+  export type CaseUncheckedCreateWithoutSessionInput = {
+    id?: string
+    userId: string
+    title: string
+    description: string
+    status?: $Enums.CaseStatus
+    opponent?: string | null
+    timeline?: CaseCreatetimelineInput | string[]
+    evidence: boolean
+    agreement: boolean
+    finalAnalysis?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    todos?: TodoUncheckedCreateNestedManyWithoutCaseInput
+    extractedDocs?: ExtractedDocUncheckedCreateNestedManyWithoutCaseInput
+  }
+
+  export type CaseCreateOrConnectWithoutSessionInput = {
+    where: CaseWhereUniqueInput
+    create: XOR<CaseCreateWithoutSessionInput, CaseUncheckedCreateWithoutSessionInput>
+  }
+
+  export type CaseUpsertWithoutSessionInput = {
+    update: XOR<CaseUpdateWithoutSessionInput, CaseUncheckedUpdateWithoutSessionInput>
+    create: XOR<CaseCreateWithoutSessionInput, CaseUncheckedCreateWithoutSessionInput>
+    where?: CaseWhereInput
+  }
+
+  export type CaseUpdateToOneWithWhereWithoutSessionInput = {
+    where?: CaseWhereInput
+    data: XOR<CaseUpdateWithoutSessionInput, CaseUncheckedUpdateWithoutSessionInput>
+  }
+
+  export type CaseUpdateWithoutSessionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    status?: EnumCaseStatusFieldUpdateOperationsInput | $Enums.CaseStatus
+    opponent?: NullableStringFieldUpdateOperationsInput | string | null
+    timeline?: CaseUpdatetimelineInput | string[]
+    evidence?: BoolFieldUpdateOperationsInput | boolean
+    agreement?: BoolFieldUpdateOperationsInput | boolean
+    finalAnalysis?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutCasesNestedInput
+    todos?: TodoUpdateManyWithoutCaseNestedInput
+    extractedDocs?: ExtractedDocUpdateManyWithoutCaseNestedInput
+  }
+
+  export type CaseUncheckedUpdateWithoutSessionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    status?: EnumCaseStatusFieldUpdateOperationsInput | $Enums.CaseStatus
+    opponent?: NullableStringFieldUpdateOperationsInput | string | null
+    timeline?: CaseUpdatetimelineInput | string[]
+    evidence?: BoolFieldUpdateOperationsInput | boolean
+    agreement?: BoolFieldUpdateOperationsInput | boolean
+    finalAnalysis?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    todos?: TodoUncheckedUpdateManyWithoutCaseNestedInput
+    extractedDocs?: ExtractedDocUncheckedUpdateManyWithoutCaseNestedInput
+  }
+
   export type CaseCreateWithoutExtractedDocsInput = {
     id?: string
     title: string
@@ -10596,8 +10734,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutCasesInput
-    involvedLaws?: EnhancedLawCreateNestedManyWithoutCaseInput
     todos?: TodoCreateNestedManyWithoutCaseInput
+    session?: SessionCreateNestedOneWithoutCaseInput
   }
 
   export type CaseUncheckedCreateWithoutExtractedDocsInput = {
@@ -10613,8 +10751,8 @@ export namespace Prisma {
     finalAnalysis?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    involvedLaws?: EnhancedLawUncheckedCreateNestedManyWithoutCaseInput
     todos?: TodoUncheckedCreateNestedManyWithoutCaseInput
+    session?: SessionUncheckedCreateNestedOneWithoutCaseInput
   }
 
   export type CaseCreateOrConnectWithoutExtractedDocsInput = {
@@ -10646,8 +10784,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutCasesNestedInput
-    involvedLaws?: EnhancedLawUpdateManyWithoutCaseNestedInput
     todos?: TodoUpdateManyWithoutCaseNestedInput
+    session?: SessionUpdateOneWithoutCaseNestedInput
   }
 
   export type CaseUncheckedUpdateWithoutExtractedDocsInput = {
@@ -10663,8 +10801,8 @@ export namespace Prisma {
     finalAnalysis?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    involvedLaws?: EnhancedLawUncheckedUpdateManyWithoutCaseNestedInput
     todos?: TodoUncheckedUpdateManyWithoutCaseNestedInput
+    session?: SessionUncheckedUpdateOneWithoutCaseNestedInput
   }
 
   export type CaseCreateWithoutTodosInput = {
@@ -10680,8 +10818,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutCasesInput
-    involvedLaws?: EnhancedLawCreateNestedManyWithoutCaseInput
     extractedDocs?: ExtractedDocCreateNestedManyWithoutCaseInput
+    session?: SessionCreateNestedOneWithoutCaseInput
   }
 
   export type CaseUncheckedCreateWithoutTodosInput = {
@@ -10697,8 +10835,8 @@ export namespace Prisma {
     finalAnalysis?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    involvedLaws?: EnhancedLawUncheckedCreateNestedManyWithoutCaseInput
     extractedDocs?: ExtractedDocUncheckedCreateNestedManyWithoutCaseInput
+    session?: SessionUncheckedCreateNestedOneWithoutCaseInput
   }
 
   export type CaseCreateOrConnectWithoutTodosInput = {
@@ -10730,8 +10868,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutCasesNestedInput
-    involvedLaws?: EnhancedLawUpdateManyWithoutCaseNestedInput
     extractedDocs?: ExtractedDocUpdateManyWithoutCaseNestedInput
+    session?: SessionUpdateOneWithoutCaseNestedInput
   }
 
   export type CaseUncheckedUpdateWithoutTodosInput = {
@@ -10747,92 +10885,8 @@ export namespace Prisma {
     finalAnalysis?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    involvedLaws?: EnhancedLawUncheckedUpdateManyWithoutCaseNestedInput
     extractedDocs?: ExtractedDocUncheckedUpdateManyWithoutCaseNestedInput
-  }
-
-  export type CaseCreateWithoutInvolvedLawsInput = {
-    id?: string
-    title: string
-    description: string
-    status?: $Enums.CaseStatus
-    opponent?: string | null
-    timeline?: CaseCreatetimelineInput | string[]
-    evidence: boolean
-    agreement: boolean
-    finalAnalysis?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutCasesInput
-    todos?: TodoCreateNestedManyWithoutCaseInput
-    extractedDocs?: ExtractedDocCreateNestedManyWithoutCaseInput
-  }
-
-  export type CaseUncheckedCreateWithoutInvolvedLawsInput = {
-    id?: string
-    userId: string
-    title: string
-    description: string
-    status?: $Enums.CaseStatus
-    opponent?: string | null
-    timeline?: CaseCreatetimelineInput | string[]
-    evidence: boolean
-    agreement: boolean
-    finalAnalysis?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    todos?: TodoUncheckedCreateNestedManyWithoutCaseInput
-    extractedDocs?: ExtractedDocUncheckedCreateNestedManyWithoutCaseInput
-  }
-
-  export type CaseCreateOrConnectWithoutInvolvedLawsInput = {
-    where: CaseWhereUniqueInput
-    create: XOR<CaseCreateWithoutInvolvedLawsInput, CaseUncheckedCreateWithoutInvolvedLawsInput>
-  }
-
-  export type CaseUpsertWithoutInvolvedLawsInput = {
-    update: XOR<CaseUpdateWithoutInvolvedLawsInput, CaseUncheckedUpdateWithoutInvolvedLawsInput>
-    create: XOR<CaseCreateWithoutInvolvedLawsInput, CaseUncheckedCreateWithoutInvolvedLawsInput>
-    where?: CaseWhereInput
-  }
-
-  export type CaseUpdateToOneWithWhereWithoutInvolvedLawsInput = {
-    where?: CaseWhereInput
-    data: XOR<CaseUpdateWithoutInvolvedLawsInput, CaseUncheckedUpdateWithoutInvolvedLawsInput>
-  }
-
-  export type CaseUpdateWithoutInvolvedLawsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    title?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
-    status?: EnumCaseStatusFieldUpdateOperationsInput | $Enums.CaseStatus
-    opponent?: NullableStringFieldUpdateOperationsInput | string | null
-    timeline?: CaseUpdatetimelineInput | string[]
-    evidence?: BoolFieldUpdateOperationsInput | boolean
-    agreement?: BoolFieldUpdateOperationsInput | boolean
-    finalAnalysis?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutCasesNestedInput
-    todos?: TodoUpdateManyWithoutCaseNestedInput
-    extractedDocs?: ExtractedDocUpdateManyWithoutCaseNestedInput
-  }
-
-  export type CaseUncheckedUpdateWithoutInvolvedLawsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
-    title?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
-    status?: EnumCaseStatusFieldUpdateOperationsInput | $Enums.CaseStatus
-    opponent?: NullableStringFieldUpdateOperationsInput | string | null
-    timeline?: CaseUpdatetimelineInput | string[]
-    evidence?: BoolFieldUpdateOperationsInput | boolean
-    agreement?: BoolFieldUpdateOperationsInput | boolean
-    finalAnalysis?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    todos?: TodoUncheckedUpdateManyWithoutCaseNestedInput
-    extractedDocs?: ExtractedDocUncheckedUpdateManyWithoutCaseNestedInput
+    session?: SessionUncheckedUpdateOneWithoutCaseNestedInput
   }
 
   export type CaseCreateManyUserInput = {
@@ -10861,9 +10915,9 @@ export namespace Prisma {
     finalAnalysis?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    involvedLaws?: EnhancedLawUpdateManyWithoutCaseNestedInput
     todos?: TodoUpdateManyWithoutCaseNestedInput
     extractedDocs?: ExtractedDocUpdateManyWithoutCaseNestedInput
+    session?: SessionUpdateOneWithoutCaseNestedInput
   }
 
   export type CaseUncheckedUpdateWithoutUserInput = {
@@ -10878,9 +10932,9 @@ export namespace Prisma {
     finalAnalysis?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    involvedLaws?: EnhancedLawUncheckedUpdateManyWithoutCaseNestedInput
     todos?: TodoUncheckedUpdateManyWithoutCaseNestedInput
     extractedDocs?: ExtractedDocUncheckedUpdateManyWithoutCaseNestedInput
+    session?: SessionUncheckedUpdateOneWithoutCaseNestedInput
   }
 
   export type CaseUncheckedUpdateManyWithoutUserInput = {
@@ -10895,14 +10949,6 @@ export namespace Prisma {
     finalAnalysis?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type EnhancedLawCreateManyCaseInput = {
-    id?: string
-    law: string
-    description: string
-    relevance: string
-    createdAt?: Date | string
   }
 
   export type TodoCreateManyCaseInput = {
@@ -10921,30 +10967,6 @@ export namespace Prisma {
     rawContent: string
     aiSummary: string
     createdAt?: Date | string
-  }
-
-  export type EnhancedLawUpdateWithoutCaseInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    law?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
-    relevance?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type EnhancedLawUncheckedUpdateWithoutCaseInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    law?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
-    relevance?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type EnhancedLawUncheckedUpdateManyWithoutCaseInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    law?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
-    relevance?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type TodoUpdateWithoutCaseInput = {

@@ -25,7 +25,7 @@ model User {
   jailTimeYears   Int?
   warningSeverity String?
   pendingCaseType String?
-  cases           Case[]
+  cases           Case[] // 1-to-many: User → Case
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
 
@@ -41,17 +41,26 @@ model Case {
   description   String
   status        CaseStatus     @default(OPEN)
   opponent      String?
-  timeline      String[]
+  timeline      String[]       @db.Text
   evidence      Boolean
   agreement     Boolean
-  involvedLaws  EnhancedLaw[]
   todos         Todo[]
   extractedDocs ExtractedDoc[]
   finalAnalysis String?
+  session       Session? // Make this optional for valid 1:1
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 
   @@index([userId])
+}
+
+model Session {
+  sessionId String   @id
+  case      Case?    @relation(fields: [caseId], references: [id])
+  caseId    String   @unique
+  messages  Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model ExtractedDoc {
@@ -84,22 +93,12 @@ model LegalTerm {
   id          String   @id @default(cuid())
   word        String   @unique
   description String
-  usage       String[] // Native text[] in PostgreSQL
+  usage       String[] @db.Text
   category    String
   source      String?
   createdAt   DateTime @default(now())
 
   @@index([word])
-}
-
-model EnhancedLaw {
-  id          String   @id @default(cuid())
-  law         String
-  description String
-  relevance   String
-  case        Case     @relation(fields: [caseId], references: [id])
-  caseId      String
-  createdAt   DateTime @default(now())
 }
 
 enum LegalKnowledge {

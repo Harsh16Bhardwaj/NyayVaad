@@ -1,13 +1,18 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import todoReducer from './slices/todoSlice';
 import caseSummaryReducer from './slices/caseSummarySlice';
+import chatSessionsReducer from './slices/chatSessionsSlice';
 
-export const store = configureStore({
-  reducer: {
-    todos: todoReducer,
-    caseSummary: caseSummaryReducer,
-  },
+const rootReducer = combineReducers({
+  todos: todoReducer,
+  caseSummary: caseSummaryReducer,
+  chatSessions: chatSessionsReducer,
 });
 
-export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch; 
+export const store = configureStore({
+  reducer: rootReducer,
+});
+
+export type RootState = ReturnType<typeof rootReducer>;
+export type AppDispatch = typeof store.dispatch;
+export default rootReducer; 

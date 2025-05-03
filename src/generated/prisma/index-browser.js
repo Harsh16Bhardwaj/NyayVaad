@@ -146,6 +146,14 @@ exports.Prisma.CaseScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.SessionScalarFieldEnum = {
+  sessionId: 'sessionId',
+  caseId: 'caseId',
+  messages: 'messages',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.ExtractedDocScalarFieldEnum = {
   id: 'id',
   docId: 'docId',
@@ -176,18 +184,13 @@ exports.Prisma.LegalTermScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
-exports.Prisma.EnhancedLawScalarFieldEnum = {
-  id: 'id',
-  law: 'law',
-  description: 'description',
-  relevance: 'relevance',
-  caseId: 'caseId',
-  createdAt: 'createdAt'
-};
-
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.QueryMode = {
@@ -198,6 +201,12 @@ exports.Prisma.QueryMode = {
 exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
+};
+
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
 };
 exports.LegalKnowledge = exports.$Enums.LegalKnowledge = {
   NONE: 'NONE',
@@ -221,10 +230,10 @@ exports.TodoStatus = exports.$Enums.TodoStatus = {
 exports.Prisma.ModelName = {
   User: 'User',
   Case: 'Case',
+  Session: 'Session',
   ExtractedDoc: 'ExtractedDoc',
   Todo: 'Todo',
-  LegalTerm: 'LegalTerm',
-  EnhancedLaw: 'EnhancedLaw'
+  LegalTerm: 'LegalTerm'
 };
 
 /**
