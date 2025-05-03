@@ -197,8 +197,8 @@ export default function FunPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
                 whileHover={{ y: -3, boxShadow: '0 8px 16px rgba(0, 0, 0, 0.3)' }}
-                onClick={() => setSelectedTerm(term)}
-                className={`cursor-pointer rounded-xl p-6 bg-gray-900/50 border ${categoryStyles[term.category]} shadow-sm hover:shadow-lg transition-all`}
+                onClick={() => setSelectedTerm(term)} 
+                className={`cursor-pointer rounded-xl p-6 bg-gray-900/50 border ${categoryStyles[term.category]} hover:scale-105 shadow-sm hover:shadow-lg transition-all`}
               >
                 <h3 className="text-lg font-semibold text-gray-100 font-[var(--font-inter)] mb-2">{term.word}</h3>
                 <p className="text-sm text-gray-400 line-clamp-2 font-[var(--font-inter)]">{term.description}</p>

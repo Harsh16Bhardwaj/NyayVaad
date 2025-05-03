@@ -381,19 +381,19 @@ const ContactPage = () => {
                   <span className="w-5 h-5 mr-2 flex items-center justify-center bg-indigo-500/20 rounded-full">
                     📍
                   </span>
-                  123 Legal Avenue, Connaught Place, New Delhi - 110001
+                  Mahraja Agrasen Institute of Technology, Sec-22, Rohini, New Delhi
                 </p>
                 <p className="text-gray-300 text-sm flex items-center">
                   <span className="w-5 h-5 mr-2 flex items-center justify-center bg-indigo-500/20 rounded-full">
                     🕒
                   </span>
-                  Mon-Fri: 9:00 AM - 6:00 PM
+                  Mon-Fri: 11:00 AM - 3:00 PM
                 </p>
                 <p className="text-gray-300 text-sm flex items-center">
                   <span className="w-5 h-5 mr-2 flex items-center justify-center bg-indigo-500/20 rounded-full">
                     📞
                   </span>
-                  +91 1234567890
+                  +91 8826200156
                 </p>
               </div>
             </div>
