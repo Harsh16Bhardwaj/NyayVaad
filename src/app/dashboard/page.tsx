@@ -32,13 +32,20 @@ import { fetchTodos, addTodo, updateTodo, deleteTodo } from '@/app/store/slices/
 import { fetchCaseSummary } from '@/app/store/slices/caseSummarySlice';
 import { Todo } from '@/app/store/slices/todoSlice';
 import { CaseSummary } from '@/app/store/slices/caseSummarySlice';
+import CasesSection from '@/components/CasesSection';
+import { fetchCases } from '@/app/store/slices/caseSlice';
 
 export default function DashboardPage() {
   const dispatch = useDispatch<AppDispatch>();
+  
+  // Get state from Redux store
+  const { cases, loading: casesLoading, error: casesError } = useSelector((state: RootState) => state.cases);
   const { todos, loading: todosLoading, error: todosError } = useSelector((state: RootState) => state.todos);
   const { summary, loading: summaryLoading, error: summaryError } = useSelector((state: RootState) => state.caseSummary);
 
   useEffect(() => {
+    // Fetch initial data
+    dispatch(fetchCases());
     dispatch(fetchTodos());
     dispatch(fetchCaseSummary());
   }, [dispatch]);
@@ -157,7 +164,7 @@ export default function DashboardPage() {
             <div className="max-w-7xl h-auto mx-auto px-8 py-8 space-y-8">
               {/* Header */}
               <div className="flex justify-between items-center">
-                <h1 className="text-3xl font-bold text-white font-[var(--font-josefin-sans)]">Case Dashboard</h1>
+                <h1 className="text-3xl font-bold text-white">Case Dashboard</h1>
                 <div className="flex items-center space-x-4">
                   <Button
                     variant="outline"
@@ -177,6 +184,12 @@ export default function DashboardPage() {
                 events={calendarEvents}
               />
 
+              {/* Cases Section */}
+              <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/5">
+                <h2 className="text-xl font-semibold text-white mb-6">My Cases</h2>
+                <CasesSection cases={cases} loading={casesLoading} error={casesError} />
+              </div>
+
               {/* Main Grid */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Left Column - Todos */}
@@ -184,7 +197,7 @@ export default function DashboardPage() {
                   {/* Todo List Section */}
                   <div className="space-y-6">
                     <div className="flex justify-between items-center">
-                      <h2 className="text-xl font-semibold text-white font-[var(--font-josefin-sans)]">Case Tasks</h2>
+                      <h2 className="text-xl font-semibold text-white">Case Tasks</h2>
                       <div className="flex items-center space-x-4">
                         {isBulkSelecting && (
                           <Button
@@ -232,7 +245,7 @@ export default function DashboardPage() {
                           <div className="w-16 h-16 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
                             <MessageSquare className="w-5 h-5 text-purple-400" />
                           </div>
-                          <h3 className="text-2xl font-bold text-gray-100 mb-2 font-[var(--font-josefin-sans)]">No Tasks Yet</h3>
+                          <h3 className="text-2xl font-bold text-gray-100 mb-2">No Tasks Yet</h3>
                           <p className="text-gray-400 text-md mb-6 max-w-md mx-auto">Start a conversation to get your case tasks and stay organized!</p>
                           <Button
                             variant="outline"
@@ -255,7 +268,7 @@ export default function DashboardPage() {
                           <div className="w-16 h-16 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
                             <MessageSquare className="w-8 h-8 text-purple-400" />
                           </div>
-                          <h3 className="text-2xl font-bold text-white mb-3 font-[var(--font-josefin-sans)]">No Tasks Yet</h3>
+                          <h3 className="text-2xl font-bold text-white mb-3">No Tasks Yet</h3>
                           <p className="text-gray-400 mb-6 max-w-md mx-auto">Start a conversation to get your case tasks and stay organized!</p>
                           <Button
                             variant="outline"
@@ -291,7 +304,7 @@ export default function DashboardPage() {
                   {/* Case Summary Section */}
                   <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/5">
                     <div className="flex justify-between items-center mb-6">
-                      <h2 className="text-xl font-semibold text-white font-[var(--font-josefin-sans)]">Case Summary</h2>
+                      <h2 className="text-xl font-semibold text-white">Case Summary</h2>
                       <Button
                         variant="outline"
                         className="bg-gradient-to-r from-[#610010] to-[#6d0113] via-[#b9132f] border-gray-500/30 cursor-pointer text-gray-300 hover:bg-purple-500/10 hover:text-white hover:scale-102 hover:shadow-lg hover:shadow-gray-500/20 hover:shadow-inner hover:duration-200  duration-150 ease-in-out"
@@ -316,7 +329,7 @@ export default function DashboardPage() {
                           <div className="w-16 h-16 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
                             <Sparkles className="w-8 h-8 text-purple-400" />
                           </div>
-                          <h3 className="text-2xl font-bold text-white mb-3 font-[var(--font-josefin-sans)]">No Case Summary Yet</h3>
+                          <h3 className="text-2xl font-bold text-white mb-3">No Case Summary Yet</h3>
                           <p className="text-gray-400 mb-6 max-w-md mx-auto">Start a conversation to get your case analyzed and receive a detailed summary!</p>
                           <Button
                             variant="outline"
@@ -416,7 +429,7 @@ export default function DashboardPage() {
                 <div className="space-y-8">
                   {/* CTA*/}
                   <div className="bg-gradient-to-tr from-[#0F2027] to-[##2C5364] via-[#203A43] backdrop-blur-sm flex flex-col items-center justify-center rounded-xl p-6 border border-white/5">
-                    <h2 className="text-xl text-left font-semibold text-white font-[var(--font-josefin-sans)] mb-1">Start A Conversation Now</h2>
+                    <h2 className="text-xl text-left font-semibold text-white mb-1">Start A Conversation Now</h2>
                     <p className="text-sm text-center text-neutral-400 font-[var(--font-inter)] mb-2">
                       Get Solution to your legal problems within minutes.
                     </p>
@@ -431,7 +444,7 @@ export default function DashboardPage() {
 
 
                   <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/5">
-                    <h2 className="text-xl font-semibold text-white font-[var(--font-josefin-sans)] mb-4">Case Progress</h2>
+                    <h2 className="text-xl font-semibold text-white mb-4">Case Progress</h2>
                     <div className="space-y-4">
                       {[
                         {

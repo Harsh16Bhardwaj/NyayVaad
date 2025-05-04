@@ -1,9 +1,18 @@
+import { CaseStatus } from '@/generated/prisma';
+
 export interface CaseData {
-  description: string | null;
+  id: string;
+  userId: string;
+  title: string;
+  description: string;
+  status: CaseStatus;
   opponent: string | null;
-  timeline: string | null;
-  evidence: boolean | null;
-  agreement: boolean | null;
+  timeline: string[];
+  evidence: boolean;
+  agreement: boolean;
+  finalAnalysis: string | null;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface ChatMessage {

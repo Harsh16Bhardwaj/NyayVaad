@@ -14,14 +14,13 @@ export async function POST(request: NextRequest) {
       console.error('Backend - Langflow token not configured');
       throw new Error('Server configuration error');
     }
-
     const { userId } = getAuth(request);
     if (!userId) {
       console.error('Backend - Unauthorized request');
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    const { message, sessionId, analysis, nextField } = await request.json();
+    const { message, sessionId } = await request.json();
     console.log('Backend - Received chat request:', { message, sessionId });
 
     if (!message || !sessionId) {
@@ -73,41 +72,39 @@ export async function POST(request: NextRequest) {
       throw new Error('Empty Langflow response');
     }
 
+    // Try to parse as JSON first, if that fails, treat as plain text
     let parsedResponse;
     try {
       const cleanJson = langflowMessage.replace(/```json\n|\n```/g, '').trim();
       parsedResponse = JSON.parse(cleanJson);
-      console.log('Backend - Parsed Langflow response:', parsedResponse);
-
-      // Destructure all possible fields from the response
-      const {
-        description,
-        opponent,
-        timeline,
-        evidence,
-        agreement,
-        ai_next_response
-      } = parsedResponse;
-
-      // Return structured response with all available fields
-      return NextResponse.json({
-        description: description || null,
-        opponent: opponent || null,
-        timeline: timeline || null,
-        evidence: evidence || null,
-        agreement: agreement || null,
-        ai_next_response: ai_next_response || null,
-      });
+      console.log('Backend - Parsed Langflow response as JSON:', parsedResponse);
     } catch (error) {
-      console.error('Backend - Error parsing Langflow response:', error);
-      return NextResponse.json(
-        {
-          error: 'Invalid Langflow response',
-          response: 'There was an issue processing the AI response. Please try again.',
-        },
-        { status: 500 }
-      );
+      console.log('Backend - Treating response as plain text');
+      // If parsing as JSON fails, treat it as a plain text response
+      parsedResponse = {
+        ai_next_response: langflowMessage
+      };
     }
+
+    // Destructure all possible fields from the response
+    const {
+      description,
+      opponent,
+      timeline,
+      evidence,
+      agreement,
+      ai_next_response
+    } = parsedResponse;
+
+    // Return structured response with all available fields
+    return NextResponse.json({
+      description: description || null,
+      opponent: opponent || null,
+      timeline: timeline || null,
+      evidence: evidence || null,
+      agreement: agreement || null,
+      ai_next_response: ai_next_response || null,
+    });
 
     // Commented out case creation for now
     /*

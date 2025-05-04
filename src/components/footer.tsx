@@ -3,6 +3,8 @@ import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { FaTwitter, FaLinkedin, FaInstagram } from "react-icons/fa";
 import Link from "next/link";
+import { Mail } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface Particle {
   x: number;
@@ -99,9 +101,9 @@ const Footer = () => {
 
   return (
     <div className="mt-0">
-        <div className="w-full h-1 bg-white"></div>
+      <div className="w-full h-1 bg-white"></div>
       <motion.footer
-        className="bg-[#1b0020] relative py-12 px-6 "
+        className="bg-[#1b0020] relative py-12 px-6"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
@@ -118,10 +120,10 @@ const Footer = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0, duration: 0.2 }}
           >
-            <h4 className="text-4xl text-white font-stylescript drop-shadow-sm">
+            <h4 className="text-4xl text-white font-script">
               NyayVaad
             </h4>
-            <p className="text-sm text-gray-300 font-inter mt-2">
+            <p className="text-sm text-gray-300 font-sans mt-2">
               Your Legal Sidekick
             </p>
           </motion.div>
@@ -143,7 +145,7 @@ const Footer = () => {
               >
                 <Link
                   href={link.href}
-                  className="text-white hover:text-lavender-haze font-inter transition"
+                  className="text-white hover:text-lavender-haze font-sans transition"
                 >
                   {link.label}
                 </Link>
@@ -180,27 +182,35 @@ const Footer = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.5 }}
           >
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="glass p-3 rounded-lg flex-1 focus:outline-none focus:ring-2 focus:ring-lavender-haze bg-[#1b0020]/30 text-white placeholder-gray-400"
-            />
-            <motion.button
-              type="submit"
-              className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-6 py-3 rounded-lg font-inter"
-              whileHover={{
-                scale: 1.05,
-                boxShadow: "0 8px 25px rgba(214, 188, 250, 0.5)",
-              }}
-              whileTap={{ scale: 0.97 }}
-            >
-              Subscribe
-            </motion.button>
+            <div className="flex gap-2 w-full">
+              <div className="relative flex-1">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-gray-900/50 border border-gray-700/50 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                  style={{ 
+                    backgroundImage: 'none',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundSize: 'auto',
+                    backgroundPosition: '0 0',
+                    cursor: 'text'
+                  }}
+                  suppressHydrationWarning
+                />
+              </div>
+              <Button
+                type="submit"
+                className="bg-purple-500 hover:bg-purple-600 text-white"
+              >
+                Subscribe
+              </Button>
+            </div>
           </motion.form>
 
           {/* Copyright */}
           <motion.p
-            className="text-sm text-gray-400 font-inter mt-8"
+            className="text-sm text-gray-400 font-sans mt-8"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.5 }}

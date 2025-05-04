@@ -1,17 +1,24 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from "react";
 import { useParams } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { format } from 'date-fns';
-import { Scale, Sparkles, RefreshCw, CheckCircle2, X, Download } from 'lucide-react';
-import { ChatMessage } from '@/types/case';
-import ProtectedPage from '@/components/ProtectedPage';
+import { motion, AnimatePresence } from "framer-motion";
+import { format } from "date-fns";
+import {
+  Scale,
+  Sparkles,
+  RefreshCw,
+  CheckCircle2,
+  X,
+  Download,
+} from "lucide-react";
+import { ChatMessage } from "@/types/case";
+import ProtectedPage from "@/components/ProtectedPage";
 import { Button } from "@/components/ui/button";
-import { useDispatch } from 'react-redux';
-import { addTodo } from '@/app/store/slices/todoSlice';
-import { AppDispatch } from '@/app/store';
-import jsPDF from 'jspdf';
+import { useDispatch } from "react-redux";
+import { addTodo } from "@/app/store/slices/todoSlice";
+import { AppDispatch } from "@/app/store";
+import jsPDF from "jspdf";
 
 type CaseData = {
   description: string | null;
@@ -60,37 +67,36 @@ const initialCaseData: CaseData = {
   agreement: null,
 };
 
-const fieldOrder = ['description', 'opponent', 'timeline', 'evidence', 'agreement'];
-
-
 export default function ChatPage() {
+  const params = useParams();
+  const session = params.sessionId; 
+  // const { session } = useParams<{ session: string }>();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [input, setInput] = useState('Hey I need help for my legal case.');
+  const [input, setInput] = useState("Hey I need help for my legal case.");
   const [isLoading, setIsLoading] = useState(false);
   const [caseData, setCaseData] = useState<CaseData>(initialCaseData);
-  const [sessionId] = useState<string>(`user_${Date.now()}`);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isAnalysisEnabled, setIsAnalysisEnabled] = useState(false);
   const [isConcluding, setIsConcluding] = useState(false);
-  const [conclusionData, setConclusionData] = useState<ConclusionData | null>(null);
+  const [conclusionData, setConclusionData] = useState<ConclusionData | null>(
+    null
+  );
   const dispatch = useDispatch<AppDispatch>();
 
-  
   // UseEffects
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
   useEffect(() => {
     const allFieldsFilled = Object.values(caseData).every(
-      (value) => value !== null && (Array.isArray(value) ? value.length > 0 : true)
+      (value) =>
+        value !== null && (Array.isArray(value) ? value.length > 0 : true)
     );
     setIsAnalysisEnabled(allFieldsFilled);
   }, [caseData]);
-  
-  
-  
+
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,77 +105,55 @@ export default function ChatPage() {
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       content: input,
-      sender: 'user',
+      sender: "user",
       timestamp: new Date(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    setInput('');
+    setInput("");
     setIsLoading(true);
 
     try {
+      console.log("sessionId", session);
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: input,
-          sessionId,
+          sessionId: session,
         }),
       });
 
-      if (!response.ok) throw new Error('API request failed');
+      if (!response.ok) throw new Error("API request failed");
 
       const data = await response.json();
-      console.log('Frontend - Case data after chat request:', {
+      initialCaseData.description = data.description;
+      initialCaseData.opponent = data.opponent;
+      initialCaseData.timeline = data.timeline;
+      initialCaseData.evidence = data.evidence;
+      initialCaseData.agreement = data.agreement;
+      const chatResponse = data.response;
+      console.log("Frontend - Case data after chat request:", {
         caseData,
-        updatedField: data.updatedField,
-        updatedValue: data.updatedValue,
+        chatResponse,
       });
-
-      if (data.updatedField && data.updatedValue !== undefined) {
-        setCaseData((prev) => ({
-          ...prev,
-          [data.updatedField]:
-            data.updatedField === 'timeline'
-              ? [data.updatedValue]
-              : data.updatedField === 'evidence' || data.updatedField === 'agreement'
-              ? data.updatedValue.toLowerCase() === 'true'
-              : data.updatedValue,
-        }));
-      }
 
       const aiMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
-        content: data.response || 'No response provided.',
-        sender: 'ai',
+        content:
+          chatResponse ||
+          "Sorry there was an error. Please try repeat your message. Sorry for the inconvenience.",
+        sender: "ai",
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, aiMessage]);
-
-      for (const todo of data.todos) {
-        const backendResponse = await fetch('/api/todos', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            title: todo.title,
-            description: todo.description,
-            deadline: new Date(),
-            status: 'pending',
-          }),
-        }); 
-
-        if (backendResponse.ok) {
-          const createdTodo = await backendResponse.json();
-          dispatch(addTodo(createdTodo));
-        }
-      }
     } catch (error) {
       setMessages((prev) => [
         ...prev,
         {
           id: (Date.now() + 1).toString(),
-          content: 'Error processing request. Please try again.',
-          sender: 'ai',
+          content: "Error processing request. Please try again.",
+          sender: "ai",
           timestamp: new Date(),
         },
       ]);
@@ -180,19 +164,18 @@ export default function ChatPage() {
 
   const handleSuperAnalysis = async () => {
     if (!isAnalysisEnabled) return;
-
     setIsLoading(true);
     try {
-      const response = await fetch('/api/chat/analysis', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ caseData, sessionId }),
+      const response = await fetch("/api/chat/analysis", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ caseData, sessionId: session as string }),
       });
 
-      if (!response.ok) throw new Error('Analysis request failed');
+      if (!response.ok) throw new Error("Analysis request failed");
 
       const data = await response.json();
-      console.log('Frontend - Case data after analysis request:', {
+      console.log("Frontend - Case data after analysis request:", {
         caseData,
         analysisData: {
           caseSummary: data.caseSummary,
@@ -205,13 +188,15 @@ export default function ChatPage() {
         ...prev,
         {
           id: (Date.now() + 1).toString(),
-          content: `**Case Summary**: ${data.caseSummary || 'No summary provided'}`,
-          sender: 'ai',
+          content: `**Case Summary**: ${
+            data.caseSummary || "No summary provided"
+          }`,
+          sender: "ai",
           timestamp: new Date(),
         },
       ]);
 
-      if (data.lawsInvolved?.length) {
+      if (data.laws_related?.length) {
         setMessages((prev) => [
           ...prev,
           {
@@ -220,20 +205,20 @@ export default function ChatPage() {
               <div class="bg-purple-900/20 p-4 rounded-lg border border-purple-500/20">
                 <h3 class="text-purple-400 font-semibold mb-2">📚 Relevant Laws</h3>
                 <div class="space-y-2">
-                  ${data.lawsInvolved
+                  ${data.laws_related
                     .map(
                       (law: any) => `
                     <div class="bg-white/5 p-3 rounded-lg">
                       <h4 class="text-white font-medium">${law.name}</h4>
                       <p class="text-gray-300 text-sm mt-1">${law.description}</p>
                     </div>
-                  `,
+                  `
                     )
-                    .join('')}
+                    .join("")}
                 </div>
               </div>
             `,
-            sender: 'ai',
+            sender: "ai",
             timestamp: new Date(),
           },
         ]);
@@ -255,13 +240,13 @@ export default function ChatPage() {
                       <h4 class="text-white font-medium">${todo.title}</h4>
                       <p className="text-gray-300 text-sm mt-1">${todo.description}</p>
                     </div>
-                  `,
+                  `
                     )
-                    .join('')}
+                    .join("")}
                 </div>
               </div>
             `,
-            sender: 'ai',
+            sender: "ai",
             timestamp: new Date(),
           },
         ]);
@@ -271,8 +256,8 @@ export default function ChatPage() {
         ...prev,
         {
           id: (Date.now() + 1).toString(),
-          content: 'Error analyzing case. Please try again.',
-          sender: 'ai',
+          content: "Error analyzing case. Please try again.",
+          sender: "ai",
           timestamp: new Date(),
         },
       ]);
@@ -290,10 +275,10 @@ export default function ChatPage() {
   const handleConclude = async () => {
     setIsConcluding(true);
     try {
-      const response = await fetch('/api/chat/conclude', {
-        method: 'POST',
+      const response = await fetch("/api/chat/conclude", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ caseData: messages }),
       });
@@ -301,14 +286,14 @@ export default function ChatPage() {
       setConclusionData(data);
 
       for (const todo of data.todos) {
-        const backendResponse = await fetch('/api/todos', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const backendResponse = await fetch("/api/todos", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             title: todo.title,
             description: todo.description,
             deadline: new Date(),
-            status: 'pending',
+            status: "pending",
           }),
         });
 
@@ -318,13 +303,13 @@ export default function ChatPage() {
         }
       }
     } catch (error) {
-      console.error('Error concluding case:', error);
+      console.error("Error concluding case:", error);
       setMessages((prev) => [
         ...prev,
         {
           id: (Date.now() + 1).toString(),
-          content: 'Error concluding case. Please try again.',
-          sender: 'ai',
+          content: "Error concluding case. Please try again.",
+          sender: "ai",
           timestamp: new Date(),
         },
       ]);
@@ -343,14 +328,25 @@ export default function ChatPage() {
     const doc = new jsPDF();
     let yOffset = 20;
 
-    const addText = (text: string, x: number, y: number, size: number, isBold = false) => {
+    const addText = (
+      text: string,
+      x: number,
+      y: number,
+      size: number,
+      isBold = false
+    ) => {
       doc.setFontSize(size);
-      doc.setFont('helvetica', isBold ? 'bold' : 'normal');
+      doc.setFont("helvetica", isBold ? "bold" : "normal");
       doc.text(text, x, y);
       return y + size * 0.5;
     };
 
-    const addSection = (title: string, items: string[], x: number, startY: number) => {
+    const addSection = (
+      title: string,
+      items: string[],
+      x: number,
+      startY: number
+    ) => {
       yOffset = addText(title, x, startY, 14, true);
       items.forEach((item) => {
         const splitText = doc.splitTextToSize(item, 180);
@@ -367,11 +363,14 @@ export default function ChatPage() {
     };
 
     doc.setFontSize(16);
-    doc.text('Case Analysis Report', 20, yOffset);
+    doc.text("Case Analysis Report", 20, yOffset);
     yOffset += 10;
 
-    yOffset = addText('Case Summary', 20, yOffset, 14, true);
-    const summaryLines = doc.splitTextToSize(conclusionData.caseFinalAnalysis.userCaseSummary, 170);
+    yOffset = addText("Case Summary", 20, yOffset, 14, true);
+    const summaryLines = doc.splitTextToSize(
+      conclusionData.caseFinalAnalysis.userCaseSummary,
+      170
+    );
     summaryLines.forEach((line: string) => {
       if (yOffset > 280) {
         doc.addPage();
@@ -381,11 +380,16 @@ export default function ChatPage() {
     });
     yOffset += 5;
 
-    yOffset = addSection('Laws Involved', conclusionData.caseFinalAnalysis.lawsInvolved, 20, yOffset);
+    yOffset = addSection(
+      "Laws Involved",
+      conclusionData.caseFinalAnalysis.lawsInvolved,
+      20,
+      yOffset
+    );
 
     conclusionData.caseFinalAnalysis.relevantCaseDetails.forEach((detail) => {
       yOffset = addText(detail.title, 20, yOffset, 12, true);
-      yOffset = addText('Case Brief:', 25, yOffset, 10, true);
+      yOffset = addText("Case Brief:", 25, yOffset, 10, true);
       const briefLines = doc.splitTextToSize(detail.caseBrief, 160);
       briefLines.forEach((line: string) => {
         if (yOffset > 280) {
@@ -394,9 +398,14 @@ export default function ChatPage() {
         }
         yOffset = addText(line, 30, yOffset, 10);
       });
-      yOffset = addSection('Laws Assessed', detail.lawsAssessed, 25, yOffset);
-      yOffset = addSection('Court Reasoning', detail.courtReasoning, 25, yOffset);
-      yOffset = addText('Conclusion:', 25, yOffset, 10, true);
+      yOffset = addSection("Laws Assessed", detail.lawsAssessed, 25, yOffset);
+      yOffset = addSection(
+        "Court Reasoning",
+        detail.courtReasoning,
+        25,
+        yOffset
+      );
+      yOffset = addText("Conclusion:", 25, yOffset, 10, true);
       const conclusionLines = doc.splitTextToSize(detail.conclusion, 160);
       conclusionLines.forEach((line: string) => {
         if (yOffset > 280) {
@@ -408,10 +417,20 @@ export default function ChatPage() {
       yOffset += 5;
     });
 
-    yOffset = addSection('Learnings', conclusionData.caseFinalAnalysis.learnings, 20, yOffset);
-    yOffset = addSection('Utilization', conclusionData.caseFinalAnalysis.utilization, 20, yOffset);
+    yOffset = addSection(
+      "Learnings",
+      conclusionData.caseFinalAnalysis.learnings,
+      20,
+      yOffset
+    );
+    yOffset = addSection(
+      "Utilization",
+      conclusionData.caseFinalAnalysis.utilization,
+      20,
+      yOffset
+    );
 
-    yOffset = addText('Action Plan', 20, yOffset, 14, true);
+    yOffset = addText("Action Plan", 20, yOffset, 14, true);
     conclusionData.caseFinalAnalysis.actionPlan.forEach((step) => {
       if (yOffset > 280) {
         doc.addPage();
@@ -425,8 +444,11 @@ export default function ChatPage() {
       yOffset += 2;
     });
 
-    yOffset = addText('Primary Recommendation', 20, yOffset, 14, true);
-    const recLines = doc.splitTextToSize(conclusionData.caseFinalAnalysis.primaryRecommendation, 170);
+    yOffset = addText("Primary Recommendation", 20, yOffset, 14, true);
+    const recLines = doc.splitTextToSize(
+      conclusionData.caseFinalAnalysis.primaryRecommendation,
+      170
+    );
     recLines.forEach((line: string) => {
       if (yOffset > 280) {
         doc.addPage();
@@ -436,7 +458,7 @@ export default function ChatPage() {
     });
     yOffset += 5;
 
-    yOffset = addText('Risks and Mitigations', 20, yOffset, 14, true);
+    yOffset = addText("Risks and Mitigations", 20, yOffset, 14, true);
     conclusionData.caseFinalAnalysis.risksAndMitigations.forEach((item) => {
       if (yOffset > 280) {
         doc.addPage();
@@ -447,9 +469,14 @@ export default function ChatPage() {
       yOffset += 2;
     });
 
-    yOffset = addSection('Long Term Strategy', conclusionData.caseFinalAnalysis.longTermStrategy, 20, yOffset);
+    yOffset = addSection(
+      "Long Term Strategy",
+      conclusionData.caseFinalAnalysis.longTermStrategy,
+      20,
+      yOffset
+    );
 
-    yOffset = addText('Todos', 20, yOffset, 14, true);
+    yOffset = addText("Todos", 20, yOffset, 14, true);
     conclusionData.todos.forEach((todo) => {
       if (yOffset > 280) {
         doc.addPage();
@@ -467,7 +494,7 @@ export default function ChatPage() {
       yOffset += 2;
     });
 
-    doc.save('case_analysis_report.pdf');
+    doc.save("case_analysis_report.pdf");
   };
 
   return (
@@ -490,7 +517,9 @@ export default function ChatPage() {
             <div className="w-80 bg-black/60 border-r border-white/10 p-4 overflow-y-auto">
               <div className="flex items-center space-x-3 mb-6">
                 <Scale className="w-5 h-5 text-purple-400" />
-                <h2 className="text-lg font-semibold text-white">Case Details</h2>
+                <h2 className="text-lg font-semibold text-white">
+                  Case Details
+                </h2>
               </div>
               <div className="space-y-3">
                 {Object.entries(caseData).map(([key, value]) => (
@@ -500,9 +529,13 @@ export default function ChatPage() {
                     animate={{ opacity: 1, x: 0 }}
                     className="bg-white/5 rounded-xl p-3 border border-white/5"
                   >
-                    <h3 className="text-xs text-purple-400 uppercase">{key.replace(/_/g, ' ')}</h3>
+                    <h3 className="text-xs text-purple-400 uppercase">
+                      {key.replace(/_/g, " ")}
+                    </h3>
                     <p className="text-sm text-gray-300 mt-1">
-                      {Array.isArray(value) ? value.join(', ') || 'Not provided' : value?.toString() || 'Not provided'}
+                      {Array.isArray(value)
+                        ? value.join(", ") || "Not provided"
+                        : value?.toString() || "Not provided"}
                     </p>
                   </motion.div>
                 ))}
@@ -511,12 +544,15 @@ export default function ChatPage() {
 
             <div className="flex-1 flex flex-col">
               <div className="bg-black/60 border-b border-white/10 p-4">
-                
                 <div className="flex items-center justify-between">
                   <div>
-                    <h1 className="text-2xl font-bold text-white">Legal Assistant</h1>
+                    <h1 className="text-2xl font-bold text-white">
+                      Legal Assistant
+                    </h1>
                     <p className="text-gray-400 text-xs mt-1">
-                      {isAnalysisEnabled ? 'Case ready!' : 'Gathering case info'}
+                      {isAnalysisEnabled
+                        ? "Case ready!"
+                        : "Gathering case info"}
                     </p>
                   </div>
                   <div className="flex justify-end space-x-4 mb-4">
@@ -527,7 +563,7 @@ export default function ChatPage() {
                       disabled={isLoading}
                     >
                       <Sparkles className="w-4 h-4 mr-2 cursor-pointer group-hover:scale-110 transition-transform duration-300" />
-                      {isLoading ? 'Processing...' : 'Start Processing'}
+                      {isLoading ? "Processing..." : "Start Processing"}
                     </Button>
                     <Button
                       variant="outline"
@@ -536,7 +572,7 @@ export default function ChatPage() {
                       disabled={isConcluding}
                     >
                       <CheckCircle2 className="w-4 h-4 mr-2 group-hover:scale-110 cursor-pointer transition-transform duration-300" />
-                      {isConcluding ? 'Analyzing...' : 'Super Analyze'}
+                      {isConcluding ? "Analyzing..." : "Super Analyze"}
                     </Button>
                   </div>
                 </div>
@@ -549,26 +585,79 @@ export default function ChatPage() {
                       key={message.id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                      className={`flex ${
+                        message.sender === "user"
+                          ? "justify-end"
+                          : "justify-start"
+                      }`}
                     >
                       <div
                         className={`max-w-[70%] rounded-xl p-3 ${
-                          message.sender === 'user' ? 'bg-purple-600/80' : 'bg-white/10'
+                          message.sender === "user"
+                            ? "bg-purple-600/80"
+                            : "bg-white/10"
                         }`}
                       >
-                        <div className="text-sm text-white" dangerouslySetInnerHTML={{ __html: message.content }} />
-                        <p className="text-xs text-gray-300 mt-1">{format(message.timestamp, 'h:mm a')}</p>
+                        <div
+                          className="text-sm text-white"
+                          dangerouslySetInnerHTML={{ __html: message.content }}
+                        />
+                        <p className="text-xs text-gray-300 mt-1">
+                          {format(message.timestamp, "h:mm a")}
+                        </p>
                       </div>
                     </motion.div>
                   ))}
                 </AnimatePresence>
                 {isLoading && (
                   <motion.div className="flex justify-start">
-                    <div className="bg-white/10 rounded-xl p-3 flex items-center gap-2">
-                      <span className="block w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <span className="block w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <span className="block w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                      <span className="ml-2 text-purple-300 text-xs font-mono">AI is thinking...</span>
+                    <div className="bg-white/10 rounded-xl p-4 flex items-center gap-4 min-w-[180px]">
+                      {/* Animated AI avatar */}
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-teal-400 animate-pulse shadow-lg flex items-center justify-center">
+                        <svg
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                        >
+                          <circle
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            fill="#a78bfa"
+                            opacity="0.2"
+                          />
+                          <circle
+                            cx="12"
+                            cy="12"
+                            r="6"
+                            fill="#a78bfa"
+                            opacity="0.5"
+                          />
+                          <circle cx="12" cy="12" r="3" fill="#a78bfa" />
+                        </svg>
+                      </div>
+                      {/* Typewriter dots */}
+                      <div className="flex flex-col">
+                        <div className="flex gap-1 mb-1">
+                          <span
+                            className="block w-2 h-2 bg-purple-400 rounded-full animate-bounce"
+                            style={{ animationDelay: "0ms" }}
+                          />
+                          <span
+                            className="block w-2 h-2 bg-purple-400 rounded-full animate-bounce"
+                            style={{ animationDelay: "150ms" }}
+                          />
+                          <span
+                            className="block w-2 h-2 bg-purple-400 rounded-full animate-bounce"
+                            style={{ animationDelay: "300ms" }}
+                          />
+                        </div>
+                        <span className="text-purple-300 text-xs font-mono animate-pulse">
+                          AI is thinking
+                          <span className="animate-pulse">...</span>
+                        </span>
+                      </div>
                     </div>
                   </motion.div>
                 )}
@@ -588,7 +677,9 @@ export default function ChatPage() {
                     type="submit"
                     disabled={isLoading || !input.trim()}
                     className={`px-6 py-3 rounded-xl text-sm text-white font-medium ${
-                      isLoading || !input.trim() ? 'bg-gray-600' : 'bg-purple-600'
+                      isLoading || !input.trim()
+                        ? "bg-gray-600"
+                        : "bg-purple-600"
                     }`}
                   >
                     Send
@@ -615,7 +706,9 @@ export default function ChatPage() {
                 className="bg-gradient-to-br from-gray-900/90 mt-28 to-gray-800/90 backdrop-blur-md rounded-xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-white/10"
               >
                 <div className="flex justify-between items-center mb-6 ">
-                  <h2 className="text-2xl font-bold text-white font-[var(--font-josefin-sans)]">Case Analysis Report</h2>
+                  <h2 className="text-2xl font-bold text-white font-[var(--font-josefin-sans)]">
+                    Case Analysis Report
+                  </h2>
                   <div className="flex space-x-4">
                     <Button
                       onClick={handleDownloadPDF}
@@ -635,151 +728,223 @@ export default function ChatPage() {
                 <div className="space-y-8">
                   {/* Case Summary */}
                   <div className="bg-gray-800/50 rounded-lg p-6">
-                    <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">Case Summary</h3>
-                    <p className="text-gray-300 text-sm">{conclusionData.caseFinalAnalysis.userCaseSummary}</p>
+                    <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">
+                      Case Summary
+                    </h3>
+                    <p className="text-gray-300 text-sm">
+                      {conclusionData.caseFinalAnalysis.userCaseSummary}
+                    </p>
                   </div>
 
                   {/* Laws Involved */}
                   <div className="bg-gray-800/50 rounded-lg p-6">
-                    <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">Laws Involved</h3>
+                    <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">
+                      Laws Involved
+                    </h3>
                     <ul className="space-y-3">
-                      {conclusionData.caseFinalAnalysis.lawsInvolved.map((law, index) => (
-                        <li key={index} className="flex items-start gap-3">
-                          <div className="mt-1.5">
-                            <div className="w-2 h-2 rounded-full bg-purple-500" />
-                          </div>
-                          <p className="text-gray-300 text-sm">{law}</p>
-                        </li>
-                      ))}
+                      {conclusionData.caseFinalAnalysis.lawsInvolved.map(
+                        (law, index) => (
+                          <li key={index} className="flex items-start gap-3">
+                            <div className="mt-1.5">
+                              <div className="w-2 h-2 rounded-full bg-purple-500" />
+                            </div>
+                            <p className="text-gray-300 text-sm">{law}</p>
+                          </li>
+                        )
+                      )}
                     </ul>
                   </div>
 
                   {/* Relevant Case Details */}
                   <div className="bg-gray-800/50 rounded-lg p-6">
-                    <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">Relevant Case Details</h3>
-                    {conclusionData.caseFinalAnalysis.relevantCaseDetails.map((caseDetail, index) => (
-                      <div key={index} className="mb-6 last:mb-0">
-                        <h4 className="text-lg font-semibold text-purple-400 mb-2">{caseDetail.title}</h4>
-                        <p className="text-gray-300 text-sm mb-4">{caseDetail.caseBrief}</p>
-                        <div className="space-y-4">
-                          <div>
-                            <h5 className="text-sm font-medium text-purple-400 mb-2">Laws Assessed</h5>
-                            <ul className="space-y-2">
-                              {caseDetail.lawsAssessed.map((law, idx) => (
-                                <li key={idx} className="text-gray-300 text-sm">{law}</li>
-                              ))}
-                            </ul>
-                          </div>
-                          <div>
-                            <h5 className="text-sm font-medium text-purple-400 mb-2">Court Reasoning</h5>
-                            <ul className="space-y-2">
-                              {caseDetail.courtReasoning.map((reason, idx) => (
-                                <li key={idx} className="text-gray-300 text-sm">{reason}</li>
-                              ))}
-                            </ul>
-                          </div>
-                          <div>
-                            <h5 className="text-sm font-medium text-purple-400 mb-2">Conclusion</h5>
-                            <p className="text-gray-300 text-sm">{caseDetail.conclusion}</p>
+                    <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">
+                      Relevant Case Details
+                    </h3>
+                    {conclusionData.caseFinalAnalysis.relevantCaseDetails.map(
+                      (caseDetail, index) => (
+                        <div key={index} className="mb-6 last:mb-0">
+                          <h4 className="text-lg font-semibold text-purple-400 mb-2">
+                            {caseDetail.title}
+                          </h4>
+                          <p className="text-gray-300 text-sm mb-4">
+                            {caseDetail.caseBrief}
+                          </p>
+                          <div className="space-y-4">
+                            <div>
+                              <h5 className="text-sm font-medium text-purple-400 mb-2">
+                                Laws Assessed
+                              </h5>
+                              <ul className="space-y-2">
+                                {caseDetail.lawsAssessed.map((law, idx) => (
+                                  <li
+                                    key={idx}
+                                    className="text-gray-300 text-sm"
+                                  >
+                                    {law}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                            <div>
+                              <h5 className="text-sm font-medium text-purple-400 mb-2">
+                                Court Reasoning
+                              </h5>
+                              <ul className="space-y-2">
+                                {caseDetail.courtReasoning.map(
+                                  (reason, idx) => (
+                                    <li
+                                      key={idx}
+                                      className="text-gray-300 text-sm"
+                                    >
+                                      {reason}
+                                    </li>
+                                  )
+                                )}
+                              </ul>
+                            </div>
+                            <div>
+                              <h5 className="text-sm font-medium text-purple-400 mb-2">
+                                Conclusion
+                              </h5>
+                              <p className="text-gray-300 text-sm">
+                                {caseDetail.conclusion}
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      )
+                    )}
                   </div>
 
                   {/* Learnings */}
                   <div className="bg-gray-800/50 rounded-lg p-6">
-                    <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">Learnings</h3>
+                    <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">
+                      Learnings
+                    </h3>
                     <ul className="space-y-3">
-                      {conclusionData.caseFinalAnalysis.learnings.map((learning, index) => (
-                        <li key={index} className="flex items-start gap-3">
-                          <div className="mt-1.5">
-                            <div className="w-2 h-2 rounded-full bg-purple-500" />
-                          </div>
-                          <p className="text-gray-300 text-sm">{learning}</p>
-                        </li>
-                      ))}
+                      {conclusionData.caseFinalAnalysis.learnings.map(
+                        (learning, index) => (
+                          <li key={index} className="flex items-start gap-3">
+                            <div className="mt-1.5">
+                              <div className="w-2 h-2 rounded-full bg-purple-500" />
+                            </div>
+                            <p className="text-gray-300 text-sm">{learning}</p>
+                          </li>
+                        )
+                      )}
                     </ul>
                   </div>
 
                   {/* Utilization */}
                   <div className="bg-gray-800/50 rounded-lg p-6">
-                    <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">Utilization</h3>
+                    <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">
+                      Utilization
+                    </h3>
                     <ul className="space-y-3">
-                      {conclusionData.caseFinalAnalysis.utilization.map((util, index) => (
-                        <li key={index} className="flex items-start gap-3">
-                          <div className="mt-1.5">
-                            <div className="w-2 h-2 rounded-full bg-purple-500" />
-                          </div>
-                          <p className="text-gray-300 text-sm">{util}</p>
-                        </li>
-                      ))}
+                      {conclusionData.caseFinalAnalysis.utilization.map(
+                        (util, index) => (
+                          <li key={index} className="flex items-start gap-3">
+                            <div className="mt-1.5">
+                              <div className="w-2 h-2 rounded-full bg-purple-500" />
+                            </div>
+                            <p className="text-gray-300 text-sm">{util}</p>
+                          </li>
+                        )
+                      )}
                     </ul>
                   </div>
 
                   {/* Action Plan */}
                   <div className="bg-gray-800/50 rounded-lg p-6">
-                    <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">Action Plan</h3>
+                    <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">
+                      Action Plan
+                    </h3>
                     <ul className="space-y-4">
-                      {conclusionData.caseFinalAnalysis.actionPlan.map((step, index) => (
-                        <li key={index} className="flex items-start gap-3">
-                          <div className="mt-1.5">
-                            <div className="w-2 h-2 rounded-full bg-purple-500" />
-                          </div>
-                          <div>
-                            <p className="text-gray-300 text-sm">{step.step}</p>
-                            <p className="text-xs text-gray-400 mt-1">Priority: {step.priority}</p>
-                            {step.resource && (
-                              <p className="text-xs text-purple-400 mt-1">{step.resource}</p>
-                            )}
-                          </div>
-                        </li>
-                      ))}
+                      {conclusionData.caseFinalAnalysis.actionPlan.map(
+                        (step, index) => (
+                          <li key={index} className="flex items-start gap-3">
+                            <div className="mt-1.5">
+                              <div className="w-2 h-2 rounded-full bg-purple-500" />
+                            </div>
+                            <div>
+                              <p className="text-gray-300 text-sm">
+                                {step.step}
+                              </p>
+                              <p className="text-xs text-gray-400 mt-1">
+                                Priority: {step.priority}
+                              </p>
+                              {step.resource && (
+                                <p className="text-xs text-purple-400 mt-1">
+                                  {step.resource}
+                                </p>
+                              )}
+                            </div>
+                          </li>
+                        )
+                      )}
                     </ul>
                   </div>
 
                   {/* Primary Recommendation */}
                   <div className="bg-gray-800/50 rounded-lg p-6">
-                    <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">Primary Recommendation</h3>
-                    <p className="text-gray-300 text-sm">{conclusionData.caseFinalAnalysis.primaryRecommendation}</p>
+                    <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">
+                      Primary Recommendation
+                    </h3>
+                    <p className="text-gray-300 text-sm">
+                      {conclusionData.caseFinalAnalysis.primaryRecommendation}
+                    </p>
                   </div>
 
                   {/* Risks and Mitigations */}
                   <div className="bg-gray-800/50 rounded-lg p-6">
-                    <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">Risks and Mitigations</h3>
+                    <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">
+                      Risks and Mitigations
+                    </h3>
                     <ul className="space-y-4">
-                      {conclusionData.caseFinalAnalysis.risksAndMitigations.map((item, index) => (
-                        <li key={index} className="flex items-start gap-3">
-                          <div className="mt-1.5">
-                            <div className="w-2 h-2 rounded-full bg-purple-500" />
-                          </div>
-                          <div>
-                            <p className="text-gray-300 text-sm font-medium">Risk: {item.risk}</p>
-                            <p className="text-gray-400 text-sm mt-1">Mitigation: {item.mitigation}</p>
-                          </div>
-                        </li>
-                      ))}
+                      {conclusionData.caseFinalAnalysis.risksAndMitigations.map(
+                        (item, index) => (
+                          <li key={index} className="flex items-start gap-3">
+                            <div className="mt-1.5">
+                              <div className="w-2 h-2 rounded-full bg-purple-500" />
+                            </div>
+                            <div>
+                              <p className="text-gray-300 text-sm font-medium">
+                                Risk: {item.risk}
+                              </p>
+                              <p className="text-gray-400 text-sm mt-1">
+                                Mitigation: {item.mitigation}
+                              </p>
+                            </div>
+                          </li>
+                        )
+                      )}
                     </ul>
                   </div>
 
                   {/* Long Term Strategy */}
                   <div className="bg-gray-800/50 rounded-lg p-6">
-                    <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">Long Term Strategy</h3>
+                    <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">
+                      Long Term Strategy
+                    </h3>
                     <ul className="space-y-3">
-                      {conclusionData.caseFinalAnalysis.longTermStrategy.map((strategy, index) => (
-                        <li key={index} className="flex items-start gap-3">
-                          <div className="mt-1.5">
-                            <div className="w-2 h-2 rounded-full bg-purple-500" />
-                          </div>
-                          <p className="text-gray-300 text-sm">{strategy}</p>
-                        </li>
-                      ))}
+                      {conclusionData.caseFinalAnalysis.longTermStrategy.map(
+                        (strategy, index) => (
+                          <li key={index} className="flex items-start gap-3">
+                            <div className="mt-1.5">
+                              <div className="w-2 h-2 rounded-full bg-purple-500" />
+                            </div>
+                            <p className="text-gray-300 text-sm">{strategy}</p>
+                          </li>
+                        )
+                      )}
                     </ul>
                   </div>
 
                   {/* Todos */}
                   <div className="bg-gray-800/50 rounded-lg p-6">
-                    <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">Todos</h3>
+                    <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">
+                      Todos
+                    </h3>
                     <ul className="space-y-4">
                       {conclusionData.todos.map((todo, index) => (
                         <li key={index} className="flex items-start gap-3">
@@ -787,8 +952,12 @@ export default function ChatPage() {
                             <div className="w-2 h-2 rounded-full bg-purple-500" />
                           </div>
                           <div>
-                            <p className="text-gray-300 text-sm font-medium">{todo.title}</p>
-                            <p className="text-gray-400 text-sm mt-1">{todo.description}</p>
+                            <p className="text-gray-300 text-sm font-medium">
+                              {todo.title}
+                            </p>
+                            <p className="text-gray-400 text-sm mt-1">
+                              {todo.description}
+                            </p>
                           </div>
                         </li>
                       ))}

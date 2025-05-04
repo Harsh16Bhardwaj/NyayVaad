@@ -6,14 +6,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { setChatSessions } from "@/app/store/slices/chatSessionsSlice";
 import { RootState } from "@/app/store"; // adjust if your store is elsewhere
 import { useUser } from "@clerk/nextjs";
+import { useParams } from "next/navigation";
 
 // Dummy previous conversations
 
 
 const generateSessionId = () => {
-  return (` session_${Math.random().toString(36).substring(2, 8) + Math.random().toString(36).substring(4, 7)}`);
+  return `session_${Math.random().toString(36).substring(2, 8) + Math.random().toString(36).substring(4, 7)}`;
 };
-
+const sessionbID = generateSessionId();
 export default function ChatLandingPage() {
   const dispatch = useDispatch();
   const { user } = useUser();
@@ -65,7 +66,7 @@ export default function ChatLandingPage() {
         transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
         className="mb-12"
       >
-        <Link href={`/chat/${generateSessionId()}`}>
+        <Link href={`/chat/${sessionbID}`}>
           <button
             className="bg-gradient-to-r cursor-pointer  border border-gray-100  from-red-900  to-purple-950 text-white px-6 py-3 rounded-xl text-lg font-bold shadow-lg hover:scale-105 transition-transform focus:outline-none focus:ring-2 focus:ring-purple-400"
             disabled={loading}

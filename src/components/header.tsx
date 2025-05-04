@@ -139,7 +139,7 @@ const Navbar = () => {
             {navSignedInLinks.map((link, index) => (
               <motion.div
                 key={link.href}
-                className="glass rounded-full px-5 py-2"
+                className="glass rounded-full px-5 py-2 cursor-pointer"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.02, duration: 0.5 }}
@@ -247,7 +247,7 @@ const Navbar = () => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.02, duration: 0.3 }}
-                className="mb-2"
+                className="mb-2 cursor-pointer"
               >
                 <Link
                   href={link.href}
