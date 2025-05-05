@@ -34,7 +34,7 @@ export const PinContainer = ({
   };
 
   return (
-    <div
+    <motion.div
       className={cn(
         "relative group/pin z-30 cursor-pointer",
         containerClassName
@@ -60,7 +60,7 @@ export const PinContainer = ({
         </div>
       </div>
       <PinPerspective title={title} href={href} />
-    </div>
+    </motion.div>
   );
 };
 

@@ -15,7 +15,7 @@ const fadeIn = {
 
 const Pricing: React.FC = () => {
   const [isYearly, setIsYearly] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<"Free" | "Pro" | "Enterprise" | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<string>("");
 
   const plans = [
     {
@@ -73,7 +73,7 @@ const Pricing: React.FC = () => {
             className="text-3xl md:text-4xl font-bold text-white mb-4"
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
+            viewport={{ once: false, amount: 0.3 }}
             variants={fadeIn}
           >
             Simple, Transparent Pricing
@@ -82,7 +82,7 @@ const Pricing: React.FC = () => {
             className="text-gray-400 max-w-2xl mx-auto"
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
+            viewport={{ once: false, amount: 0.3 }}
             variants={fadeIn}
           >
             Choose the plan that empowers your legal journey.
@@ -93,7 +93,7 @@ const Pricing: React.FC = () => {
             className="flex items-center justify-center gap-4 mt-8"
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
+            viewport={{ once: false, amount: 0.3 }}
             variants={fadeIn}
           >
             <span className={`${!isYearly ? "text-white" : "text-gray-500"} font-medium`}>
@@ -126,7 +126,7 @@ const Pricing: React.FC = () => {
               )}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
+              viewport={{ once: false, amount: 0.3 }}
               variants={{
                 hidden: { opacity: 0, y: 30 },
                 visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut", delay: index * 0.2 } },

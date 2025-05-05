@@ -24,16 +24,26 @@ interface FeatureItem {
   icon: React.ReactNode;
 }
 
+const fadeIn = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
 // Define props for ParallaxFeatures
 interface ParallaxFeaturesProps {
   features: FeatureItem[];
   offerings: FeatureItem[];
 }
 
-// Random gradient generator
-const getRandomGradient = () => {
+// Replace the random gradient generator with a deterministic one
+const getGradientForTitle = (title: string) => {
+  // Create a hash of the title to get a consistent number
+  const hash = title.split("").reduce((acc, char) => {
+    return char.charCodeAt(0) + ((acc << 5) - acc);
+  }, 0);
+
+  // Use the hash to select a gradient
   const gradients = [
-    "from-teal-900/80  to-gray-900/80",
+    "from-teal-900/80 to-gray-900/80",
     "from-purple-900/80 to-teal-900/80",
     "from-gray-900/80 to-purple-900/80",
     "from-teal-800/80 to-purple-800/80",
@@ -43,25 +53,31 @@ const getRandomGradient = () => {
     "from-purple-900/80 to-blue-900/80",
     "from-blue-800/80 to-purple-800/80",
     "from-purple-800/80 to-blue-800/80",
-    
   ];
-  return gradients[Math.floor(Math.random() * gradients.length)];
+
+  return gradients[Math.abs(hash) % gradients.length];
 };
 
 export const ParallaxFeatures = ({
   features,
   offerings,
 }: ParallaxFeaturesProps) => {
-  const firstRow = features.slice(0, 5); // 5 cards
-  const secondRow = offerings.slice(0, 5); // 5 cards
+  const firstRow = features.slice(0, 5);
+  const secondRow = offerings.slice(0, 5);
   const ref = React.useRef(null);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"],
   });
 
-  const springConfig = { stiffness: 100, damping: 50, mass: 0.8 };
+  // Add spring config for smooth motion
+  const springConfig = {
+    stiffness: 100,
+    damping: 30,
+    mass: 0.5,
+  };
 
+  // Keep original ranges but add spring physics
   const translateX = useSpring(
     useTransform(scrollYProgress, [0, 1], [0, 800]),
     springConfig
@@ -99,21 +115,21 @@ export const ParallaxFeatures = ({
           rotateZ,
           translateY,
           opacity,
-          willChange: "transform, opacity",
         }}
+        transition={{ duration: 0.5 }}
       >
-        <h1 className="text-5xl text-center font-bold text-white mb-16 max-w-7xl mx-auto">
+        <motion.h1 variants={fadeIn} initial="hidden" whileInView="visible" transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }} className="text-5xl text-center font-bold text-white mb-16 max-w-7xl mx-auto">
           What we offer ?
-        </h1>
-        <motion.div className="flex flex-row-reverse space-x-reverse space-x-8 mb-16 max-w-7xl mx-auto" style={{ willChange: "transform" }}>
+        </motion.h1>
+        <motion.div variants={fadeIn} initial="hidden" whileInView="visible" transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }} className="flex flex-row-reverse space-x-reverse space-x-8 mb-16 max-w-7xl mx-auto">
           {firstRow.map((item) => (
             <FeatureCard item={item} translate={translateX} key={item.title} />
           ))}
         </motion.div>
-        <h1 className="text-5xl text-center font-bold text-white mb-16 max-w-7xl mx-auto">
+        <motion.h1 variants={fadeIn} initial="hidden" whileInView="visible" transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }} className="text-5xl text-center font-bold text-white mb-16 max-w-7xl mx-auto">
           The Features :
-        </h1>
-        <motion.div className="flex flex-row mb-16 space-x-8 max-w-7xl mx-auto" style={{ willChange: "transform" }}>
+        </motion.h1>
+        <motion.div variants={fadeIn} initial="hidden" whileInView="visible" transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }} className="flex flex-row mb-16 space-x-8 max-w-7xl mx-auto">
           {secondRow.map((item) => (
             <FeatureCard
               item={item}
@@ -122,11 +138,6 @@ export const ParallaxFeatures = ({
             />
           ))}
         </motion.div>
-        {/* <motion.div className="flex flex-row-reverse space-x-reverse space-x-8 max-w-7xl mx-auto">
-          {thirdRow.map((item) => (
-            <FeatureCard item={item} translate={translateX} key={item.title} />
-          ))}
-        </motion.div> */}
       </motion.div>
     </div>
   );
@@ -134,18 +145,37 @@ export const ParallaxFeatures = ({
 
 export const Header = () => {
   return (
-    <div className="max-w-7xl relative mx-auto py-20 md:py-40 px-4 w-full">
-      <h1 className="text-3xl md:text-7xl font-bold text-white tracking-tight">
-        Facing <span className="text-red-500">Legal</span> Trouble,
-      </h1>
-      <h1 className="text-3xl md:text-5xl font-bold text-white tracking-tight">
+    <motion.div className="max-w-7xl relative mx-auto py-20 md:py-40 px-4 w-full">
+      <motion.h1
+        variants={fadeIn}
+        initial="hidden"
+        whileInView="visible"
+        transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
+        className="text-3xl md:text-7xl font-bold text-white tracking-tight"
+      >
+        Facing <motion.span variants={fadeIn} initial="hidden" whileInView="visible" transition={{ duration: 0.8, delay: 1, ease: "easeOut" }} className="text-red-500">Legal</motion.span> Trouble,
+      </motion.h1>
+      <motion.h1
+        variants={fadeIn}
+        initial="hidden"
+        whileInView="visible"
+        transition={{ duration: 0.8, delay: 0.7, ease: "easeOut" }}
+        className="text-3xl md:text-5xl font-bold text-white tracking-tight"
+      >
         Not sure where to start ?
-      </h1>
-      <p className="max-w-2xl text-base md:text-lg mt-6 text-gray-300">
+      </motion.h1>
+      <motion.p
+        variants={fadeIn}
+        initial="hidden"
+        whileInView="visible"
+        transition={{ duration: 0.5, delay: 0.9, ease: "easeOut" }}
+        className="max-w-2xl text-base md:text-lg mt-6 text-gray-300"
+      >
         From panic to a plan — in just minutes. We combine AI with real legal
-        insight. Understand your case. Know your rights. Take action now.
-      </p>
-    </div>
+        insight. Understand your case. Know your rights. Take action now. For
+        Initial Legal Consultance.
+      </motion.p>
+    </motion.div>
   );
 };
 
@@ -160,18 +190,21 @@ export const FeatureCard = ({
     <motion.div
       style={{
         x: translate,
-        willChange: "transform",
       }}
       whileHover={{
         y: -15,
         scale: 1.05,
-        transition: { duration: 0.2 },
       }}
-      key={item.title}
+      transition={{
+        duration: 0.2,
+        ease: "easeOut",
+      }}
       className="group/feature w-96 h-96 relative shrink-0 rounded-xl overflow-hidden border border-teal-300/20"
     >
       <div
-        className={`absolute inset-0 bg-gradient-to-br ${getRandomGradient()} opacity-90 group-hover/feature:opacity-100 transition-opacity duration-300`}
+        className={`absolute inset-0 bg-gradient-to-br ${getGradientForTitle(
+          item.title
+        )} opacity-90 group-hover/feature:opacity-100 transition-opacity duration-300`}
       />
       <div className="relative z-10 flex flex-col items-center justify-center h-full p-6 cursor-pointer">
         <div className="mb-4">{item.icon}</div>

@@ -154,9 +154,42 @@ const howWeWorkPoints = [
   },
 ];
 
+// Simplified animation variants
 const fadeIn = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { duration: 0.5 },
+  },
+};
+
+const slideUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5 },
+  },
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const staggerItem = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5 },
+  },
 };
 
 const LandingPage = () => {
@@ -205,112 +238,154 @@ const LandingPage = () => {
           <div className="max-w-6xl mx-auto px-4 md:px-8 text-center">
             <motion.h2
               className="text-2xl md:text-5xl underline decoration-white underline-offset-8 decoration-2 font-bold mb-4"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-              variants={fadeIn}
+              initial="hidden y-30"
+              whileInView="visible y-0"
+              viewport={{ once: false, amount: 0.3 }}
+              variants={slideUp}
             >
               Empowered by{" "}
-              <span className="text-red-400 text-4xl md:text-6xl"> Reliability</span> and{" "}
-              <span className="text-blue-400 text-4xl md:text-6xl">Creativity</span>
+              <motion.span
+                className="text-red-400 text-4xl md:text-6xl"
+                variants={fadeIn}
+                initial="hidden"
+                whileInView="visible"
+                transition={{ duration: 0.8, delay: 1, ease: "easeOut" }}
+              >
+                {" "}
+                Reliability
+              </motion.span>{" "}
+              and{" "}
+              <motion.span
+                className="text-blue-400 text-4xl md:text-6xl"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: false, amount: 0.5 }}
+                variants={fadeIn}
+              >
+                {" "}
+                Creativity
+              </motion.span>
             </motion.h2>
             <motion.p
               className="text-base md:text-xl text-gray-300 max-w-3xl mx-auto mb-12 md:mb-36"
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
+              viewport={{ once: false, amount: 0.2 }}
               variants={fadeIn}
+              transition={{ duration: 0.4, ease: "easeOut" }}
             >
               We have ensured that the data is secure and the analysis is
               accurate by using the latest Gemini Models. To back the data we
               are not relying on any single but rather 3 different source.
             </motion.p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <PinContainer
-                title="Flash-2.0 Latest Gemini"
-                href="https://aistudio.google.com/welcome?utm_source=google&utm_medium=cpc&utm_campaign=FY25-global-DR-gsem-BKWS-1710442&utm_content=text-ad-none-any-DEV_c-CRE_726176536025-ADGP_Hybrid%20%7C%20BKWS%20-%20EXA%20%7C%20Txt-Gemini-Gemini%20API-KWID_43700081658540311-kwd-927524447508&utm_term=KW_gemini%20api-ST_gemini%20api&gad_source=1&gbraid=0AAAAACn9t64NMeQYUJJKvFRJNz7gTak2m&gclid=Cj0KCQjw2tHABhCiARIsANZzDWrw3ZV7mW8INh8Mt40Du4DZkZ7tKlD67sASp9TwdL04mf07SDrL2lcaAnJOEALw_wcB&gclsrc=aw.ds"
-              >
-                <div className="flex basis-full flex-col p-4 rounded-xl bg-gradient-to-br  tracking-tight text-slate-100/50 sm:basis-1/2 w-[20rem] h-[24rem] ">
-                  <h3 className="max-w-xs pb-2 !m-0 font-bold flex items-center justify-center gap-x-2 text-base text-slate-100">
-                    Powered by{" "}
-                    <span className="text-purple-400 text-3xl font-bold">
-                      GEMINI
-                    </span>
-                  </h3>
-                  <div className="text-base !m-0 !p-0 font-normal ">
-                    <span className="text-slate-400 ">
-                      Advanced AI for complex legal case analysis and
-                      recommendations.{" "}
-                    </span>
-                  </div>
-                  <div className="flex flex-1 w-full rounded-xl mt-8 bg-gradient-to-br h-[90px] from-violet-500 via-purple-500 to-blue-500">
-                    <Image
-                      alt="gemini"
-                      src="/Gem.png"
-                      width={100}
-                      height={100}
-                      className="w-full border border-gray-400 rounded-xl h-full object-cover"
-                    ></Image>
-                  </div>
-                </div>
-              </PinContainer>
-              <PinContainer
-                title="Official Legal Database of India"
-                href="https://indiankanoon.org/"
-              >
-                <div className="flex basis-full flex-col p-4 tracking-tight text-slate-100/50 sm:basis-1/2 w-[20rem] h-[24rem] ">
-                  <h3 className="max-w-xs pb-2 !m-0 font-bold flex items-center justify-center gap-x-2 text-base text-slate-100">
-                    Reliability of{" "}
-                    <span className="text-red-400 text-3xl font-bold">
-                      KanoonAPI
-                    </span>
-                  </h3>
-                  <div className="text-base !m-0 !p-0 font-normal ">
-                    <span className="text-slate-500 ">
-                      Acess India's Legal Database, get relevant cases
-                      summaries.{" "}
-                    </span>
-                  </div>
-                  <div className="flex flex-1 w-full mt-8 h-[90px] rounded-lg  bg-gradient-to-br from-violet-500 via-purple-500 to-blue-500">
-                    <Image
-                      alt="kanoon"
-                      src="/kanoon.png"
-                      width={100}
-                      height={80}
-                      className="w-full border border-gray-400 rounded-xl object-cover"
-                    ></Image>
-                  </div>
-                </div>
-              </PinContainer>
-              <PinContainer
-                title="Encrypted Data by Supabse"
-                href="https://supabase.com/"
-              >
-                <div className="flex basis-full flex-col p-4 tracking-tight text-slate-100/50 sm:basis-1/2 w-[20rem] h-[24rem] ">
-                  <h3 className="max-w-xs pb-2 !m-0 font-bold flex items-center justify-center gap-x-2 text-base text-slate-100">
-                    Secured by{" "}
-                    <span className="text-teal-400 text-3xl  font-bold">
-                      Supabase
-                    </span>
-                  </h3>
-                  <div className="text-base !m-0 !p-0 font-normal">
-                    <span className="text-slate-500">
-                      Enterprise-grade data security with real-time updates and
-                      Scalability.
-                    </span>
-                  </div>
-                  <div className="flex flex-1 w-full h-[90px] rounded-xl mt-8 bg-gradient-to-br from-violet-500 via-purple-500 to-blue-500">
-                    <Image
-                      alt="supabase"
-                      src="/Supa.png"
-                      width={100}
-                      height={100}
-                      className="w-full border border-gray-400 rounded-xl h-full object-cover"
-                    ></Image>
-                  </div>
-                </div>
-              </PinContainer>
-            </div>
+
+            <motion.div
+              className="grid grid-cols-1 md:grid-cols-3 gap-6"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.1 }}
+              variants={staggerContainer}
+            >
+              {[
+                {
+                  title: "Flash-2.0 Latest Gemini",
+                  href: "https://aistudio.google.com/welcome?utm_source=google&utm_medium=cpc&utm_campaign=FY25-global-DR-gsem-BKWS-1710442&utm_content=text-ad-none-any-DEV_c-CRE_726176536025-ADGP_Hybrid%20%7C%20BKWS%20-%20EXA%20%7C%20Txt-Gemini-Gemini%20API-KWID_43700081658540311-kwd-927524447508&utm_term=KW_gemini%20api-ST_gemini%20api&gad_source=1&gbraid=0AAAAACn9t64NMeQYUJJKvFRJNz7gTak2m&gclid=Cj0KCQjw2tHABhCiARIsANZzDWrw3ZV7mW8INh8Mt40Du4DZkZ7tKlD67sASp9TwdL04mf07SDrL2lcaAnJOEALw_wcB&gclsrc=aw.ds",
+                  content: (
+                    <div className="flex basis-full flex-col p-4 rounded-xl bg-gradient-to-br tracking-tight text-slate-100/50 sm:basis-1/2 w-[20rem] h-[24rem]">
+                      <h3 className="max-w-xs pb-2 !m-0 font-bold flex items-center justify-center gap-x-2 text-base text-slate-100">
+                        Powered by{" "}
+                        <span className="text-purple-400 text-3xl font-bold">
+                          GEMINI
+                        </span>
+                      </h3>
+                      <div className="text-base !m-0 !p-0 font-normal">
+                        <span className="text-slate-400">
+                          Advanced AI for complex legal case analysis and
+                          recommendations.{" "}
+                        </span>
+                      </div>
+                      <div className="flex flex-1 w-full rounded-xl mt-8 bg-gradient-to-br h-[90px] from-violet-500 via-purple-500 to-blue-500">
+                        <Image
+                          alt="gemini"
+                          src="/Gem.png"
+                          width={100}
+                          height={100}
+                          className="w-full border border-gray-400 rounded-xl h-full object-cover"
+                        />
+                      </div>
+                    </div>
+                  ),
+                },
+                {
+                  title: "Official Legal Database of India",
+                  href: "https://indiankanoon.org/",
+                  content: (
+                    <div className="flex basis-full flex-col p-4 tracking-tight text-slate-100/50 sm:basis-1/2 w-[20rem] h-[24rem]">
+                      <h3 className="max-w-xs pb-2 !m-0 font-bold flex items-center justify-center gap-x-2 text-base text-slate-100">
+                        Reliability of{" "}
+                        <span className="text-red-400 text-3xl font-bold">
+                          KanoonAPI
+                        </span>
+                      </h3>
+                      <div className="text-base !m-0 !p-0 font-normal">
+                        <span className="text-slate-500">
+                          Access India's Legal Database, get relevant cases
+                          summaries.{" "}
+                        </span>
+                      </div>
+                      <div className="flex flex-1 w-full mt-8 h-[90px] rounded-lg bg-gradient-to-br from-violet-500 via-purple-500 to-blue-500">
+                        <Image
+                          alt="kanoon"
+                          src="/kanoon.png"
+                          width={100}
+                          height={80}
+                          className="w-full border border-gray-400 rounded-xl object-cover"
+                        />
+                      </div>
+                    </div>
+                  ),
+                },
+                {
+                  title: "Encrypted Data by Supabase",
+                  href: "https://supabase.com/",
+                  content: (
+                    <div className="flex basis-full flex-col p-4 tracking-tight text-slate-100/50 sm:basis-1/2 w-[20rem] h-[24rem]">
+                      <h3 className="max-w-xs pb-2 !m-0 font-bold flex items-center justify-center gap-x-2 text-base text-slate-100">
+                        Secured by{" "}
+                        <span className="text-teal-400 text-3xl font-bold">
+                          Supabase
+                        </span>
+                      </h3>
+                      <div className="text-base !m-0 !p-0 font-normal">
+                        <span className="text-slate-500">
+                          Enterprise-grade data security with real-time updates
+                          and Scalability.
+                        </span>
+                      </div>
+                      <div className="flex flex-1 w-full h-[90px] rounded-xl mt-8 bg-gradient-to-br from-violet-500 via-purple-500 to-blue-500">
+                        <Image
+                          alt="supabase"
+                          src="/Supa.png"
+                          width={100}
+                          height={100}
+                          className="w-full border border-gray-400 rounded-xl h-full object-cover"
+                        />
+                      </div>
+                    </div>
+                  ),
+                },
+              ].map((card, index) => (
+                <motion.div
+                  key={card.title}
+                  variants={staggerItem}
+                  className="w-full"
+                >
+                  <PinContainer title={card.title} href={card.href}>
+                    {card.content}
+                  </PinContainer>
+                </motion.div>
+              ))}
+            </motion.div>
           </div>
         </section>
 
@@ -325,7 +400,7 @@ const LandingPage = () => {
               className="text-2xl md:text-5xl underline decoration-teal-400 underline-offset-8 decoration-1 font-bold text-gray-100 text-center mb-2 md:mb-4"
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
+              viewport={{ once: false, amount: 0.3 }}
               variants={fadeIn}
             >
               Get Started in Minutes
@@ -335,35 +410,38 @@ const LandingPage = () => {
               className="text-base md:text-xl font-bold text-gray-400 animate-bounce text-center mb-6 md:mb-12"
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
+              viewport={{ once: false, amount: 0.3 }}
               variants={fadeIn}
             >
               Drag the cards to see further steps
             </motion.h3>
-
-            <DraggableCardContainer className="relative h-[400px] md:h-[800px] w-full">
-              <p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 mx-auto max-w-xs md:max-w-sm text-center text-lg md:text-2xl font-black text-neutral-400 md:text-4xl dark:text-neutral-800">
-                That's it!! You are all set to go.
-              </p>
-              {items.map((item, index) => (
-                <DraggableCardBody
-                  key={item.title}
-                  className={`absolute ${item.className} z-${index + 10}`}
-                >
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="pointer-events-none relative z-10 w-full max-w-xs md:h-60 md:w-80 object-cover"
-                  />
-                  <h3 className="mt-4 text-center text-lg md:text-2xl font-bold text-neutral-200 dark:text-neutral-300">
-                    {item.title}
-                  </h3>
-                  <p className="mt-2 text-center text-gray-400 dark:text-gray-400 text-sm md:text-base">
-                    {item.desc}
-                  </p>
-                </DraggableCardBody>
-              ))}
-            </DraggableCardContainer>
+            <motion.div variants={staggerContainer}>
+              <DraggableCardContainer className="relative h-[400px] md:h-[800px] w-full">
+                <p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 mx-auto max-w-xs md:max-w-sm text-center text-lg md:text-2xl font-black text-neutral-400   dark:text-neutral-800">
+                  That's it!! You are all set to go.
+                </p>
+                {items.map((item, index) => (
+                  <motion.div key={item.title}>
+                    <DraggableCardBody
+                      key={item.title}
+                      className={`absolute ${item.className} z-${index + 10}`}
+                    >
+                      <img
+                        src={item.image}
+                        alt={item.title}
+                        className="pointer-events-none relative z-10 w-full max-w-xs md:h-60 md:w-80 object-cover"
+                      />
+                      <h3 className="mt-4 text-center text-lg md:text-2xl font-bold text-neutral-200 dark:text-neutral-300">
+                        {item.title}
+                      </h3>
+                      <p className="mt-2 text-center text-gray-400 dark:text-gray-400 text-sm md:text-base">
+                        {item.desc}
+                      </p>
+                    </DraggableCardBody>
+                  </motion.div>
+                ))}
+              </DraggableCardContainer>
+            </motion.div>
           </div>
         </section>
 
@@ -382,7 +460,7 @@ const LandingPage = () => {
               className="text-3xl md:text-6xl font-extrabold bg-gradient-to-r from-teal-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-4 md:mb-6 drop-shadow-lg"
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.5 }}
+              viewport={{ once: false, amount: 0.5 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
             >
               Ready to Transform Your Legal Journey?
@@ -391,10 +469,11 @@ const LandingPage = () => {
               className="text-base md:text-2xl text-gray-200 mb-8 md:mb-12"
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.5 }}
+              viewport={{ once: false, amount: 0.5 }}
               transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
             >
-              Start for free and unlock AI-powered legal solutions today. No hidden fees, just clarity and results.
+              Start for free and unlock AI-powered legal solutions today. No
+              hidden fees, just clarity and results.
             </motion.p>
             <div className="flex flex-col md:flex-row gap-4 md:gap-6 justify-center items-center w-full">
               {[
@@ -402,21 +481,21 @@ const LandingPage = () => {
                   label: "Start Free Analysis",
                   href: "/dashboard",
                   style:
-                    "w-full md:w-auto bg-gradient-to-r from-teal-500 to-purple-500 text-white px-6 md:px-10 py-4 md:py-5 rounded-xl text-base md:text-lg font-bold shadow-lg hover:scale-105 transition-transform",
+                    "w-full md:w-auto bg-gradient-to-br from-teal-300 via-neutral-200 to-blue-300 hover:from-teal-100 cursor-pointer hover:via-neutral-100 hover:to-blue-100 px-6 md:px-10 py-4 md:py-5 rounded-xl text-neutral-900 border-2 border-teal-400 text-base md:text-lg font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:translate-y-[-2px]",
                 },
                 {
                   label: "See Pricing",
                   href: "#pricing",
                   style:
-                    "w-full md:w-auto border-2 border-teal-400 text-teal-300 px-6 md:px-10 py-4 md:py-5 rounded-xl text-base md:text-lg font-bold bg-white/5 hover:bg-teal-400/10 shadow-lg hover:scale-105 transition-transform",
+                    "w-full md:w-auto bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 hover:from-gray-800 cursor-pointer hover:via-gray-700 hover:to-gray-800 border-2 border-teal-400 text-teal-300 px-6 md:px-10 py-4 md:py-5 rounded-xl text-base md:text-lg font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:translate-y-[-2px]",
                 },
               ].map((btn, i) => (
                 <motion.div
                   key={btn.label}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.5 }}
-                  transition={{ delay: 0.4 + i * 0.15, duration: 0.5, ease: "easeOut" }}
+                  viewport={{ once: true, amount: 0.1 }}
+                  transition={{ duration: 0.5, delay: i * 0.2 }}
                   className="w-full md:w-auto"
                 >
                   <a href={btn.href}>

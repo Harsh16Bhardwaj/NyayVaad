@@ -60,7 +60,9 @@ const HowWeWorkSection: React.FC<HowWeWorkSectionProps> = ({ darkMode }) => {
     <section
       className={cn(
         "pt-20 pb-40",
-        darkMode ? "bg-gradient-to-b from-gray-900 to-black" : "bg-gradient-to-b from-white to-gray-100"
+        darkMode
+          ? "bg-gradient-to-b from-gray-900 to-black"
+          : "bg-gradient-to-b from-white to-gray-100"
       )}
       aria-labelledby="how-we-work-heading"
     >
@@ -70,7 +72,7 @@ const HowWeWorkSection: React.FC<HowWeWorkSectionProps> = ({ darkMode }) => {
           className="text-3xl md:text-4xl font-bold text-teal-400 text-center mb-12"
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
+          viewport={{ once: false, amount: 0.3 }}
           variants={fadeIn}
         >
           How NyayVaad Works
@@ -80,7 +82,7 @@ const HowWeWorkSection: React.FC<HowWeWorkSectionProps> = ({ darkMode }) => {
             className="flex-1"
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
+            viewport={{ once: false, amount: 0.3 }}
             variants={fadeIn}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -96,13 +98,17 @@ const HowWeWorkSection: React.FC<HowWeWorkSectionProps> = ({ darkMode }) => {
                   )}
                   initial="hidden"
                   whileInView="visible"
-                  viewport={{ once: true, amount: 0.3 }}
+                  viewport={{ once: false, amount: 0.3 }}
                   variants={{
                     hidden: { opacity: 0, y: 20 },
                     visible: {
                       opacity: 1,
                       y: 0,
-                      transition: { duration: 0.5, ease: "easeOut", delay: index * 0.2 },
+                      transition: {
+                        duration: 0.5,
+                        ease: "easeOut",
+                        delay: index * 0.2,
+                      },
                     },
                   }}
                   whileHover={{
@@ -138,7 +144,7 @@ const HowWeWorkSection: React.FC<HowWeWorkSectionProps> = ({ darkMode }) => {
             className="flex-1"
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
+            viewport={{ once: false, amount: 0.3 }}
             variants={fadeIn}
           >
             <motion.div
@@ -147,6 +153,10 @@ const HowWeWorkSection: React.FC<HowWeWorkSectionProps> = ({ darkMode }) => {
                 scale: 1.05,
                 boxShadow: "0 10px 20px rgba(45, 212, 191, 0.3)",
               }}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: false, amount: 0.3 }}
+              variants={fadeIn}
               transition={{ duration: 0.3 }}
             >
               <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 to-violet-600/10" />

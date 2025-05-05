@@ -47,10 +47,6 @@ type ConclusionData = {
       resource?: string;
     }>;
     primaryRecommendation: string;
-    risksAndMitigations: Array<{
-      risk: string;
-      mitigation: string;
-    }>;
     longTermStrategy: string[];
   };
   todos: Array<{
@@ -132,7 +128,7 @@ export default function ChatPage() {
       initialCaseData.timeline = data.timeline;
       initialCaseData.evidence = data.evidence;
       initialCaseData.agreement = data.agreement;
-      const chatResponse = data.response;
+      const chatResponse = data.ai_next_response;
       console.log("Frontend - Case data after chat request:", {
         caseData,
         chatResponse,
@@ -273,42 +269,26 @@ export default function ChatPage() {
   };
 
   const handleConclude = async () => {
+    if (!isAnalysisEnabled) return;
     setIsConcluding(true);
     try {
       const response = await fetch("/api/chat/conclude", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ caseData: messages }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ caseData, sessionId: session as string }),
       });
+
+      if (!response.ok) throw new Error("Conclusion request failed");
+
       const data = await response.json();
       setConclusionData(data);
-
-      for (const todo of data.todos) {
-        const backendResponse = await fetch("/api/todos", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            title: todo.title,
-            description: todo.description,
-            deadline: new Date(),
-            status: "pending",
-          }),
-        });
-
-        if (backendResponse.ok) {
-          const createdTodo = await backendResponse.json();
-          dispatch(addTodo(createdTodo));
-        }
-      }
     } catch (error) {
-      console.error("Error concluding case:", error);
+      console.error("Error getting conclusion:", error);
       setMessages((prev) => [
         ...prev,
         {
           id: (Date.now() + 1).toString(),
-          content: "Error concluding case. Please try again.",
+          content: "Error getting conclusion. Please try again.",
           sender: "ai",
           timestamp: new Date(),
         },
@@ -324,182 +304,33 @@ export default function ChatPage() {
 
   const handleDownloadPDF = () => {
     if (!conclusionData) return;
-
+    
     const doc = new jsPDF();
-    let yOffset = 20;
-
-    const addText = (
-      text: string,
-      x: number,
-      y: number,
-      size: number,
-      isBold = false
-    ) => {
-      doc.setFontSize(size);
-      doc.setFont("helvetica", isBold ? "bold" : "normal");
-      doc.text(text, x, y);
-      return y + size * 0.5;
-    };
-
-    const addSection = (
-      title: string,
-      items: string[],
-      x: number,
-      startY: number
-    ) => {
-      yOffset = addText(title, x, startY, 14, true);
-      items.forEach((item) => {
-        const splitText = doc.splitTextToSize(item, 180);
-        splitText.forEach((line: string) => {
-          if (yOffset > 280) {
-            doc.addPage();
-            yOffset = 20;
-          }
-          yOffset = addText(line, x + 5, yOffset, 10);
-        });
-        yOffset += 2;
-      });
-      return yOffset;
-    };
-
+    // Add content to PDF
+    doc.setFontSize(20);
+    doc.text("Case Analysis Report", 20, 20);
+    
+    // Add case summary
     doc.setFontSize(16);
-    doc.text("Case Analysis Report", 20, yOffset);
-    yOffset += 10;
-
-    yOffset = addText("Case Summary", 20, yOffset, 14, true);
-    const summaryLines = doc.splitTextToSize(
-      conclusionData.caseFinalAnalysis.userCaseSummary,
-      170
-    );
-    summaryLines.forEach((line: string) => {
-      if (yOffset > 280) {
-        doc.addPage();
-        yOffset = 20;
-      }
-      yOffset = addText(line, 25, yOffset, 10);
+    doc.text("Case Summary", 20, 40);
+    doc.setFontSize(12);
+    doc.text(conclusionData.caseFinalAnalysis.userCaseSummary, 20, 50);
+    
+    // Add laws involved
+    doc.setFontSize(16);
+    doc.text("Laws Involved", 20, 80);
+    doc.setFontSize(12);
+    conclusionData.caseFinalAnalysis.lawsInvolved.forEach((law, index) => {
+      doc.text(`• ${law}`, 20, 90 + (index * 7));
     });
-    yOffset += 5;
-
-    yOffset = addSection(
-      "Laws Involved",
-      conclusionData.caseFinalAnalysis.lawsInvolved,
-      20,
-      yOffset
-    );
-
-    conclusionData.caseFinalAnalysis.relevantCaseDetails.forEach((detail) => {
-      yOffset = addText(detail.title, 20, yOffset, 12, true);
-      yOffset = addText("Case Brief:", 25, yOffset, 10, true);
-      const briefLines = doc.splitTextToSize(detail.caseBrief, 160);
-      briefLines.forEach((line: string) => {
-        if (yOffset > 280) {
-          doc.addPage();
-          yOffset = 20;
-        }
-        yOffset = addText(line, 30, yOffset, 10);
-      });
-      yOffset = addSection("Laws Assessed", detail.lawsAssessed, 25, yOffset);
-      yOffset = addSection(
-        "Court Reasoning",
-        detail.courtReasoning,
-        25,
-        yOffset
-      );
-      yOffset = addText("Conclusion:", 25, yOffset, 10, true);
-      const conclusionLines = doc.splitTextToSize(detail.conclusion, 160);
-      conclusionLines.forEach((line: string) => {
-        if (yOffset > 280) {
-          doc.addPage();
-          yOffset = 20;
-        }
-        yOffset = addText(line, 30, yOffset, 10);
-      });
-      yOffset += 5;
-    });
-
-    yOffset = addSection(
-      "Learnings",
-      conclusionData.caseFinalAnalysis.learnings,
-      20,
-      yOffset
-    );
-    yOffset = addSection(
-      "Utilization",
-      conclusionData.caseFinalAnalysis.utilization,
-      20,
-      yOffset
-    );
-
-    yOffset = addText("Action Plan", 20, yOffset, 14, true);
-    conclusionData.caseFinalAnalysis.actionPlan.forEach((step) => {
-      if (yOffset > 280) {
-        doc.addPage();
-        yOffset = 20;
-      }
-      yOffset = addText(step.step, 25, yOffset, 10);
-      if (step.resource) {
-        yOffset = addText(`Resource: ${step.resource}`, 30, yOffset, 10);
-      }
-      yOffset = addText(`Priority: ${step.priority}`, 30, yOffset, 10);
-      yOffset += 2;
-    });
-
-    yOffset = addText("Primary Recommendation", 20, yOffset, 14, true);
-    const recLines = doc.splitTextToSize(
-      conclusionData.caseFinalAnalysis.primaryRecommendation,
-      170
-    );
-    recLines.forEach((line: string) => {
-      if (yOffset > 280) {
-        doc.addPage();
-        yOffset = 20;
-      }
-      yOffset = addText(line, 25, yOffset, 10);
-    });
-    yOffset += 5;
-
-    yOffset = addText("Risks and Mitigations", 20, yOffset, 14, true);
-    conclusionData.caseFinalAnalysis.risksAndMitigations.forEach((item) => {
-      if (yOffset > 280) {
-        doc.addPage();
-        yOffset = 20;
-      }
-      yOffset = addText(`Risk: ${item.risk}`, 25, yOffset, 10);
-      yOffset = addText(`Mitigation: ${item.mitigation}`, 25, yOffset, 10);
-      yOffset += 2;
-    });
-
-    yOffset = addSection(
-      "Long Term Strategy",
-      conclusionData.caseFinalAnalysis.longTermStrategy,
-      20,
-      yOffset
-    );
-
-    yOffset = addText("Todos", 20, yOffset, 14, true);
-    conclusionData.todos.forEach((todo) => {
-      if (yOffset > 280) {
-        doc.addPage();
-        yOffset = 20;
-      }
-      yOffset = addText(todo.title, 25, yOffset, 10, true);
-      const todoLines = doc.splitTextToSize(todo.description, 160);
-      todoLines.forEach((line: string) => {
-        if (yOffset > 280) {
-          doc.addPage();
-          yOffset = 20;
-        }
-        yOffset = addText(line, 30, yOffset, 10);
-      });
-      yOffset += 2;
-    });
-
-    doc.save("case_analysis_report.pdf");
+    
+    // Save the PDF
+    doc.save("case-analysis.pdf");
   };
 
   return (
     <ProtectedPage>
-      <div className="min-h-screen bg-neutral-900 pt-10">
+      <div className="min-h-screen bg-neutral-900 pt-14 ">
         <div className="mx-auto ">
           <h1 className="text-2xl font-bold text-white flex items-center justify-between">
             Chat
@@ -532,7 +363,7 @@ export default function ChatPage() {
                     <h3 className="text-xs text-purple-400 uppercase">
                       {key.replace(/_/g, " ")}
                     </h3>
-                    <p className="text-sm text-gray-300 mt-1">
+                    <p className="text-sm text-gray-300 mt-1 line-clamp-3">
                       {Array.isArray(value)
                         ? value.join(", ") || "Not provided"
                         : value?.toString() || "Not provided"}
@@ -895,32 +726,6 @@ export default function ChatPage() {
                     </p>
                   </div>
 
-                  {/* Risks and Mitigations */}
-                  <div className="bg-gray-800/50 rounded-lg p-6">
-                    <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">
-                      Risks and Mitigations
-                    </h3>
-                    <ul className="space-y-4">
-                      {conclusionData.caseFinalAnalysis.risksAndMitigations.map(
-                        (item, index) => (
-                          <li key={index} className="flex items-start gap-3">
-                            <div className="mt-1.5">
-                              <div className="w-2 h-2 rounded-full bg-purple-500" />
-                            </div>
-                            <div>
-                              <p className="text-gray-300 text-sm font-medium">
-                                Risk: {item.risk}
-                              </p>
-                              <p className="text-gray-400 text-sm mt-1">
-                                Mitigation: {item.mitigation}
-                              </p>
-                            </div>
-                          </li>
-                        )
-                      )}
-                    </ul>
-                  </div>
-
                   {/* Long Term Strategy */}
                   <div className="bg-gray-800/50 rounded-lg p-6">
                     <h3 className="text-xl font-bold text-white mb-4 font-[var(--font-josefin-sans)]">
@@ -928,7 +733,7 @@ export default function ChatPage() {
                     </h3>
                     <ul className="space-y-3">
                       {conclusionData.caseFinalAnalysis.longTermStrategy.map(
-                        (strategy, index) => (
+                        (strategy: string, index: number) => (
                           <li key={index} className="flex items-start gap-3">
                             <div className="mt-1.5">
                               <div className="w-2 h-2 rounded-full bg-purple-500" />

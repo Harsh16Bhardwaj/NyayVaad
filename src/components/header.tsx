@@ -24,7 +24,7 @@ const Navbar = () => {
   const navSignedInLinks = [
     { href: "/dashboard", label: "Dashboard" },
     { href: "/chat", label: "Chat" },
-    { href: "/summarize", label: "Summarize" },
+    { href: "/summarize", label: ` Summarize` },
     { href: "/contact", label: "Contact" },
     { href: "/fun", label: "Fun" },
   ];
