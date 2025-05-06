@@ -1,3 +1,133 @@
+# 🏛️ NyaayVaad: Legal Document Intelligence Platform
+
+## Overview
+
+**NyaayVaad** is an AI-powered legal document intelligence platform designed to streamline legal research, case summarization, and law recommendation. By integrating advanced AI models (Gemini, ChatGPT), robust backend management, and scalable storage (Supabase), NyaayVaad automates the extraction, matching, and summarization of legal documents, making legal research faster, smarter, and more reliable.
+
+---
+
+## 🚀 Workflow
+
+![Workflow Diagram](./path/to/your/workflow-image.png) <!-- Update with actual path if needed -->
+
+### Step-by-Step Process
+
+1. **User Interaction**
+   - Users interact with the platform via the frontend, submitting queries or documents.
+
+2. **Backend State Management**
+   - The backend manages user state and orchestrates the workflow, ensuring smooth data flow and process management.
+
+3. **AI-Powered Document Matching**
+   - **Gemini** performs AI-based description matching to identify relevant legal documents from the **Kanoon** database.
+   - Document 1-liners are fetched and matched using advanced semantic search.
+
+4. **Document Fetching & Parsing**
+   - Once matched, documents are fetched from Kanoon.
+   - Documents are parsed (HTML Parsing) and pre-processed for further analysis.
+
+5. **Initial Reduction & Analysis**
+   - Gemini performs an initial reduction, extracting key information and reducing document complexity.
+
+6. **Legal Intelligence & Recommendations**
+   - Gemini generates:
+     - Case summaries
+     - Relevant law recommendations
+     - TODO lists
+     - Handles further queries
+   - Relevant laws are fetched using a combination of chat memory, URL parsing, and vector database lookups.
+
+7. **Data Storage**
+   - All processed data, summaries, and recommendations are stored in **Supabase** for scalability and easy retrieval.
+
+8. **Final Summarization**
+   - The final summary is generated using **ChatGPT**, providing a concise, user-friendly PDF report.
+
+---
+
+## 🛠️ Tech Stack
+
+- **AI Models:** Gemini, ChatGPT
+- **Backend:** Custom API/Server (State Management)
+- **Legal Database:** Kanoon
+- **Storage:** Supabase
+- **Parsing:** HTML Parsing Engine
+- **Frontend:** (To be specified)
+- **Other:** Vector DB, URL Parser, Chat Memory
+
+---
+
+## 📦 Features
+
+- **AI-Based Legal Document Matching**
+- **Automated Case Summarization**
+- **Relevant Law Extraction & Recommendations**
+- **PDF Report Generation**
+- **Scalable Data Storage**
+- **Stateful User Experience**
+
+---
+
+## 🏗️ Architecture Highlights
+
+- **Modular & Scalable:** Easily extendable for new data sources or AI models.
+- **Seamless Integration:** Connects legal databases, AI, and storage for end-to-end automation.
+- **User-Centric:** Designed for legal professionals, researchers, and students.
+
+---
+
+## 📄 Getting Started
+
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/your-org/nyaayvaad.git
+   cd nyaayvaad
+   ```
+
+2. **Install Dependencies**
+   ```bash
+   # Example for Node.js/React backend
+   npm install
+   ```
+
+3. **Configure Environment**
+   - Set up API keys for Gemini, ChatGPT, Supabase, and Kanoon.
+   - Update `.env` with your credentials.
+
+4. **Run the Application**
+   ```bash
+   npm start
+   ```
+
+5. **Access the Platform**
+   - Open your browser and navigate to `http://localhost:3000`
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+---
+
+## 📢 License
+
+This project is licensed under the MIT License.
+
+---
+
+## 🙏 Acknowledgements
+
+- [Kanoon](https://www.kanoon.com/) for legal document access
+- [OpenAI](https://openai.com/) for ChatGPT
+- [Supabase](https://supabase.com/) for scalable storage
+
+---
+
+**NyaayVaad** — Empowering legal research with AI.
+
+---
+
 # NyaayVaad 🏛️
 
 A Modern Legal Case Management System built with Next.js, TypeScript, and Supabase.
