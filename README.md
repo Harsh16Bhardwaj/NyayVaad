@@ -8,7 +8,7 @@
 
 ## 🚀 Workflow
 
-![Workflow Diagram](./path/to/your/workflow-image.png) <!-- Update with actual path if needed -->
+![Workflow Diagram](./public/Workflow.png) <!-- Update with actual path if needed -->
 
 ### Step-by-Step Process
 
