@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import Link from "next/link";
 import {
   motion,
   useScroll,
@@ -175,6 +176,16 @@ export const Header = () => {
         insight. Understand your case. Know your rights. Take action now. For
         Initial Legal Consultance.
       </motion.p>
+      <Link href="/chat">
+      <motion.button
+        variants={fadeIn}
+        initial="hidden"
+        whileInView="visible"
+        transition={{ duration: 0.3, delay: 1, ease: "easeOut" }}
+        className="mt-8 cursor-pointer relative z-40 px-6 py-3 font-semibold bg-teal-500 text-white rounded-lg shadow-lg hover:bg-teal-700 hover:scale-103 border-2 border-gray-600 transition duration-300">
+          Get Started
+        </motion.button>
+          </Link>
     </motion.div>
   );
 };

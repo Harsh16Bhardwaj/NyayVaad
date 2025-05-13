@@ -199,7 +199,7 @@ const Navbar = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <SignInButton mode="modal" afterSignInUrl="/dashboard">
+              <SignInButton mode="modal" aftersigninurl="/dashboard">
                 <button className=" cursor-pointer from-blue-600 to-cyan-500 text-white px-6 py-2 rounded-full font-semibold">
                   Sign In
                 </button>

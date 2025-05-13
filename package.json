@@ -24,7 +24,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
-    "framer-motion": "^12.7.4",
+    "framer-motion": "^10.1.1",
     "gsap": "^3.12.7",
     "jspdf": "^3.0.1",
     "lucide-react": "^0.501.0",
