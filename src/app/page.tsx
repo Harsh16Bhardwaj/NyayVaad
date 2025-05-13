@@ -209,18 +209,6 @@ const LandingPage = () => {
     console.log("Current cards:", cards);
   }, [cards]);
 
-  const handleDragEnd = (id: number, info: any) => {
-    console.log("Drag end for card:", id, "Info:", info);
-    if (Math.abs(info.point.x) > 300) {
-      setCards((prev) => {
-        const newCards = prev.filter((card) => card.id !== id);
-        console.log("New cards after removal:", newCards);
-        return newCards.length === 0
-          ? onboardingSteps.map((step, index) => ({ ...step, id: index }))
-          : newCards;
-      });
-    }
-  };
   return (
     <div
       className={`min-h-screen ${

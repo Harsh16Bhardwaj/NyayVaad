@@ -200,7 +200,7 @@ export default function TodoItem({
                 autoFocus
               />
             ) : (
-              <h3 className="text-lg font-medium text-white font-[var(--font-inter)]">
+              <h3 className="text-lg font-medium text-white ">
                 {todo.title}
               </h3>
             )}
