@@ -209,7 +209,7 @@ const Navbar = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <SignUpButton mode="modal" afterSignUpUrl="/dashboard">
+              <SignUpButton mode="modal" aftersignupurl="/dashboard">
                 <button className="bg-gradient-to-r curosr-pointer from-pink-600 to-red-500 text-white px-6 py-2 rounded-full font-semibold">
                   Sign Up
                 </button>
@@ -280,14 +280,14 @@ const Navbar = () => {
           </SignedOut>
           <SignedOut>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <SignInButton mode="modal" afterSignInUrl="/dashboard">
+              <SignInButton mode="modal" aftersigninUrl="/dashboard">
                 <button className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-6 py-3 rounded-full font-semibold mt-4">
                   Sign In
                 </button>
               </SignInButton>
             </motion.div>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <SignUpButton mode="modal" afterSignUpUrl="/dashboard">
+              <SignUpButton mode="modal" aftersignupurl="/dashboard">
                 <button className="w-full bg-gradient-to-r from-pink-600 to-red-500 text-white px-6 py-3 rounded-full font-semibold mt-2">
                   Sign Up
                 </button>
