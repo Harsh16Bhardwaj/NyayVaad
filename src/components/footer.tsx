@@ -29,17 +29,17 @@ const Footer = () => {
   const socials = [
     {
       icon: <FaTwitter />,
-      href: "https://twitter.com/kourtsell",
+      href: "https://x.com/HBhardwaj_05",
       label: "Twitter",
     },
     {
       icon: <FaLinkedin />,
-      href: "https://linkedin.com/company/kourtsell",
+      href: "linkedin.com/in/harsh-bhardwaj-80297b285/",
       label: "LinkedIn",
     },
     {
       icon: <FaInstagram />,
-      href: "https://instagram.com/kourtsell",
+      href: "https://www.instagram.com/harshh_bhardwajj_/",
       label: "Instagram",
     },
   ];
