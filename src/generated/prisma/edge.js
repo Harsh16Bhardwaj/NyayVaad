@@ -218,7 +218,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "D:\\KourtSell\\NyaayVaad\\nyayvaad\\src\\generated\\prisma",
+      "value": "/media/harsh-bhardwaj/New Volume/Coding/KourtSell/NyaayVaad/nyayvaad/src/generated/prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -227,12 +227,12 @@ const config = {
     "binaryTargets": [
       {
         "fromEnvVar": null,
-        "value": "windows",
+        "value": "debian-openssl-3.0.x",
         "native": true
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "D:\\KourtSell\\NyaayVaad\\nyayvaad\\prisma\\schema.prisma",
+    "sourceFilePath": "/media/harsh-bhardwaj/New Volume/Coding/KourtSell/NyaayVaad/nyayvaad/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
