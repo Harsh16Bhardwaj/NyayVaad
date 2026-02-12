@@ -17,9 +17,6 @@ import { supabase } from "@/lib/supabase";
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const canvasRef = useRef(null);
-  
-  
-  
 
   const navSignedInLinks = [
     { href: "/dashboard", label: "Dashboard" },
@@ -109,7 +106,10 @@ const Navbar = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
     >
-      <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full opacity-20" />
+      <canvas
+        ref={canvasRef}
+        className="absolute top-0 left-0 w-full h-full opacity-20"
+      />
       <div className="mx-auto flex justify-between items-center relative max-w-7xl">
         {/* Logo */}
         <motion.div
@@ -195,21 +195,15 @@ const Navbar = () => {
             </motion.div>
           </SignedIn>
           <SignedOut>
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <SignInButton mode="modal" aftersigninurl="/dashboard">
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <SignInButton mode="modal" forceRedirectUrl="/dashboard">
                 <button className=" cursor-pointer from-blue-600 to-cyan-500 text-white px-6 py-2 rounded-full font-semibold">
                   Sign In
                 </button>
               </SignInButton>
             </motion.div>
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <SignUpButton mode="modal" aftersignupurl="/dashboard">
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <SignUpButton mode="modal" forceRedirectUrl="/onboarding">
                 <button className="bg-gradient-to-r curosr-pointer from-pink-600 to-red-500 text-white px-6 py-2 rounded-full font-semibold">
                   Sign Up
                 </button>
