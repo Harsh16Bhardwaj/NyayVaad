@@ -51,8 +51,8 @@ export default function RootLayout({
           colorTextOnPrimaryBackground: 'white',
         }
       }}
-      aftersigninurl="/dashboard"
-      aftersignupurl="/onboarding"
+      afterSignInUrl="/dashboard"
+      afterSignUpUrl="/onboarding"
     >
       <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} ${josefinSans.variable}`}>
         <body suppressHydrationWarning className="antialiased bg-neutral-950">

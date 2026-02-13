@@ -39,9 +39,6 @@ export async function POST(request: Request) {
           evidence: false,
           agreement: false,
           timeline: [],
-          involvedLaws: {
-            create: [] // Create an empty array of EnhancedLaw
-          }
         }
       });
       caseToUse = mockCase.id;

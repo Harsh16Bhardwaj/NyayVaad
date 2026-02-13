@@ -30,8 +30,8 @@ interface TodoItemProps {
     id: string;
     title: string;
     description: string;
-    deadline: Date;
-    status: "pending" | "ongoing" | "done";
+    dueAt: Date;
+    status: "PENDING" | "ONGOING" | "DONE";
     subtasks?: {
       id: string;
       title: string;
@@ -39,7 +39,7 @@ interface TodoItemProps {
       completed: boolean;
     }[];
   };
-  onStatusChange: (id: string, status: "pending" | "ongoing" | "done") => void;
+  onStatusChange: (id: string, status: "PENDING" | "ONGOING" | "DONE") => void;
   onDateChange: (id: string, date: Date) => void;
   onTitleChange: (id: string, title: string) => void;
   onSubtaskToggle: (todoId: string, subtaskId: string) => void;
@@ -174,16 +174,16 @@ export default function TodoItem({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                onStatusChange(todo.id, "done");
+                onStatusChange(todo.id, "DONE");
               }}
               className="mt-1"
             >
               <CheckCircle2
                 className={`
                   w-5 h-5 transition-colors
-                  ${todo.status === "done" ? "text-green-500" : ""}
-                  ${todo.status === "ongoing" ? "text-blue-500" : ""}
-                  ${todo.status === "pending" ? "text-yellow-500" : ""}
+                  ${todo.status === "DONE" ? "text-green-500" : ""}
+                  ${todo.status === "ONGOING" ? "text-blue-500" : ""}
+                  ${todo.status === "PENDING" ? "text-yellow-500" : ""}
                 `}
               />
             </button>
@@ -223,7 +223,7 @@ export default function TodoItem({
             <>
               <Select
                 value={todo.status}
-                onValueChange={(value: "pending" | "ongoing" | "done") =>
+                onValueChange={(value: "PENDING" | "ONGOING" | "DONE") =>
                   onStatusChange(todo.id, value)
                 }
               >
@@ -232,19 +232,19 @@ export default function TodoItem({
                 </SelectTrigger>
                 <SelectContent className="bg-gray-900 border-gray-700">
                   <SelectItem
-                    value="pending"
+                    value="PENDING"
                     className="text-yellow-400 hover:bg-gray-800"
                   >
                     Pending
                   </SelectItem>
                   <SelectItem
-                    value="ongoing"
+                    value="ONGOING"
                     className="text-blue-400 hover:bg-gray-800"
                   >
                     Ongoing
                   </SelectItem>
                   <SelectItem
-                    value="done"
+                    value="DONE"
                     className="text-green-400 hover:bg-gray-800"
                   >
                     Done
@@ -260,13 +260,13 @@ export default function TodoItem({
                     onClick={(e) => e.stopPropagation()}
                   >
                     <CalendarIcon className="w-4 h-4 mr-1" />
-                    {format(todo.deadline, "MMM dd")}
+                    {format(todo.dueAt, "MMM dd")}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0 bg-gray-900 border border-gray-700">
                   <Calendar
                     mode="single"
-                    selected={todo.deadline}
+                    selected={todo.dueAt}
                     onSelect={(date) => {
                       if (date) {
                         onDateChange(todo.id, date);

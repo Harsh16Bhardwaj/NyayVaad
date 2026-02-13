@@ -2,7 +2,7 @@ import { Webhook } from 'svix';
 import { headers } from 'next/headers';
 import { WebhookEvent } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/prisma';
+import prisma from '@/lib/prisma';
 
 export async function POST(req: Request) {
   const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
@@ -48,12 +48,12 @@ export async function POST(req: Request) {
     const { id, email_addresses, first_name, last_name } = evt.data;
 
     try {
-      await db.user.create({
+      await prisma.user.create({
         data: {
           clerkId: id,
           email: email_addresses[0].email_address,
-          firstName: first_name,
-          lastName: last_name,
+          name: `${first_name} ${last_name}`.trim(),
+          legalKnowledge: 'NONE',
         },
       });
     } catch (error) {

@@ -119,7 +119,7 @@ export default function DashboardPage() {
     dispatch(fetchCaseSummary());
   }, [dispatch]);
 
-  const handleTodoStatusChange = (id: string, status: 'pending' | 'ongoing' | 'done') => {
+  const handleTodoStatusChange = (id: string, status: 'PENDING' | 'ONGOING' | 'DONE') => {
     const todo = todos.find((t: Todo) => t.id === id);
     if (todo) {
       dispatch(updateTodo({ ...todo, status }));
@@ -129,7 +129,7 @@ export default function DashboardPage() {
   const handleDateChange = (id: string, date: Date) => {
     const todo = todos.find((t: Todo) => t.id === id);
     if (todo) {
-      dispatch(updateTodo({ ...todo, deadline: date }));
+      dispatch(updateTodo({ ...todo, dueAt: date }));
     }
   };
 
@@ -143,7 +143,7 @@ export default function DashboardPage() {
   const handleSubtaskToggle = (todoId: string, subtaskId: string) => {
     const todo = todos.find((t: Todo) => t.id === todoId);
     if (todo && todo.subtasks) {
-      const updatedSubtasks = todo.subtasks.map((subtask: { id: string; completed: boolean }) =>
+      const updatedSubtasks = todo.subtasks.map((subtask) =>
         subtask.id === subtaskId
           ? { ...subtask, completed: !subtask.completed }
           : subtask
@@ -174,9 +174,11 @@ export default function DashboardPage() {
     const newTodo = {
       title: 'New Task',
       description: 'Click to edit description',
-      deadline: new Date(),
-      status: 'pending' as const,
-      subtasks: []
+      dueAt: new Date(),
+      status: 'PENDING' as const,
+      subtasks: [],
+      caseId: '', // Will be set by API or user selection
+      createdAt: new Date(),
     };
     dispatch(addTodo(newTodo));
   };
@@ -211,7 +213,7 @@ export default function DashboardPage() {
     ...todos.map((todo: Todo) => ({
       id: todo.id,
       title: todo.title,
-      date: todo.deadline,
+      date: todo.dueAt,
       type: 'deadline' as const
     })),
     ...(summary ? [
@@ -256,7 +258,7 @@ export default function DashboardPage() {
               {/* Cases Section */}
               <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/5">
                 <h2 className="text-xl font-semibold text-white mb-6">My Cases</h2>
-                <CasesSection cases={cases} loading={casesLoading} error={casesError} />
+                <CasesSection cases={cases} loading={casesLoading} />
               </div>
 
               {/* Main Grid */}

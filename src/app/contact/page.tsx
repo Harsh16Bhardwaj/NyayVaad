@@ -360,7 +360,7 @@ const ContactPage = () => {
                     animate={{ rotate: 360 }}
                     transition={{ duration: 5, repeat: Infinity, ease: 'linear' }}
                   >
-                    <handle.icon className="text-3xl" style={{ color: handle.color }} />
+                    <handle.icon className="text-3xl" />
                   </motion.div>
                   <motion.span
                     className="absolute top-14 left-1/2 -translate-x-1/2 text-xs font-[var(--font-inter)] text-white opacity-0"
