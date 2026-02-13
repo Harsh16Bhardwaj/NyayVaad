@@ -3,6 +3,7 @@ import caseReducer from './slices/caseSlice';
 import todoReducer from './slices/todoSlice';
 import caseSummaryReducer from './slices/caseSummarySlice';
 import chatSessionsReducer from './slices/chatSessionsSlice';
+import chatMessagesReducer from './slices/chatMessagesSlice';
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     todos: todoReducer,
     caseSummary: caseSummaryReducer,
     chatSessions: chatSessionsReducer,
+    chatMessages: chatMessagesReducer,
   },
 });
 

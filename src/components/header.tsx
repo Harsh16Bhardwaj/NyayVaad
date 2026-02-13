@@ -13,10 +13,17 @@ import {
   SignedOut,
 } from "@clerk/nextjs";
 import { supabase } from "@/lib/supabase";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/app/store";
+import { loadSessionsFromStorage } from "@/app/store/slices/chatSessionsSlice";
+import { loadMessagesFromStorage } from "@/app/store/slices/chatMessagesSlice";
+import { initializeSyncIntervals } from "@/lib/sync";
+import { store } from "@/app/store";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const canvasRef = useRef(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const dispatch = useDispatch<AppDispatch>();
 
   const navSignedInLinks = [
     { href: "/dashboard", label: "Dashboard" },
@@ -32,17 +39,48 @@ const Navbar = () => {
     { href: "/fun", label: "Fun" },
   ];
 
+  // Initialize sync system on mount
+  useEffect(() => {
+    console.log('[Header] Initializing sync system...');
+    
+    // Step 1: Load from localStorage to Redux (instant)
+    dispatch(loadSessionsFromStorage());
+    dispatch(loadMessagesFromStorage());
+    
+    // Step 2: Start 30-second sync intervals
+    const cleanup = initializeSyncIntervals(
+      store.dispatch,
+      store.getState
+    );
+    
+    // Cleanup on unmount
+    return () => {
+      cleanup();
+    };
+  }, [dispatch]);
+
   // Particle animation with window resize support
   useEffect(() => {
     const canvas = canvasRef.current;
+    if (!canvas) return;
+    
     const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    type Particle = {
+      x: number;
+      y: number;
+      radius: number;
+      vx: number;
+      vy: number;
+    };
 
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
       canvas.height = 80;
     };
 
-    const particles = [];
+    const particles: Particle[] = [];
     const createParticles = () => {
       particles.length = 0;
       for (let i = 0; i < 20; i++) {
@@ -76,7 +114,7 @@ const Navbar = () => {
     createParticles();
     animate();
 
-    const handleMouseMove = (e) => {
+    const handleMouseMove = (e: MouseEvent) => {
       particles.forEach((p) => {
         const dx = e.clientX - p.x;
         const dy = e.clientY - p.y;
@@ -274,14 +312,14 @@ const Navbar = () => {
           </SignedOut>
           <SignedOut>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <SignInButton mode="modal" aftersigninUrl="/dashboard">
+              <SignInButton mode="modal" forceRedirectUrl="/dashboard">
                 <button className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-6 py-3 rounded-full font-semibold mt-4">
                   Sign In
                 </button>
               </SignInButton>
             </motion.div>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <SignUpButton mode="modal" aftersignupurl="/dashboard">
+              <SignUpButton mode="modal" forceRedirectUrl="/dashboard">
                 <button className="w-full bg-gradient-to-r from-pink-600 to-red-500 text-white px-6 py-3 rounded-full font-semibold mt-2">
                   Sign Up
                 </button>

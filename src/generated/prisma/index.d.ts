@@ -105,7 +105,7 @@ export const TodoStatus: typeof $Enums.TodoStatus
  */
 export class PrismaClient<
   ClientOptions extends Prisma.PrismaClientOptions = Prisma.PrismaClientOptions,
-  U = 'log' extends keyof ClientOptions ? ClientOptions['log'] extends Array<Prisma.LogLevel | Prisma.LogDefinition> ? Prisma.GetEvents<ClientOptions['log']> : never : never,
+  const U = 'log' extends keyof ClientOptions ? ClientOptions['log'] extends Array<Prisma.LogLevel | Prisma.LogDefinition> ? Prisma.GetEvents<ClientOptions['log']> : never : never,
   ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs
 > {
   [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['other'] }
@@ -137,13 +137,6 @@ export class PrismaClient<
    * Disconnect from the database
    */
   $disconnect(): $Utils.JsPromise<void>;
-
-  /**
-   * Add a middleware
-   * @deprecated since 4.16.0. For new code, prefer client extensions instead.
-   * @see https://pris.ly/d/extensions
-   */
-  $use(cb: Prisma.Middleware): void
 
 /**
    * Executes a prepared raw query and returns the number of affected rows.
@@ -331,8 +324,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 6.6.0
-   * Query Engine version: f676762280b54cd07c770017ed3711ddde35f37a
+   * Prisma Client JS version: 6.19.2
+   * Query Engine version: c2990dca591cba766e3b7ef5d9e8a84796e47ab7
    */
   export type PrismaVersion = {
     client: string
@@ -345,6 +338,7 @@ export namespace Prisma {
    */
 
 
+  export import Bytes = runtime.Bytes
   export import JsonObject = runtime.JsonObject
   export import JsonArray = runtime.JsonArray
   export import JsonValue = runtime.JsonValue
@@ -1228,16 +1222,24 @@ export namespace Prisma {
     /**
      * @example
      * ```
-     * // Defaults to stdout
+     * // Shorthand for `emit: 'stdout'`
      * log: ['query', 'info', 'warn', 'error']
      * 
-     * // Emit as events
+     * // Emit as events only
      * log: [
-     *   { emit: 'stdout', level: 'query' },
-     *   { emit: 'stdout', level: 'info' },
-     *   { emit: 'stdout', level: 'warn' }
-     *   { emit: 'stdout', level: 'error' }
+     *   { emit: 'event', level: 'query' },
+     *   { emit: 'event', level: 'info' },
+     *   { emit: 'event', level: 'warn' }
+     *   { emit: 'event', level: 'error' }
      * ]
+     * 
+     * / Emit as events and log to stdout
+     * og: [
+     *  { emit: 'stdout', level: 'query' },
+     *  { emit: 'stdout', level: 'info' },
+     *  { emit: 'stdout', level: 'warn' }
+     *  { emit: 'stdout', level: 'error' }
+     * 
      * ```
      * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/logging#the-log-option).
      */
@@ -1252,6 +1254,10 @@ export namespace Prisma {
       timeout?: number
       isolationLevel?: Prisma.TransactionIsolationLevel
     }
+    /**
+     * Instance of a Driver Adapter, e.g., like one provided by `@prisma/adapter-planetscale`
+     */
+    adapter?: runtime.SqlDriverAdapterFactory | null
     /**
      * Global configuration for omitting model fields by default.
      * 
@@ -1284,10 +1290,15 @@ export namespace Prisma {
     emit: 'stdout' | 'event'
   }
 
-  export type GetLogType<T extends LogLevel | LogDefinition> = T extends LogDefinition ? T['emit'] extends 'event' ? T['level'] : never : never
-  export type GetEvents<T extends any> = T extends Array<LogLevel | LogDefinition> ?
-    GetLogType<T[0]> | GetLogType<T[1]> | GetLogType<T[2]> | GetLogType<T[3]>
-    : never
+  export type CheckIsLogLevel<T> = T extends LogLevel ? T : never;
+
+  export type GetLogType<T> = CheckIsLogLevel<
+    T extends LogDefinition ? T['level'] : T
+  >;
+
+  export type GetEvents<T extends any[]> = T extends Array<LogLevel | LogDefinition>
+    ? GetLogType<T[number]>
+    : never;
 
   export type QueryEvent = {
     timestamp: Date
@@ -1328,25 +1339,6 @@ export namespace Prisma {
     | 'findRaw'
     | 'groupBy'
 
-  /**
-   * These options are being passed into the middleware as "params"
-   */
-  export type MiddlewareParams = {
-    model?: ModelName
-    action: PrismaAction
-    args: any
-    dataPath: string[]
-    runInTransaction: boolean
-  }
-
-  /**
-   * The `T` type makes sure, that the `return proceed` is not forgotten in the middleware implementation
-   */
-  export type Middleware<T = any> = (
-    params: MiddlewareParams,
-    next: (params: MiddlewareParams) => $Utils.JsPromise<T>,
-  ) => $Utils.JsPromise<T>
-
   // tested in getLogLevel.test.ts
   export function getLogLevel(log: Array<LogLevel | LogDefinition>): LogLevel | undefined;
 
@@ -1370,10 +1362,12 @@ export namespace Prisma {
 
   export type UserCountOutputType = {
     cases: number
+    sessions: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     cases?: boolean | UserCountOutputTypeCountCasesArgs
+    sessions?: boolean | UserCountOutputTypeCountSessionsArgs
   }
 
   // Custom InputTypes
@@ -1394,19 +1388,26 @@ export namespace Prisma {
     where?: CaseWhereInput
   }
 
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountSessionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SessionWhereInput
+  }
+
 
   /**
    * Count Type CaseCountOutputType
    */
 
   export type CaseCountOutputType = {
-    todos: number
     extractedDocs: number
+    todos: number
   }
 
   export type CaseCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    todos?: boolean | CaseCountOutputTypeCountTodosArgs
     extractedDocs?: boolean | CaseCountOutputTypeCountExtractedDocsArgs
+    todos?: boolean | CaseCountOutputTypeCountTodosArgs
   }
 
   // Custom InputTypes
@@ -1423,15 +1424,15 @@ export namespace Prisma {
   /**
    * CaseCountOutputType without action
    */
-  export type CaseCountOutputTypeCountTodosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: TodoWhereInput
+  export type CaseCountOutputTypeCountExtractedDocsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ExtractedDocWhereInput
   }
 
   /**
    * CaseCountOutputType without action
    */
-  export type CaseCountOutputTypeCountExtractedDocsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: ExtractedDocWhereInput
+  export type CaseCountOutputTypeCountTodosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TodoWhereInput
   }
 
 
@@ -1461,7 +1462,6 @@ export namespace Prisma {
 
   export type UserMinAggregateOutputType = {
     id: string | null
-    clerkId: string | null
     email: string | null
     name: string | null
     profession: string | null
@@ -1471,11 +1471,11 @@ export namespace Prisma {
     pendingCaseType: string | null
     createdAt: Date | null
     updatedAt: Date | null
+    clerkId: string | null
   }
 
   export type UserMaxAggregateOutputType = {
     id: string | null
-    clerkId: string | null
     email: string | null
     name: string | null
     profession: string | null
@@ -1485,11 +1485,11 @@ export namespace Prisma {
     pendingCaseType: string | null
     createdAt: Date | null
     updatedAt: Date | null
+    clerkId: string | null
   }
 
   export type UserCountAggregateOutputType = {
     id: number
-    clerkId: number
     email: number
     name: number
     profession: number
@@ -1499,6 +1499,7 @@ export namespace Prisma {
     pendingCaseType: number
     createdAt: number
     updatedAt: number
+    clerkId: number
     _all: number
   }
 
@@ -1513,7 +1514,6 @@ export namespace Prisma {
 
   export type UserMinAggregateInputType = {
     id?: true
-    clerkId?: true
     email?: true
     name?: true
     profession?: true
@@ -1523,11 +1523,11 @@ export namespace Prisma {
     pendingCaseType?: true
     createdAt?: true
     updatedAt?: true
+    clerkId?: true
   }
 
   export type UserMaxAggregateInputType = {
     id?: true
-    clerkId?: true
     email?: true
     name?: true
     profession?: true
@@ -1537,11 +1537,11 @@ export namespace Prisma {
     pendingCaseType?: true
     createdAt?: true
     updatedAt?: true
+    clerkId?: true
   }
 
   export type UserCountAggregateInputType = {
     id?: true
-    clerkId?: true
     email?: true
     name?: true
     profession?: true
@@ -1551,6 +1551,7 @@ export namespace Prisma {
     pendingCaseType?: true
     createdAt?: true
     updatedAt?: true
+    clerkId?: true
     _all?: true
   }
 
@@ -1642,7 +1643,6 @@ export namespace Prisma {
 
   export type UserGroupByOutputType = {
     id: string
-    clerkId: string
     email: string
     name: string | null
     profession: string | null
@@ -1652,6 +1652,7 @@ export namespace Prisma {
     pendingCaseType: string | null
     createdAt: Date
     updatedAt: Date
+    clerkId: string
     _count: UserCountAggregateOutputType | null
     _avg: UserAvgAggregateOutputType | null
     _sum: UserSumAggregateOutputType | null
@@ -1675,7 +1676,6 @@ export namespace Prisma {
 
   export type UserSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    clerkId?: boolean
     email?: boolean
     name?: boolean
     profession?: boolean
@@ -1685,13 +1685,14 @@ export namespace Prisma {
     pendingCaseType?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    clerkId?: boolean
     cases?: boolean | User$casesArgs<ExtArgs>
+    sessions?: boolean | User$sessionsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    clerkId?: boolean
     email?: boolean
     name?: boolean
     profession?: boolean
@@ -1701,11 +1702,11 @@ export namespace Prisma {
     pendingCaseType?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    clerkId?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    clerkId?: boolean
     email?: boolean
     name?: boolean
     profession?: boolean
@@ -1715,11 +1716,11 @@ export namespace Prisma {
     pendingCaseType?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    clerkId?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
     id?: boolean
-    clerkId?: boolean
     email?: boolean
     name?: boolean
     profession?: boolean
@@ -1729,11 +1730,13 @@ export namespace Prisma {
     pendingCaseType?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    clerkId?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clerkId" | "email" | "name" | "profession" | "legalKnowledge" | "jailTimeYears" | "warningSeverity" | "pendingCaseType" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "name" | "profession" | "legalKnowledge" | "jailTimeYears" | "warningSeverity" | "pendingCaseType" | "createdAt" | "updatedAt" | "clerkId", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     cases?: boolean | User$casesArgs<ExtArgs>
+    sessions?: boolean | User$sessionsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -1743,10 +1746,10 @@ export namespace Prisma {
     name: "User"
     objects: {
       cases: Prisma.$CasePayload<ExtArgs>[]
+      sessions: Prisma.$SessionPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      clerkId: string
       email: string
       name: string | null
       profession: string | null
@@ -1756,6 +1759,7 @@ export namespace Prisma {
       pendingCaseType: string | null
       createdAt: Date
       updatedAt: Date
+      clerkId: string
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -2151,6 +2155,7 @@ export namespace Prisma {
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     cases<T extends User$casesArgs<ExtArgs> = {}>(args?: Subset<T, User$casesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CasePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    sessions<T extends User$sessionsArgs<ExtArgs> = {}>(args?: Subset<T, User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2181,7 +2186,6 @@ export namespace Prisma {
    */
   interface UserFieldRefs {
     readonly id: FieldRef<"User", 'String'>
-    readonly clerkId: FieldRef<"User", 'String'>
     readonly email: FieldRef<"User", 'String'>
     readonly name: FieldRef<"User", 'String'>
     readonly profession: FieldRef<"User", 'String'>
@@ -2191,6 +2195,7 @@ export namespace Prisma {
     readonly pendingCaseType: FieldRef<"User", 'String'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
+    readonly clerkId: FieldRef<"User", 'String'>
   }
     
 
@@ -2603,6 +2608,30 @@ export namespace Prisma {
   }
 
   /**
+   * User.sessions
+   */
+  export type User$sessionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Session
+     */
+    select?: SessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Session
+     */
+    omit?: SessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SessionInclude<ExtArgs> | null
+    where?: SessionWhereInput
+    orderBy?: SessionOrderByWithRelationInput | SessionOrderByWithRelationInput[]
+    cursor?: SessionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SessionScalarFieldEnum | SessionScalarFieldEnum[]
+  }
+
+  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2838,9 +2867,9 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
-    todos?: boolean | Case$todosArgs<ExtArgs>
     extractedDocs?: boolean | Case$extractedDocsArgs<ExtArgs>
     session?: boolean | Case$sessionArgs<ExtArgs>
+    todos?: boolean | Case$todosArgs<ExtArgs>
     _count?: boolean | CaseCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["case"]>
 
@@ -2894,9 +2923,9 @@ export namespace Prisma {
   export type CaseOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "title" | "description" | "status" | "opponent" | "timeline" | "evidence" | "agreement" | "finalAnalysis" | "createdAt" | "updatedAt", ExtArgs["result"]["case"]>
   export type CaseInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
-    todos?: boolean | Case$todosArgs<ExtArgs>
     extractedDocs?: boolean | Case$extractedDocsArgs<ExtArgs>
     session?: boolean | Case$sessionArgs<ExtArgs>
+    todos?: boolean | Case$todosArgs<ExtArgs>
     _count?: boolean | CaseCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type CaseIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2910,9 +2939,9 @@ export namespace Prisma {
     name: "Case"
     objects: {
       user: Prisma.$UserPayload<ExtArgs>
-      todos: Prisma.$TodoPayload<ExtArgs>[]
       extractedDocs: Prisma.$ExtractedDocPayload<ExtArgs>[]
       session: Prisma.$SessionPayload<ExtArgs> | null
+      todos: Prisma.$TodoPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -3322,9 +3351,9 @@ export namespace Prisma {
   export interface Prisma__CaseClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    todos<T extends Case$todosArgs<ExtArgs> = {}>(args?: Subset<T, Case$todosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TodoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     extractedDocs<T extends Case$extractedDocsArgs<ExtArgs> = {}>(args?: Subset<T, Case$extractedDocsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExtractedDocPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     session<T extends Case$sessionArgs<ExtArgs> = {}>(args?: Subset<T, Case$sessionArgs<ExtArgs>>): Prisma__SessionClient<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    todos<T extends Case$todosArgs<ExtArgs> = {}>(args?: Subset<T, Case$todosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TodoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3762,30 +3791,6 @@ export namespace Prisma {
   }
 
   /**
-   * Case.todos
-   */
-  export type Case$todosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Todo
-     */
-    select?: TodoSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Todo
-     */
-    omit?: TodoOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: TodoInclude<ExtArgs> | null
-    where?: TodoWhereInput
-    orderBy?: TodoOrderByWithRelationInput | TodoOrderByWithRelationInput[]
-    cursor?: TodoWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: TodoScalarFieldEnum | TodoScalarFieldEnum[]
-  }
-
-  /**
    * Case.extractedDocs
    */
   export type Case$extractedDocsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3829,6 +3834,30 @@ export namespace Prisma {
   }
 
   /**
+   * Case.todos
+   */
+  export type Case$todosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Todo
+     */
+    select?: TodoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Todo
+     */
+    omit?: TodoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TodoInclude<ExtArgs> | null
+    where?: TodoWhereInput
+    orderBy?: TodoOrderByWithRelationInput | TodoOrderByWithRelationInput[]
+    cursor?: TodoWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TodoScalarFieldEnum | TodoScalarFieldEnum[]
+  }
+
+  /**
    * Case without action
    */
   export type CaseDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3853,8 +3882,18 @@ export namespace Prisma {
 
   export type AggregateSession = {
     _count: SessionCountAggregateOutputType | null
+    _avg: SessionAvgAggregateOutputType | null
+    _sum: SessionSumAggregateOutputType | null
     _min: SessionMinAggregateOutputType | null
     _max: SessionMaxAggregateOutputType | null
+  }
+
+  export type SessionAvgAggregateOutputType = {
+    messageCount: number | null
+  }
+
+  export type SessionSumAggregateOutputType = {
+    messageCount: number | null
   }
 
   export type SessionMinAggregateOutputType = {
@@ -3862,6 +3901,8 @@ export namespace Prisma {
     caseId: string | null
     createdAt: Date | null
     updatedAt: Date | null
+    messageCount: number | null
+    userId: string | null
   }
 
   export type SessionMaxAggregateOutputType = {
@@ -3869,6 +3910,8 @@ export namespace Prisma {
     caseId: string | null
     createdAt: Date | null
     updatedAt: Date | null
+    messageCount: number | null
+    userId: string | null
   }
 
   export type SessionCountAggregateOutputType = {
@@ -3877,15 +3920,27 @@ export namespace Prisma {
     messages: number
     createdAt: number
     updatedAt: number
+    messageCount: number
+    userId: number
     _all: number
   }
 
+
+  export type SessionAvgAggregateInputType = {
+    messageCount?: true
+  }
+
+  export type SessionSumAggregateInputType = {
+    messageCount?: true
+  }
 
   export type SessionMinAggregateInputType = {
     sessionId?: true
     caseId?: true
     createdAt?: true
     updatedAt?: true
+    messageCount?: true
+    userId?: true
   }
 
   export type SessionMaxAggregateInputType = {
@@ -3893,6 +3948,8 @@ export namespace Prisma {
     caseId?: true
     createdAt?: true
     updatedAt?: true
+    messageCount?: true
+    userId?: true
   }
 
   export type SessionCountAggregateInputType = {
@@ -3901,6 +3958,8 @@ export namespace Prisma {
     messages?: true
     createdAt?: true
     updatedAt?: true
+    messageCount?: true
+    userId?: true
     _all?: true
   }
 
@@ -3942,6 +4001,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: SessionAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SessionSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: SessionMinAggregateInputType
@@ -3972,17 +4043,23 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: SessionCountAggregateInputType | true
+    _avg?: SessionAvgAggregateInputType
+    _sum?: SessionSumAggregateInputType
     _min?: SessionMinAggregateInputType
     _max?: SessionMaxAggregateInputType
   }
 
   export type SessionGroupByOutputType = {
     sessionId: string
-    caseId: string
+    caseId: string | null
     messages: JsonValue
     createdAt: Date
     updatedAt: Date
+    messageCount: number
+    userId: string
     _count: SessionCountAggregateOutputType | null
+    _avg: SessionAvgAggregateOutputType | null
+    _sum: SessionSumAggregateOutputType | null
     _min: SessionMinAggregateOutputType | null
     _max: SessionMaxAggregateOutputType | null
   }
@@ -4007,7 +4084,10 @@ export namespace Prisma {
     messages?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    messageCount?: boolean
+    userId?: boolean
     case?: boolean | Session$caseArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["session"]>
 
   export type SessionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -4016,7 +4096,10 @@ export namespace Prisma {
     messages?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    messageCount?: boolean
+    userId?: boolean
     case?: boolean | Session$caseArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["session"]>
 
   export type SessionSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -4025,7 +4108,10 @@ export namespace Prisma {
     messages?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    messageCount?: boolean
+    userId?: boolean
     case?: boolean | Session$caseArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["session"]>
 
   export type SessionSelectScalar = {
@@ -4034,30 +4120,38 @@ export namespace Prisma {
     messages?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    messageCount?: boolean
+    userId?: boolean
   }
 
-  export type SessionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"sessionId" | "caseId" | "messages" | "createdAt" | "updatedAt", ExtArgs["result"]["session"]>
+  export type SessionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"sessionId" | "caseId" | "messages" | "createdAt" | "updatedAt" | "messageCount" | "userId", ExtArgs["result"]["session"]>
   export type SessionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     case?: boolean | Session$caseArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
   }
   export type SessionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     case?: boolean | Session$caseArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
   }
   export type SessionIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     case?: boolean | Session$caseArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
   }
 
   export type $SessionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Session"
     objects: {
       case: Prisma.$CasePayload<ExtArgs> | null
+      user: Prisma.$UserPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       sessionId: string
-      caseId: string
+      caseId: string | null
       messages: Prisma.JsonValue
       createdAt: Date
       updatedAt: Date
+      messageCount: number
+      userId: string
     }, ExtArgs["result"]["session"]>
     composites: {}
   }
@@ -4453,6 +4547,7 @@ export namespace Prisma {
   export interface Prisma__SessionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     case<T extends Session$caseArgs<ExtArgs> = {}>(args?: Subset<T, Session$caseArgs<ExtArgs>>): Prisma__CaseClient<$Result.GetResult<Prisma.$CasePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4487,6 +4582,8 @@ export namespace Prisma {
     readonly messages: FieldRef<"Session", 'Json'>
     readonly createdAt: FieldRef<"Session", 'DateTime'>
     readonly updatedAt: FieldRef<"Session", 'DateTime'>
+    readonly messageCount: FieldRef<"Session", 'Int'>
+    readonly userId: FieldRef<"Session", 'String'>
   }
     
 
@@ -8121,7 +8218,6 @@ export namespace Prisma {
 
   export const UserScalarFieldEnum: {
     id: 'id',
-    clerkId: 'clerkId',
     email: 'email',
     name: 'name',
     profession: 'profession',
@@ -8130,7 +8226,8 @@ export namespace Prisma {
     warningSeverity: 'warningSeverity',
     pendingCaseType: 'pendingCaseType',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    clerkId: 'clerkId'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -8159,7 +8256,9 @@ export namespace Prisma {
     caseId: 'caseId',
     messages: 'messages',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    messageCount: 'messageCount',
+    userId: 'userId'
   };
 
   export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
@@ -8376,7 +8475,6 @@ export namespace Prisma {
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
     id?: StringFilter<"User"> | string
-    clerkId?: StringFilter<"User"> | string
     email?: StringFilter<"User"> | string
     name?: StringNullableFilter<"User"> | string | null
     profession?: StringNullableFilter<"User"> | string | null
@@ -8386,12 +8484,13 @@ export namespace Prisma {
     pendingCaseType?: StringNullableFilter<"User"> | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
+    clerkId?: StringFilter<"User"> | string
     cases?: CaseListRelationFilter
+    sessions?: SessionListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
     id?: SortOrder
-    clerkId?: SortOrder
     email?: SortOrder
     name?: SortOrderInput | SortOrder
     profession?: SortOrderInput | SortOrder
@@ -8401,13 +8500,15 @@ export namespace Prisma {
     pendingCaseType?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    clerkId?: SortOrder
     cases?: CaseOrderByRelationAggregateInput
+    sessions?: SessionOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    clerkId?: string
     email?: string
+    clerkId?: string
     AND?: UserWhereInput | UserWhereInput[]
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
@@ -8420,11 +8521,11 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     cases?: CaseListRelationFilter
-  }, "id" | "clerkId" | "email">
+    sessions?: SessionListRelationFilter
+  }, "id" | "email" | "clerkId">
 
   export type UserOrderByWithAggregationInput = {
     id?: SortOrder
-    clerkId?: SortOrder
     email?: SortOrder
     name?: SortOrderInput | SortOrder
     profession?: SortOrderInput | SortOrder
@@ -8434,6 +8535,7 @@ export namespace Prisma {
     pendingCaseType?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    clerkId?: SortOrder
     _count?: UserCountOrderByAggregateInput
     _avg?: UserAvgOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
@@ -8446,7 +8548,6 @@ export namespace Prisma {
     OR?: UserScalarWhereWithAggregatesInput[]
     NOT?: UserScalarWhereWithAggregatesInput | UserScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"User"> | string
-    clerkId?: StringWithAggregatesFilter<"User"> | string
     email?: StringWithAggregatesFilter<"User"> | string
     name?: StringNullableWithAggregatesFilter<"User"> | string | null
     profession?: StringNullableWithAggregatesFilter<"User"> | string | null
@@ -8456,6 +8557,7 @@ export namespace Prisma {
     pendingCaseType?: StringNullableWithAggregatesFilter<"User"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
+    clerkId?: StringWithAggregatesFilter<"User"> | string
   }
 
   export type CaseWhereInput = {
@@ -8475,9 +8577,9 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Case"> | Date | string
     updatedAt?: DateTimeFilter<"Case"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
-    todos?: TodoListRelationFilter
     extractedDocs?: ExtractedDocListRelationFilter
     session?: XOR<SessionNullableScalarRelationFilter, SessionWhereInput> | null
+    todos?: TodoListRelationFilter
   }
 
   export type CaseOrderByWithRelationInput = {
@@ -8494,9 +8596,9 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
-    todos?: TodoOrderByRelationAggregateInput
     extractedDocs?: ExtractedDocOrderByRelationAggregateInput
     session?: SessionOrderByWithRelationInput
+    todos?: TodoOrderByRelationAggregateInput
   }
 
   export type CaseWhereUniqueInput = Prisma.AtLeast<{
@@ -8516,9 +8618,9 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Case"> | Date | string
     updatedAt?: DateTimeFilter<"Case"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
-    todos?: TodoListRelationFilter
     extractedDocs?: ExtractedDocListRelationFilter
     session?: XOR<SessionNullableScalarRelationFilter, SessionWhereInput> | null
+    todos?: TodoListRelationFilter
   }, "id">
 
   export type CaseOrderByWithAggregationInput = {
@@ -8562,20 +8664,26 @@ export namespace Prisma {
     OR?: SessionWhereInput[]
     NOT?: SessionWhereInput | SessionWhereInput[]
     sessionId?: StringFilter<"Session"> | string
-    caseId?: StringFilter<"Session"> | string
+    caseId?: StringNullableFilter<"Session"> | string | null
     messages?: JsonFilter<"Session">
     createdAt?: DateTimeFilter<"Session"> | Date | string
     updatedAt?: DateTimeFilter<"Session"> | Date | string
+    messageCount?: IntFilter<"Session"> | number
+    userId?: StringFilter<"Session"> | string
     case?: XOR<CaseNullableScalarRelationFilter, CaseWhereInput> | null
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
 
   export type SessionOrderByWithRelationInput = {
     sessionId?: SortOrder
-    caseId?: SortOrder
+    caseId?: SortOrderInput | SortOrder
     messages?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    messageCount?: SortOrder
+    userId?: SortOrder
     case?: CaseOrderByWithRelationInput
+    user?: UserOrderByWithRelationInput
   }
 
   export type SessionWhereUniqueInput = Prisma.AtLeast<{
@@ -8587,18 +8695,25 @@ export namespace Prisma {
     messages?: JsonFilter<"Session">
     createdAt?: DateTimeFilter<"Session"> | Date | string
     updatedAt?: DateTimeFilter<"Session"> | Date | string
+    messageCount?: IntFilter<"Session"> | number
+    userId?: StringFilter<"Session"> | string
     case?: XOR<CaseNullableScalarRelationFilter, CaseWhereInput> | null
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }, "sessionId" | "caseId">
 
   export type SessionOrderByWithAggregationInput = {
     sessionId?: SortOrder
-    caseId?: SortOrder
+    caseId?: SortOrderInput | SortOrder
     messages?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    messageCount?: SortOrder
+    userId?: SortOrder
     _count?: SessionCountOrderByAggregateInput
+    _avg?: SessionAvgOrderByAggregateInput
     _max?: SessionMaxOrderByAggregateInput
     _min?: SessionMinOrderByAggregateInput
+    _sum?: SessionSumOrderByAggregateInput
   }
 
   export type SessionScalarWhereWithAggregatesInput = {
@@ -8606,10 +8721,12 @@ export namespace Prisma {
     OR?: SessionScalarWhereWithAggregatesInput[]
     NOT?: SessionScalarWhereWithAggregatesInput | SessionScalarWhereWithAggregatesInput[]
     sessionId?: StringWithAggregatesFilter<"Session"> | string
-    caseId?: StringWithAggregatesFilter<"Session"> | string
+    caseId?: StringNullableWithAggregatesFilter<"Session"> | string | null
     messages?: JsonWithAggregatesFilter<"Session">
     createdAt?: DateTimeWithAggregatesFilter<"Session"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Session"> | Date | string
+    messageCount?: IntWithAggregatesFilter<"Session"> | number
+    userId?: StringWithAggregatesFilter<"Session"> | string
   }
 
   export type ExtractedDocWhereInput = {
@@ -8806,7 +8923,6 @@ export namespace Prisma {
 
   export type UserCreateInput = {
     id?: string
-    clerkId: string
     email: string
     name?: string | null
     profession?: string | null
@@ -8816,12 +8932,13 @@ export namespace Prisma {
     pendingCaseType?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    clerkId: string
     cases?: CaseCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
     id?: string
-    clerkId: string
     email: string
     name?: string | null
     profession?: string | null
@@ -8831,12 +8948,13 @@ export namespace Prisma {
     pendingCaseType?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    clerkId: string
     cases?: CaseUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    clerkId?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     profession?: NullableStringFieldUpdateOperationsInput | string | null
@@ -8846,12 +8964,13 @@ export namespace Prisma {
     pendingCaseType?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    clerkId?: StringFieldUpdateOperationsInput | string
     cases?: CaseUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    clerkId?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     profession?: NullableStringFieldUpdateOperationsInput | string | null
@@ -8861,12 +8980,13 @@ export namespace Prisma {
     pendingCaseType?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    clerkId?: StringFieldUpdateOperationsInput | string
     cases?: CaseUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
     id?: string
-    clerkId: string
     email: string
     name?: string | null
     profession?: string | null
@@ -8876,11 +8996,11 @@ export namespace Prisma {
     pendingCaseType?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    clerkId: string
   }
 
   export type UserUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    clerkId?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     profession?: NullableStringFieldUpdateOperationsInput | string | null
@@ -8890,11 +9010,11 @@ export namespace Prisma {
     pendingCaseType?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    clerkId?: StringFieldUpdateOperationsInput | string
   }
 
   export type UserUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    clerkId?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     profession?: NullableStringFieldUpdateOperationsInput | string | null
@@ -8904,6 +9024,7 @@ export namespace Prisma {
     pendingCaseType?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    clerkId?: StringFieldUpdateOperationsInput | string
   }
 
   export type CaseCreateInput = {
@@ -8919,9 +9040,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutCasesInput
-    todos?: TodoCreateNestedManyWithoutCaseInput
     extractedDocs?: ExtractedDocCreateNestedManyWithoutCaseInput
     session?: SessionCreateNestedOneWithoutCaseInput
+    todos?: TodoCreateNestedManyWithoutCaseInput
   }
 
   export type CaseUncheckedCreateInput = {
@@ -8937,9 +9058,9 @@ export namespace Prisma {
     finalAnalysis?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    todos?: TodoUncheckedCreateNestedManyWithoutCaseInput
     extractedDocs?: ExtractedDocUncheckedCreateNestedManyWithoutCaseInput
     session?: SessionUncheckedCreateNestedOneWithoutCaseInput
+    todos?: TodoUncheckedCreateNestedManyWithoutCaseInput
   }
 
   export type CaseUpdateInput = {
@@ -8955,9 +9076,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutCasesNestedInput
-    todos?: TodoUpdateManyWithoutCaseNestedInput
     extractedDocs?: ExtractedDocUpdateManyWithoutCaseNestedInput
     session?: SessionUpdateOneWithoutCaseNestedInput
+    todos?: TodoUpdateManyWithoutCaseNestedInput
   }
 
   export type CaseUncheckedUpdateInput = {
@@ -8973,9 +9094,9 @@ export namespace Prisma {
     finalAnalysis?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    todos?: TodoUncheckedUpdateManyWithoutCaseNestedInput
     extractedDocs?: ExtractedDocUncheckedUpdateManyWithoutCaseNestedInput
     session?: SessionUncheckedUpdateOneWithoutCaseNestedInput
+    todos?: TodoUncheckedUpdateManyWithoutCaseNestedInput
   }
 
   export type CaseCreateManyInput = {
@@ -9024,18 +9145,22 @@ export namespace Prisma {
 
   export type SessionCreateInput = {
     sessionId: string
-    messages: JsonNullValueInput | InputJsonValue
+    messages?: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
+    messageCount?: number
     case?: CaseCreateNestedOneWithoutSessionInput
+    user: UserCreateNestedOneWithoutSessionsInput
   }
 
   export type SessionUncheckedCreateInput = {
     sessionId: string
-    caseId: string
-    messages: JsonNullValueInput | InputJsonValue
+    caseId?: string | null
+    messages?: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
+    messageCount?: number
+    userId: string
   }
 
   export type SessionUpdateInput = {
@@ -9043,23 +9168,29 @@ export namespace Prisma {
     messages?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    messageCount?: IntFieldUpdateOperationsInput | number
     case?: CaseUpdateOneWithoutSessionNestedInput
+    user?: UserUpdateOneRequiredWithoutSessionsNestedInput
   }
 
   export type SessionUncheckedUpdateInput = {
     sessionId?: StringFieldUpdateOperationsInput | string
-    caseId?: StringFieldUpdateOperationsInput | string
+    caseId?: NullableStringFieldUpdateOperationsInput | string | null
     messages?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    messageCount?: IntFieldUpdateOperationsInput | number
+    userId?: StringFieldUpdateOperationsInput | string
   }
 
   export type SessionCreateManyInput = {
     sessionId: string
-    caseId: string
-    messages: JsonNullValueInput | InputJsonValue
+    caseId?: string | null
+    messages?: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
+    messageCount?: number
+    userId: string
   }
 
   export type SessionUpdateManyMutationInput = {
@@ -9067,14 +9198,17 @@ export namespace Prisma {
     messages?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    messageCount?: IntFieldUpdateOperationsInput | number
   }
 
   export type SessionUncheckedUpdateManyInput = {
     sessionId?: StringFieldUpdateOperationsInput | string
-    caseId?: StringFieldUpdateOperationsInput | string
+    caseId?: NullableStringFieldUpdateOperationsInput | string | null
     messages?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    messageCount?: IntFieldUpdateOperationsInput | number
+    userId?: StringFieldUpdateOperationsInput | string
   }
 
   export type ExtractedDocCreateInput = {
@@ -9350,6 +9484,12 @@ export namespace Prisma {
     none?: CaseWhereInput
   }
 
+  export type SessionListRelationFilter = {
+    every?: SessionWhereInput
+    some?: SessionWhereInput
+    none?: SessionWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -9359,9 +9499,12 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type SessionOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type UserCountOrderByAggregateInput = {
     id?: SortOrder
-    clerkId?: SortOrder
     email?: SortOrder
     name?: SortOrder
     profession?: SortOrder
@@ -9371,6 +9514,7 @@ export namespace Prisma {
     pendingCaseType?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    clerkId?: SortOrder
   }
 
   export type UserAvgOrderByAggregateInput = {
@@ -9379,7 +9523,6 @@ export namespace Prisma {
 
   export type UserMaxOrderByAggregateInput = {
     id?: SortOrder
-    clerkId?: SortOrder
     email?: SortOrder
     name?: SortOrder
     profession?: SortOrder
@@ -9389,11 +9532,11 @@ export namespace Prisma {
     pendingCaseType?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    clerkId?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
     id?: SortOrder
-    clerkId?: SortOrder
     email?: SortOrder
     name?: SortOrder
     profession?: SortOrder
@@ -9403,6 +9546,7 @@ export namespace Prisma {
     pendingCaseType?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    clerkId?: SortOrder
   }
 
   export type UserSumOrderByAggregateInput = {
@@ -9510,12 +9654,6 @@ export namespace Prisma {
     isNot?: UserWhereInput
   }
 
-  export type TodoListRelationFilter = {
-    every?: TodoWhereInput
-    some?: TodoWhereInput
-    none?: TodoWhereInput
-  }
-
   export type ExtractedDocListRelationFilter = {
     every?: ExtractedDocWhereInput
     some?: ExtractedDocWhereInput
@@ -9527,11 +9665,17 @@ export namespace Prisma {
     isNot?: SessionWhereInput | null
   }
 
-  export type TodoOrderByRelationAggregateInput = {
-    _count?: SortOrder
+  export type TodoListRelationFilter = {
+    every?: TodoWhereInput
+    some?: TodoWhereInput
+    none?: TodoWhereInput
   }
 
   export type ExtractedDocOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type TodoOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -9619,6 +9763,17 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
   export type CaseNullableScalarRelationFilter = {
     is?: CaseWhereInput | null
     isNot?: CaseWhereInput | null
@@ -9630,6 +9785,12 @@ export namespace Prisma {
     messages?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    messageCount?: SortOrder
+    userId?: SortOrder
+  }
+
+  export type SessionAvgOrderByAggregateInput = {
+    messageCount?: SortOrder
   }
 
   export type SessionMaxOrderByAggregateInput = {
@@ -9637,6 +9798,8 @@ export namespace Prisma {
     caseId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    messageCount?: SortOrder
+    userId?: SortOrder
   }
 
   export type SessionMinOrderByAggregateInput = {
@@ -9644,6 +9807,12 @@ export namespace Prisma {
     caseId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    messageCount?: SortOrder
+    userId?: SortOrder
+  }
+
+  export type SessionSumOrderByAggregateInput = {
+    messageCount?: SortOrder
   }
   export type JsonWithAggregatesFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -9670,6 +9839,22 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedJsonFilter<$PrismaModel>
     _max?: NestedJsonFilter<$PrismaModel>
+  }
+
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type CaseScalarRelationFilter = {
@@ -9814,11 +9999,25 @@ export namespace Prisma {
     connect?: CaseWhereUniqueInput | CaseWhereUniqueInput[]
   }
 
+  export type SessionCreateNestedManyWithoutUserInput = {
+    create?: XOR<SessionCreateWithoutUserInput, SessionUncheckedCreateWithoutUserInput> | SessionCreateWithoutUserInput[] | SessionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SessionCreateOrConnectWithoutUserInput | SessionCreateOrConnectWithoutUserInput[]
+    createMany?: SessionCreateManyUserInputEnvelope
+    connect?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
+  }
+
   export type CaseUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<CaseCreateWithoutUserInput, CaseUncheckedCreateWithoutUserInput> | CaseCreateWithoutUserInput[] | CaseUncheckedCreateWithoutUserInput[]
     connectOrCreate?: CaseCreateOrConnectWithoutUserInput | CaseCreateOrConnectWithoutUserInput[]
     createMany?: CaseCreateManyUserInputEnvelope
     connect?: CaseWhereUniqueInput | CaseWhereUniqueInput[]
+  }
+
+  export type SessionUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<SessionCreateWithoutUserInput, SessionUncheckedCreateWithoutUserInput> | SessionCreateWithoutUserInput[] | SessionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SessionCreateOrConnectWithoutUserInput | SessionCreateOrConnectWithoutUserInput[]
+    createMany?: SessionCreateManyUserInputEnvelope
+    connect?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -9859,6 +10058,20 @@ export namespace Prisma {
     deleteMany?: CaseScalarWhereInput | CaseScalarWhereInput[]
   }
 
+  export type SessionUpdateManyWithoutUserNestedInput = {
+    create?: XOR<SessionCreateWithoutUserInput, SessionUncheckedCreateWithoutUserInput> | SessionCreateWithoutUserInput[] | SessionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SessionCreateOrConnectWithoutUserInput | SessionCreateOrConnectWithoutUserInput[]
+    upsert?: SessionUpsertWithWhereUniqueWithoutUserInput | SessionUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: SessionCreateManyUserInputEnvelope
+    set?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
+    disconnect?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
+    delete?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
+    connect?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
+    update?: SessionUpdateWithWhereUniqueWithoutUserInput | SessionUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: SessionUpdateManyWithWhereWithoutUserInput | SessionUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: SessionScalarWhereInput | SessionScalarWhereInput[]
+  }
+
   export type CaseUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<CaseCreateWithoutUserInput, CaseUncheckedCreateWithoutUserInput> | CaseCreateWithoutUserInput[] | CaseUncheckedCreateWithoutUserInput[]
     connectOrCreate?: CaseCreateOrConnectWithoutUserInput | CaseCreateOrConnectWithoutUserInput[]
@@ -9873,6 +10086,20 @@ export namespace Prisma {
     deleteMany?: CaseScalarWhereInput | CaseScalarWhereInput[]
   }
 
+  export type SessionUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<SessionCreateWithoutUserInput, SessionUncheckedCreateWithoutUserInput> | SessionCreateWithoutUserInput[] | SessionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SessionCreateOrConnectWithoutUserInput | SessionCreateOrConnectWithoutUserInput[]
+    upsert?: SessionUpsertWithWhereUniqueWithoutUserInput | SessionUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: SessionCreateManyUserInputEnvelope
+    set?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
+    disconnect?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
+    delete?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
+    connect?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
+    update?: SessionUpdateWithWhereUniqueWithoutUserInput | SessionUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: SessionUpdateManyWithWhereWithoutUserInput | SessionUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: SessionScalarWhereInput | SessionScalarWhereInput[]
+  }
+
   export type CaseCreatetimelineInput = {
     set: string[]
   }
@@ -9881,13 +10108,6 @@ export namespace Prisma {
     create?: XOR<UserCreateWithoutCasesInput, UserUncheckedCreateWithoutCasesInput>
     connectOrCreate?: UserCreateOrConnectWithoutCasesInput
     connect?: UserWhereUniqueInput
-  }
-
-  export type TodoCreateNestedManyWithoutCaseInput = {
-    create?: XOR<TodoCreateWithoutCaseInput, TodoUncheckedCreateWithoutCaseInput> | TodoCreateWithoutCaseInput[] | TodoUncheckedCreateWithoutCaseInput[]
-    connectOrCreate?: TodoCreateOrConnectWithoutCaseInput | TodoCreateOrConnectWithoutCaseInput[]
-    createMany?: TodoCreateManyCaseInputEnvelope
-    connect?: TodoWhereUniqueInput | TodoWhereUniqueInput[]
   }
 
   export type ExtractedDocCreateNestedManyWithoutCaseInput = {
@@ -9903,7 +10123,7 @@ export namespace Prisma {
     connect?: SessionWhereUniqueInput
   }
 
-  export type TodoUncheckedCreateNestedManyWithoutCaseInput = {
+  export type TodoCreateNestedManyWithoutCaseInput = {
     create?: XOR<TodoCreateWithoutCaseInput, TodoUncheckedCreateWithoutCaseInput> | TodoCreateWithoutCaseInput[] | TodoUncheckedCreateWithoutCaseInput[]
     connectOrCreate?: TodoCreateOrConnectWithoutCaseInput | TodoCreateOrConnectWithoutCaseInput[]
     createMany?: TodoCreateManyCaseInputEnvelope
@@ -9921,6 +10141,13 @@ export namespace Prisma {
     create?: XOR<SessionCreateWithoutCaseInput, SessionUncheckedCreateWithoutCaseInput>
     connectOrCreate?: SessionCreateOrConnectWithoutCaseInput
     connect?: SessionWhereUniqueInput
+  }
+
+  export type TodoUncheckedCreateNestedManyWithoutCaseInput = {
+    create?: XOR<TodoCreateWithoutCaseInput, TodoUncheckedCreateWithoutCaseInput> | TodoCreateWithoutCaseInput[] | TodoUncheckedCreateWithoutCaseInput[]
+    connectOrCreate?: TodoCreateOrConnectWithoutCaseInput | TodoCreateOrConnectWithoutCaseInput[]
+    createMany?: TodoCreateManyCaseInputEnvelope
+    connect?: TodoWhereUniqueInput | TodoWhereUniqueInput[]
   }
 
   export type EnumCaseStatusFieldUpdateOperationsInput = {
@@ -9942,20 +10169,6 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutCasesInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutCasesInput, UserUpdateWithoutCasesInput>, UserUncheckedUpdateWithoutCasesInput>
-  }
-
-  export type TodoUpdateManyWithoutCaseNestedInput = {
-    create?: XOR<TodoCreateWithoutCaseInput, TodoUncheckedCreateWithoutCaseInput> | TodoCreateWithoutCaseInput[] | TodoUncheckedCreateWithoutCaseInput[]
-    connectOrCreate?: TodoCreateOrConnectWithoutCaseInput | TodoCreateOrConnectWithoutCaseInput[]
-    upsert?: TodoUpsertWithWhereUniqueWithoutCaseInput | TodoUpsertWithWhereUniqueWithoutCaseInput[]
-    createMany?: TodoCreateManyCaseInputEnvelope
-    set?: TodoWhereUniqueInput | TodoWhereUniqueInput[]
-    disconnect?: TodoWhereUniqueInput | TodoWhereUniqueInput[]
-    delete?: TodoWhereUniqueInput | TodoWhereUniqueInput[]
-    connect?: TodoWhereUniqueInput | TodoWhereUniqueInput[]
-    update?: TodoUpdateWithWhereUniqueWithoutCaseInput | TodoUpdateWithWhereUniqueWithoutCaseInput[]
-    updateMany?: TodoUpdateManyWithWhereWithoutCaseInput | TodoUpdateManyWithWhereWithoutCaseInput[]
-    deleteMany?: TodoScalarWhereInput | TodoScalarWhereInput[]
   }
 
   export type ExtractedDocUpdateManyWithoutCaseNestedInput = {
@@ -9982,7 +10195,7 @@ export namespace Prisma {
     update?: XOR<XOR<SessionUpdateToOneWithWhereWithoutCaseInput, SessionUpdateWithoutCaseInput>, SessionUncheckedUpdateWithoutCaseInput>
   }
 
-  export type TodoUncheckedUpdateManyWithoutCaseNestedInput = {
+  export type TodoUpdateManyWithoutCaseNestedInput = {
     create?: XOR<TodoCreateWithoutCaseInput, TodoUncheckedCreateWithoutCaseInput> | TodoCreateWithoutCaseInput[] | TodoUncheckedCreateWithoutCaseInput[]
     connectOrCreate?: TodoCreateOrConnectWithoutCaseInput | TodoCreateOrConnectWithoutCaseInput[]
     upsert?: TodoUpsertWithWhereUniqueWithoutCaseInput | TodoUpsertWithWhereUniqueWithoutCaseInput[]
@@ -10020,10 +10233,38 @@ export namespace Prisma {
     update?: XOR<XOR<SessionUpdateToOneWithWhereWithoutCaseInput, SessionUpdateWithoutCaseInput>, SessionUncheckedUpdateWithoutCaseInput>
   }
 
+  export type TodoUncheckedUpdateManyWithoutCaseNestedInput = {
+    create?: XOR<TodoCreateWithoutCaseInput, TodoUncheckedCreateWithoutCaseInput> | TodoCreateWithoutCaseInput[] | TodoUncheckedCreateWithoutCaseInput[]
+    connectOrCreate?: TodoCreateOrConnectWithoutCaseInput | TodoCreateOrConnectWithoutCaseInput[]
+    upsert?: TodoUpsertWithWhereUniqueWithoutCaseInput | TodoUpsertWithWhereUniqueWithoutCaseInput[]
+    createMany?: TodoCreateManyCaseInputEnvelope
+    set?: TodoWhereUniqueInput | TodoWhereUniqueInput[]
+    disconnect?: TodoWhereUniqueInput | TodoWhereUniqueInput[]
+    delete?: TodoWhereUniqueInput | TodoWhereUniqueInput[]
+    connect?: TodoWhereUniqueInput | TodoWhereUniqueInput[]
+    update?: TodoUpdateWithWhereUniqueWithoutCaseInput | TodoUpdateWithWhereUniqueWithoutCaseInput[]
+    updateMany?: TodoUpdateManyWithWhereWithoutCaseInput | TodoUpdateManyWithWhereWithoutCaseInput[]
+    deleteMany?: TodoScalarWhereInput | TodoScalarWhereInput[]
+  }
+
   export type CaseCreateNestedOneWithoutSessionInput = {
     create?: XOR<CaseCreateWithoutSessionInput, CaseUncheckedCreateWithoutSessionInput>
     connectOrCreate?: CaseCreateOrConnectWithoutSessionInput
     connect?: CaseWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutSessionsInput = {
+    create?: XOR<UserCreateWithoutSessionsInput, UserUncheckedCreateWithoutSessionsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSessionsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
   }
 
   export type CaseUpdateOneWithoutSessionNestedInput = {
@@ -10034,6 +10275,14 @@ export namespace Prisma {
     delete?: CaseWhereInput | boolean
     connect?: CaseWhereUniqueInput
     update?: XOR<XOR<CaseUpdateToOneWithWhereWithoutSessionInput, CaseUpdateWithoutSessionInput>, CaseUncheckedUpdateWithoutSessionInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutSessionsNestedInput = {
+    create?: XOR<UserCreateWithoutSessionsInput, UserUncheckedCreateWithoutSessionsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSessionsInput
+    upsert?: UserUpsertWithoutSessionsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSessionsInput, UserUpdateWithoutSessionsInput>, UserUncheckedUpdateWithoutSessionsInput>
   }
 
   export type CaseCreateNestedOneWithoutExtractedDocsInput = {
@@ -10287,6 +10536,33 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
+  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type NestedFloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
   export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
@@ -10341,9 +10617,9 @@ export namespace Prisma {
     finalAnalysis?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    todos?: TodoCreateNestedManyWithoutCaseInput
     extractedDocs?: ExtractedDocCreateNestedManyWithoutCaseInput
     session?: SessionCreateNestedOneWithoutCaseInput
+    todos?: TodoCreateNestedManyWithoutCaseInput
   }
 
   export type CaseUncheckedCreateWithoutUserInput = {
@@ -10358,9 +10634,9 @@ export namespace Prisma {
     finalAnalysis?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    todos?: TodoUncheckedCreateNestedManyWithoutCaseInput
     extractedDocs?: ExtractedDocUncheckedCreateNestedManyWithoutCaseInput
     session?: SessionUncheckedCreateNestedOneWithoutCaseInput
+    todos?: TodoUncheckedCreateNestedManyWithoutCaseInput
   }
 
   export type CaseCreateOrConnectWithoutUserInput = {
@@ -10370,6 +10646,34 @@ export namespace Prisma {
 
   export type CaseCreateManyUserInputEnvelope = {
     data: CaseCreateManyUserInput | CaseCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SessionCreateWithoutUserInput = {
+    sessionId: string
+    messages?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    messageCount?: number
+    case?: CaseCreateNestedOneWithoutSessionInput
+  }
+
+  export type SessionUncheckedCreateWithoutUserInput = {
+    sessionId: string
+    caseId?: string | null
+    messages?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    messageCount?: number
+  }
+
+  export type SessionCreateOrConnectWithoutUserInput = {
+    where: SessionWhereUniqueInput
+    create: XOR<SessionCreateWithoutUserInput, SessionUncheckedCreateWithoutUserInput>
+  }
+
+  export type SessionCreateManyUserInputEnvelope = {
+    data: SessionCreateManyUserInput | SessionCreateManyUserInput[]
     skipDuplicates?: boolean
   }
 
@@ -10407,9 +10711,37 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Case"> | Date | string
   }
 
+  export type SessionUpsertWithWhereUniqueWithoutUserInput = {
+    where: SessionWhereUniqueInput
+    update: XOR<SessionUpdateWithoutUserInput, SessionUncheckedUpdateWithoutUserInput>
+    create: XOR<SessionCreateWithoutUserInput, SessionUncheckedCreateWithoutUserInput>
+  }
+
+  export type SessionUpdateWithWhereUniqueWithoutUserInput = {
+    where: SessionWhereUniqueInput
+    data: XOR<SessionUpdateWithoutUserInput, SessionUncheckedUpdateWithoutUserInput>
+  }
+
+  export type SessionUpdateManyWithWhereWithoutUserInput = {
+    where: SessionScalarWhereInput
+    data: XOR<SessionUpdateManyMutationInput, SessionUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type SessionScalarWhereInput = {
+    AND?: SessionScalarWhereInput | SessionScalarWhereInput[]
+    OR?: SessionScalarWhereInput[]
+    NOT?: SessionScalarWhereInput | SessionScalarWhereInput[]
+    sessionId?: StringFilter<"Session"> | string
+    caseId?: StringNullableFilter<"Session"> | string | null
+    messages?: JsonFilter<"Session">
+    createdAt?: DateTimeFilter<"Session"> | Date | string
+    updatedAt?: DateTimeFilter<"Session"> | Date | string
+    messageCount?: IntFilter<"Session"> | number
+    userId?: StringFilter<"Session"> | string
+  }
+
   export type UserCreateWithoutCasesInput = {
     id?: string
-    clerkId: string
     email: string
     name?: string | null
     profession?: string | null
@@ -10419,11 +10751,12 @@ export namespace Prisma {
     pendingCaseType?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    clerkId: string
+    sessions?: SessionCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutCasesInput = {
     id?: string
-    clerkId: string
     email: string
     name?: string | null
     profession?: string | null
@@ -10433,39 +10766,13 @@ export namespace Prisma {
     pendingCaseType?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    clerkId: string
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutCasesInput = {
     where: UserWhereUniqueInput
     create: XOR<UserCreateWithoutCasesInput, UserUncheckedCreateWithoutCasesInput>
-  }
-
-  export type TodoCreateWithoutCaseInput = {
-    id?: string
-    title: string
-    description?: string | null
-    dueAt?: Date | string | null
-    status?: $Enums.TodoStatus
-    createdAt?: Date | string
-  }
-
-  export type TodoUncheckedCreateWithoutCaseInput = {
-    id?: string
-    title: string
-    description?: string | null
-    dueAt?: Date | string | null
-    status?: $Enums.TodoStatus
-    createdAt?: Date | string
-  }
-
-  export type TodoCreateOrConnectWithoutCaseInput = {
-    where: TodoWhereUniqueInput
-    create: XOR<TodoCreateWithoutCaseInput, TodoUncheckedCreateWithoutCaseInput>
-  }
-
-  export type TodoCreateManyCaseInputEnvelope = {
-    data: TodoCreateManyCaseInput | TodoCreateManyCaseInput[]
-    skipDuplicates?: boolean
   }
 
   export type ExtractedDocCreateWithoutCaseInput = {
@@ -10498,21 +10805,53 @@ export namespace Prisma {
 
   export type SessionCreateWithoutCaseInput = {
     sessionId: string
-    messages: JsonNullValueInput | InputJsonValue
+    messages?: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
+    messageCount?: number
+    user: UserCreateNestedOneWithoutSessionsInput
   }
 
   export type SessionUncheckedCreateWithoutCaseInput = {
     sessionId: string
-    messages: JsonNullValueInput | InputJsonValue
+    messages?: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
+    messageCount?: number
+    userId: string
   }
 
   export type SessionCreateOrConnectWithoutCaseInput = {
     where: SessionWhereUniqueInput
     create: XOR<SessionCreateWithoutCaseInput, SessionUncheckedCreateWithoutCaseInput>
+  }
+
+  export type TodoCreateWithoutCaseInput = {
+    id?: string
+    title: string
+    description?: string | null
+    dueAt?: Date | string | null
+    status?: $Enums.TodoStatus
+    createdAt?: Date | string
+  }
+
+  export type TodoUncheckedCreateWithoutCaseInput = {
+    id?: string
+    title: string
+    description?: string | null
+    dueAt?: Date | string | null
+    status?: $Enums.TodoStatus
+    createdAt?: Date | string
+  }
+
+  export type TodoCreateOrConnectWithoutCaseInput = {
+    where: TodoWhereUniqueInput
+    create: XOR<TodoCreateWithoutCaseInput, TodoUncheckedCreateWithoutCaseInput>
+  }
+
+  export type TodoCreateManyCaseInputEnvelope = {
+    data: TodoCreateManyCaseInput | TodoCreateManyCaseInput[]
+    skipDuplicates?: boolean
   }
 
   export type UserUpsertWithoutCasesInput = {
@@ -10528,7 +10867,6 @@ export namespace Prisma {
 
   export type UserUpdateWithoutCasesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    clerkId?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     profession?: NullableStringFieldUpdateOperationsInput | string | null
@@ -10538,11 +10876,12 @@ export namespace Prisma {
     pendingCaseType?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    clerkId?: StringFieldUpdateOperationsInput | string
+    sessions?: SessionUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCasesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    clerkId?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     profession?: NullableStringFieldUpdateOperationsInput | string | null
@@ -10552,35 +10891,8 @@ export namespace Prisma {
     pendingCaseType?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type TodoUpsertWithWhereUniqueWithoutCaseInput = {
-    where: TodoWhereUniqueInput
-    update: XOR<TodoUpdateWithoutCaseInput, TodoUncheckedUpdateWithoutCaseInput>
-    create: XOR<TodoCreateWithoutCaseInput, TodoUncheckedCreateWithoutCaseInput>
-  }
-
-  export type TodoUpdateWithWhereUniqueWithoutCaseInput = {
-    where: TodoWhereUniqueInput
-    data: XOR<TodoUpdateWithoutCaseInput, TodoUncheckedUpdateWithoutCaseInput>
-  }
-
-  export type TodoUpdateManyWithWhereWithoutCaseInput = {
-    where: TodoScalarWhereInput
-    data: XOR<TodoUpdateManyMutationInput, TodoUncheckedUpdateManyWithoutCaseInput>
-  }
-
-  export type TodoScalarWhereInput = {
-    AND?: TodoScalarWhereInput | TodoScalarWhereInput[]
-    OR?: TodoScalarWhereInput[]
-    NOT?: TodoScalarWhereInput | TodoScalarWhereInput[]
-    id?: StringFilter<"Todo"> | string
-    title?: StringFilter<"Todo"> | string
-    description?: StringNullableFilter<"Todo"> | string | null
-    dueAt?: DateTimeNullableFilter<"Todo"> | Date | string | null
-    status?: EnumTodoStatusFilter<"Todo"> | $Enums.TodoStatus
-    caseId?: StringFilter<"Todo"> | string
-    createdAt?: DateTimeFilter<"Todo"> | Date | string
+    clerkId?: StringFieldUpdateOperationsInput | string
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ExtractedDocUpsertWithWhereUniqueWithoutCaseInput = {
@@ -10628,6 +10940,8 @@ export namespace Prisma {
     messages?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    messageCount?: IntFieldUpdateOperationsInput | number
+    user?: UserUpdateOneRequiredWithoutSessionsNestedInput
   }
 
   export type SessionUncheckedUpdateWithoutCaseInput = {
@@ -10635,6 +10949,37 @@ export namespace Prisma {
     messages?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    messageCount?: IntFieldUpdateOperationsInput | number
+    userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type TodoUpsertWithWhereUniqueWithoutCaseInput = {
+    where: TodoWhereUniqueInput
+    update: XOR<TodoUpdateWithoutCaseInput, TodoUncheckedUpdateWithoutCaseInput>
+    create: XOR<TodoCreateWithoutCaseInput, TodoUncheckedCreateWithoutCaseInput>
+  }
+
+  export type TodoUpdateWithWhereUniqueWithoutCaseInput = {
+    where: TodoWhereUniqueInput
+    data: XOR<TodoUpdateWithoutCaseInput, TodoUncheckedUpdateWithoutCaseInput>
+  }
+
+  export type TodoUpdateManyWithWhereWithoutCaseInput = {
+    where: TodoScalarWhereInput
+    data: XOR<TodoUpdateManyMutationInput, TodoUncheckedUpdateManyWithoutCaseInput>
+  }
+
+  export type TodoScalarWhereInput = {
+    AND?: TodoScalarWhereInput | TodoScalarWhereInput[]
+    OR?: TodoScalarWhereInput[]
+    NOT?: TodoScalarWhereInput | TodoScalarWhereInput[]
+    id?: StringFilter<"Todo"> | string
+    title?: StringFilter<"Todo"> | string
+    description?: StringNullableFilter<"Todo"> | string | null
+    dueAt?: DateTimeNullableFilter<"Todo"> | Date | string | null
+    status?: EnumTodoStatusFilter<"Todo"> | $Enums.TodoStatus
+    caseId?: StringFilter<"Todo"> | string
+    createdAt?: DateTimeFilter<"Todo"> | Date | string
   }
 
   export type CaseCreateWithoutSessionInput = {
@@ -10650,8 +10995,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutCasesInput
-    todos?: TodoCreateNestedManyWithoutCaseInput
     extractedDocs?: ExtractedDocCreateNestedManyWithoutCaseInput
+    todos?: TodoCreateNestedManyWithoutCaseInput
   }
 
   export type CaseUncheckedCreateWithoutSessionInput = {
@@ -10667,13 +11012,48 @@ export namespace Prisma {
     finalAnalysis?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    todos?: TodoUncheckedCreateNestedManyWithoutCaseInput
     extractedDocs?: ExtractedDocUncheckedCreateNestedManyWithoutCaseInput
+    todos?: TodoUncheckedCreateNestedManyWithoutCaseInput
   }
 
   export type CaseCreateOrConnectWithoutSessionInput = {
     where: CaseWhereUniqueInput
     create: XOR<CaseCreateWithoutSessionInput, CaseUncheckedCreateWithoutSessionInput>
+  }
+
+  export type UserCreateWithoutSessionsInput = {
+    id?: string
+    email: string
+    name?: string | null
+    profession?: string | null
+    legalKnowledge: $Enums.LegalKnowledge
+    jailTimeYears?: number | null
+    warningSeverity?: string | null
+    pendingCaseType?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    clerkId: string
+    cases?: CaseCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutSessionsInput = {
+    id?: string
+    email: string
+    name?: string | null
+    profession?: string | null
+    legalKnowledge: $Enums.LegalKnowledge
+    jailTimeYears?: number | null
+    warningSeverity?: string | null
+    pendingCaseType?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    clerkId: string
+    cases?: CaseUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutSessionsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutSessionsInput, UserUncheckedCreateWithoutSessionsInput>
   }
 
   export type CaseUpsertWithoutSessionInput = {
@@ -10700,8 +11080,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutCasesNestedInput
-    todos?: TodoUpdateManyWithoutCaseNestedInput
     extractedDocs?: ExtractedDocUpdateManyWithoutCaseNestedInput
+    todos?: TodoUpdateManyWithoutCaseNestedInput
   }
 
   export type CaseUncheckedUpdateWithoutSessionInput = {
@@ -10717,8 +11097,49 @@ export namespace Prisma {
     finalAnalysis?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    todos?: TodoUncheckedUpdateManyWithoutCaseNestedInput
     extractedDocs?: ExtractedDocUncheckedUpdateManyWithoutCaseNestedInput
+    todos?: TodoUncheckedUpdateManyWithoutCaseNestedInput
+  }
+
+  export type UserUpsertWithoutSessionsInput = {
+    update: XOR<UserUpdateWithoutSessionsInput, UserUncheckedUpdateWithoutSessionsInput>
+    create: XOR<UserCreateWithoutSessionsInput, UserUncheckedCreateWithoutSessionsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutSessionsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutSessionsInput, UserUncheckedUpdateWithoutSessionsInput>
+  }
+
+  export type UserUpdateWithoutSessionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    profession?: NullableStringFieldUpdateOperationsInput | string | null
+    legalKnowledge?: EnumLegalKnowledgeFieldUpdateOperationsInput | $Enums.LegalKnowledge
+    jailTimeYears?: NullableIntFieldUpdateOperationsInput | number | null
+    warningSeverity?: NullableStringFieldUpdateOperationsInput | string | null
+    pendingCaseType?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    clerkId?: StringFieldUpdateOperationsInput | string
+    cases?: CaseUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutSessionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    profession?: NullableStringFieldUpdateOperationsInput | string | null
+    legalKnowledge?: EnumLegalKnowledgeFieldUpdateOperationsInput | $Enums.LegalKnowledge
+    jailTimeYears?: NullableIntFieldUpdateOperationsInput | number | null
+    warningSeverity?: NullableStringFieldUpdateOperationsInput | string | null
+    pendingCaseType?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    clerkId?: StringFieldUpdateOperationsInput | string
+    cases?: CaseUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type CaseCreateWithoutExtractedDocsInput = {
@@ -10734,8 +11155,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutCasesInput
-    todos?: TodoCreateNestedManyWithoutCaseInput
     session?: SessionCreateNestedOneWithoutCaseInput
+    todos?: TodoCreateNestedManyWithoutCaseInput
   }
 
   export type CaseUncheckedCreateWithoutExtractedDocsInput = {
@@ -10751,8 +11172,8 @@ export namespace Prisma {
     finalAnalysis?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    todos?: TodoUncheckedCreateNestedManyWithoutCaseInput
     session?: SessionUncheckedCreateNestedOneWithoutCaseInput
+    todos?: TodoUncheckedCreateNestedManyWithoutCaseInput
   }
 
   export type CaseCreateOrConnectWithoutExtractedDocsInput = {
@@ -10784,8 +11205,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutCasesNestedInput
-    todos?: TodoUpdateManyWithoutCaseNestedInput
     session?: SessionUpdateOneWithoutCaseNestedInput
+    todos?: TodoUpdateManyWithoutCaseNestedInput
   }
 
   export type CaseUncheckedUpdateWithoutExtractedDocsInput = {
@@ -10801,8 +11222,8 @@ export namespace Prisma {
     finalAnalysis?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    todos?: TodoUncheckedUpdateManyWithoutCaseNestedInput
     session?: SessionUncheckedUpdateOneWithoutCaseNestedInput
+    todos?: TodoUncheckedUpdateManyWithoutCaseNestedInput
   }
 
   export type CaseCreateWithoutTodosInput = {
@@ -10903,6 +11324,15 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type SessionCreateManyUserInput = {
+    sessionId: string
+    caseId?: string | null
+    messages?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    messageCount?: number
+  }
+
   export type CaseUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
@@ -10915,9 +11345,9 @@ export namespace Prisma {
     finalAnalysis?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    todos?: TodoUpdateManyWithoutCaseNestedInput
     extractedDocs?: ExtractedDocUpdateManyWithoutCaseNestedInput
     session?: SessionUpdateOneWithoutCaseNestedInput
+    todos?: TodoUpdateManyWithoutCaseNestedInput
   }
 
   export type CaseUncheckedUpdateWithoutUserInput = {
@@ -10932,9 +11362,9 @@ export namespace Prisma {
     finalAnalysis?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    todos?: TodoUncheckedUpdateManyWithoutCaseNestedInput
     extractedDocs?: ExtractedDocUncheckedUpdateManyWithoutCaseNestedInput
     session?: SessionUncheckedUpdateOneWithoutCaseNestedInput
+    todos?: TodoUncheckedUpdateManyWithoutCaseNestedInput
   }
 
   export type CaseUncheckedUpdateManyWithoutUserInput = {
@@ -10951,13 +11381,31 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type TodoCreateManyCaseInput = {
-    id?: string
-    title: string
-    description?: string | null
-    dueAt?: Date | string | null
-    status?: $Enums.TodoStatus
-    createdAt?: Date | string
+  export type SessionUpdateWithoutUserInput = {
+    sessionId?: StringFieldUpdateOperationsInput | string
+    messages?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    messageCount?: IntFieldUpdateOperationsInput | number
+    case?: CaseUpdateOneWithoutSessionNestedInput
+  }
+
+  export type SessionUncheckedUpdateWithoutUserInput = {
+    sessionId?: StringFieldUpdateOperationsInput | string
+    caseId?: NullableStringFieldUpdateOperationsInput | string | null
+    messages?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    messageCount?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type SessionUncheckedUpdateManyWithoutUserInput = {
+    sessionId?: StringFieldUpdateOperationsInput | string
+    caseId?: NullableStringFieldUpdateOperationsInput | string | null
+    messages?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    messageCount?: IntFieldUpdateOperationsInput | number
   }
 
   export type ExtractedDocCreateManyCaseInput = {
@@ -10969,31 +11417,13 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
-  export type TodoUpdateWithoutCaseInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    title?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    dueAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    status?: EnumTodoStatusFieldUpdateOperationsInput | $Enums.TodoStatus
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type TodoUncheckedUpdateWithoutCaseInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    title?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    dueAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    status?: EnumTodoStatusFieldUpdateOperationsInput | $Enums.TodoStatus
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type TodoUncheckedUpdateManyWithoutCaseInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    title?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    dueAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    status?: EnumTodoStatusFieldUpdateOperationsInput | $Enums.TodoStatus
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  export type TodoCreateManyCaseInput = {
+    id?: string
+    title: string
+    description?: string | null
+    dueAt?: Date | string | null
+    status?: $Enums.TodoStatus
+    createdAt?: Date | string
   }
 
   export type ExtractedDocUpdateWithoutCaseInput = {
@@ -11020,6 +11450,33 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     rawContent?: StringFieldUpdateOperationsInput | string
     aiSummary?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TodoUpdateWithoutCaseInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    dueAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumTodoStatusFieldUpdateOperationsInput | $Enums.TodoStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TodoUncheckedUpdateWithoutCaseInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    dueAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumTodoStatusFieldUpdateOperationsInput | $Enums.TodoStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TodoUncheckedUpdateManyWithoutCaseInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    dueAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumTodoStatusFieldUpdateOperationsInput | $Enums.TodoStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 

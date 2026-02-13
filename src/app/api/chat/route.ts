@@ -1,10 +1,8 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { auth } from "@clerk/nextjs/server";
-import { PrismaClient } from '@/generated/prisma';
+import prisma from '@/lib/prisma';
 import { LangflowAPI } from "@/lib/langflow";
-
-const prisma = new PrismaClient();
 
 export const runtime = 'nodejs'; // Use Node.js runtime
 export const dynamic = 'force-dynamic'; // Disable caching
@@ -38,6 +36,36 @@ export async function POST(req: Request) {
       messageLength: message.length
     });
 
+    // Find or create user in database
+    let user = await prisma.user.findUnique({ where: { clerkId: userId } });
+    if (!user) {
+      console.log("[Chat] User not found in database, creating new user");
+      user = await prisma.user.create({
+        data: {
+          clerkId: userId,
+          email: `${userId}@temp.com`, // Temporary email, should be updated from Clerk
+          legalKnowledge: 'NONE', // Default value
+        }
+      });
+    }
+
+    // Find or create session
+    let session = await prisma.session.findUnique({
+      where: { sessionId }
+    });
+
+    if (!session) {
+      console.log("[Chat] Creating new session:", sessionId);
+      session = await prisma.session.create({
+        data: {
+          sessionId,
+          userId: user.id,
+          messages: [],
+          messageCount: 0,
+        }
+      });
+    }
+
     // Create a new ReadableStream
     const stream = new ReadableStream({
       async start(controller) {
@@ -64,6 +92,40 @@ export async function POST(req: Request) {
             console.log("[Chat] Successfully parsed response:", {
               hasAiResponse: !!parsedResponse.ai_next_response,
               hasLaws: !!parsedResponse.laws_related?.length
+            });
+
+            // Save messages to database
+            const currentMessages = (session!.messages as any[]) || [];
+            const timestamp = new Date().toISOString();
+            
+            const newMessages = [
+              ...currentMessages,
+              {
+                id: Date.now().toString(),
+                content: message,
+                sender: 'user',
+                timestamp
+              },
+              {
+                id: (Date.now() + 1).toString(),
+                content: parsedResponse.ai_next_response || 'No response',
+                sender: 'ai',
+                timestamp
+              }
+            ];
+
+            await prisma.session.update({
+              where: { sessionId },
+              data: {
+                messages: newMessages,
+                messageCount: newMessages.length,
+                updatedAt: new Date()
+              }
+            });
+
+            console.log("[Chat] Messages saved to database:", {
+              sessionId,
+              messageCount: newMessages.length
             });
 
             // Send the response through the stream

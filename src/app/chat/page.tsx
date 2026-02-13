@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
-import { setChatSessions } from "@/app/store/slices/chatSessionsSlice";
+import { setChatSessions, addChatSession } from "@/app/store/slices/chatSessionsSlice";
 import { RootState } from "@/app/store";
 import { useUser } from "@clerk/nextjs";
 import { useParams } from "next/navigation";
@@ -11,8 +11,8 @@ import { Captions, ShieldPlus, MessageCircleCode, MessageSquare } from "lucide-r
 
 interface ChatSession {
   sessionId: string;
-  title: string;
-  description: string;
+  title: string; // Derived from case data
+  description: string; // Derived from case data or message count
 }
 
 const generateSessionId = () => {
@@ -21,7 +21,6 @@ const generateSessionId = () => {
     Math.random().toString(36).substring(4, 7)
   }`;
 };
-
 const sessionbID = generateSessionId();
 
 export default function ChatLandingPage() {
@@ -31,32 +30,48 @@ export default function ChatLandingPage() {
   const sessions = useSelector(
     (state: RootState) => state.chatSessions.sessions
   ) as ChatSession[] | null;
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const loading = useSelector(
+    (state: RootState) => state.chatSessions.loading
+  );
+  const error = useSelector(
+    (state: RootState) => state.chatSessions.error
+  );
 
+  // Load sessions on mount: Check localStorage first, then API
   useEffect(() => {
-    if (!sessions && userId) {
-      setLoading(true);
-      fetch(`/api/chat/sessions?userId=${userId}`)
-        .then((res) => {
-          if (!res.ok) {
-            throw new Error("Failed to fetch chat sessions");
-          }
-          return res.json();
-        })
-        .then((data) => {
-          dispatch(setChatSessions(data));
-          setError(null);
-        })
-        .catch((err) => {
-          setError(err.message);
-          console.error("Error fetching chat sessions:", err);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
-  }, [sessions, userId, dispatch]);
+    // Step 1: Try to load from localStorage immediately
+    dispatch({ type: 'chatSessions/loadSessionsFromStorage' });
+  }, [dispatch]);
+
+  // Step 2: If no sessions in localStorage and user is loaded, fetch from API
+  useEffect(() => {
+    const fetchSessions = async () => {
+      if (!userId || loading) return;
+      
+      // Only fetch if we haven't loaded sessions yet (sessions is null)
+      // If sessions is an empty array, we already fetched and there are no sessions
+      if (sessions !== null) return;
+      
+      dispatch({ type: 'chatSessions/setLoading', payload: true });
+      
+      try {
+        const res = await fetch(`/api/chat/sessions`);
+        if (!res.ok) {
+          throw new Error("Failed to fetch chat sessions");
+        }
+        const data = await res.json();
+        dispatch(setChatSessions(data));
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+        dispatch({ type: 'chatSessions/setError', payload: errorMessage });
+        console.error("Error fetching chat sessions:", err);
+        // Set sessions to empty array to prevent infinite retries
+        dispatch(setChatSessions([]));
+      }
+    };
+
+    fetchSessions();
+  }, [userId, loading, dispatch, sessions]);
 
   // Render loading state
   if (loading) {
