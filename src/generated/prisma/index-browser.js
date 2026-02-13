@@ -123,7 +123,6 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
 
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
-  clerkId: 'clerkId',
   email: 'email',
   name: 'name',
   profession: 'profession',
@@ -132,7 +131,8 @@ exports.Prisma.UserScalarFieldEnum = {
   warningSeverity: 'warningSeverity',
   pendingCaseType: 'pendingCaseType',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  clerkId: 'clerkId'
 };
 
 exports.Prisma.CaseScalarFieldEnum = {
@@ -155,7 +155,9 @@ exports.Prisma.SessionScalarFieldEnum = {
   caseId: 'caseId',
   messages: 'messages',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  messageCount: 'messageCount',
+  userId: 'userId'
 };
 
 exports.Prisma.ExtractedDocScalarFieldEnum = {

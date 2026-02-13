@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Calendar, 
@@ -17,7 +17,8 @@ import {
   MessageSquare,
   FileText as FileTextIcon,
   Briefcase,
-  Gavel
+  Gavel,
+  AlertCircle
 } from 'lucide-react';
 import TodoItem from '@/components/TodoItem';
 import { Button } from '@/components/ui/button';
@@ -34,14 +35,82 @@ import { Todo } from '@/app/store/slices/todoSlice';
 import { CaseSummary } from '@/app/store/slices/caseSummarySlice';
 import CasesSection from '@/components/CasesSection';
 import { fetchCases } from '@/app/store/slices/caseSlice';
+import toast, { Toaster } from 'react-hot-toast';
+import { useRouter, usePathname } from 'next/navigation';
 
 export default function DashboardPage() {
   const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
+  const pathname = usePathname();
+  const hasShownToast = useRef(false);
   
   // Get state from Redux store
   const { cases, loading: casesLoading, error: casesError } = useSelector((state: RootState) => state.cases);
   const { todos, loading: todosLoading, error: todosError } = useSelector((state: RootState) => state.todos);
   const { summary, loading: summaryLoading, error: summaryError } = useSelector((state: RootState) => state.caseSummary);
+
+  // Check onboarding status
+  useEffect(() => {
+    const checkOnboardingStatus = async () => {
+      // Prevent showing toast multiple times or on chat pages
+      if (hasShownToast.current || pathname?.includes('/chat')) return;
+      
+      try {
+        const response = await fetch('/api/onboarding');
+        if (response.ok) {
+          const data = await response.json();
+          
+          // If user doesn't exist or onboarding is not complete
+          if (!data.exists || !data.isComplete) {
+            hasShownToast.current = true;
+            
+            toast.custom((t) => (
+              <div
+                className={`${
+                  t.visible ? 'animate-enter' : 'animate-leave'
+                } max-w-md w-full bg-gradient-to-br from-gray-900 to-gray-800 shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-purple-500/50 border border-purple-500/30`}
+              >
+                <div className="flex-1 w-0 p-4">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 pt-0.5">
+                      <AlertCircle className="h-10 w-10 text-purple-400" />
+                    </div>
+                    <div className="ml-3 flex-1">
+                      <p className="text-sm font-medium text-gray-100">
+                        Complete Your Profile
+                      </p>
+                      <p className="mt-1 text-sm text-gray-400">
+                        Help us personalize your experience by completing your profile.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex border-l border-gray-700">
+                  <button
+                    onClick={() => {
+                      toast.dismiss(t.id);
+                      router.push('/onboarding');
+                    }}
+                    className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium text-purple-400 hover:text-purple-300 hover:bg-purple-500/10 focus:outline-none transition-colors"
+                  >
+                    Complete Now
+                  </button>
+                </div>
+              </div>
+            ), {
+              id: 'onboarding-reminder',
+              duration: Infinity,
+              position: 'bottom-right',
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error checking onboarding status:', error);
+      }
+    };
+
+    checkOnboardingStatus();
+  }, [router, pathname]);
 
   useEffect(() => {
     // Fetch initial data
@@ -529,6 +598,19 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+      
+      {/* Toast Notifications */}
+      <Toaster 
+        position="bottom-right"
+        toastOptions={{
+          duration: 5000,
+          style: {
+            background: '#1f2937',
+            color: '#f3f4f6',
+            border: '1px solid #6b7280',
+          },
+        }}
+      />
     </ProtectedPage>
   );
 } 

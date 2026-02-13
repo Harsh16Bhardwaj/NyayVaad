@@ -12,6 +12,7 @@ import { ArrowLeft, Sparkles, Home } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Scale from '@/../public/scale.jpg';
+import toast, { Toaster } from 'react-hot-toast';
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -89,33 +90,45 @@ export default function OnboardingPage() {
         legalKnowledge: formData.legalKnowledge
       });
       setError('Please fill all required fields');
+      toast.error('Please fill all required fields');
       return;
     }
 
     try {
       console.log('Onboarding - Submitting form data:', formData);
+      toast.loading('Saving your profile...');
+      
       const res = await fetch('/api/onboarding', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
       
+      toast.dismiss();
       const data = await res.json();
       console.log('Onboarding - API response:', data);
 
       if (res.ok) {
-        router.push('/dashboard');
+        toast.success('Profile saved successfully! Redirecting to dashboard...');
+        setTimeout(() => {
+          router.push('/dashboard');
+        }, 1000);
       } else {
         console.error('Onboarding - API error:', {
           status: res.status,
           statusText: res.statusText,
           data
         });
-        setError(data.error || 'Failed to save preferences');
+        const errorMessage = data.error || 'Failed to save preferences';
+        setError(errorMessage);
+        toast.error(errorMessage);
       }
     } catch (error) {
+      toast.dismiss();
       console.error('Onboarding - Network error:', error);
-      setError('An error occurred while saving your preferences');
+      const errorMessage = 'An error occurred while saving your preferences';
+      setError(errorMessage);
+      toast.error(errorMessage);
     }
   };
 
@@ -351,16 +364,13 @@ export default function OnboardingPage() {
       <canvas className="absolute inset-0 z-0" id="starfield"></canvas>
 
       {/* Header */}
-      <header className="fixed top-0 left-0 w-full bg-gray-950/50 backdrop-blur-sm py-4 z-20">
+      <header className="fixed top-0 left-0 w-full  py-4 z-20">
         <div className="max-w-7xl mx-auto px-8 flex items-center justify-between">
           <Link href="/" className="flex items-center text-gray-100 hover:text-purple-400 transition-colors">
-            <Home className="w-6 h-6 mr-2" />
+            <Home className="w-4 h-4 mr-2" />
             <span className="text-lg font-medium">Home</span>
           </Link>
           <h1 className="text-3xl font-bold text-gray-100 glow flex items-center">
-            <Sparkles className="w-6 h-6 mr-2 text-purple-400" />
-            NyayVaad
-            <Sparkles className="w-6 h-6 ml-2 text-purple-400" />
           </h1>
           <div className="w-24"></div> {/* Spacer for flex justify-between */}
         </div>
@@ -474,6 +484,19 @@ export default function OnboardingPage() {
           }
           animate();
         `,
+        }}
+      />
+      
+      {/* Toast Notifications */}
+      <Toaster 
+        position="bottom-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#1f2937',
+            color: '#f3f4f6',
+            border: '1px solid #6b7280',
+          },
         }}
       />
     </div>
