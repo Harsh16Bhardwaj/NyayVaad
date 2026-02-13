@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
     // Find or create user in Prisma
-    let user = await prisma.user.findUnique({ where: { clerkId: userId } });
+    const user = await prisma.user.findUnique({ where: { clerkId: userId } });
     if (!user) {
       console.error('Backend - User not found for clerkId:', userId);
       return NextResponse.json(

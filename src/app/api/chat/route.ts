@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
 import { auth } from "@clerk/nextjs/server";
 import prisma from '@/lib/prisma';
 import { LangflowAPI } from "@/lib/langflow";
