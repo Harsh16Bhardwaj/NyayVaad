@@ -11,6 +11,8 @@
   "dependencies": {
     "@clerk/nextjs": "^6.16.0",
     "@clerk/themes": "^2.2.35",
+    "@langchain/core": "^1.1.24",
+    "@langchain/google-genai": "^2.1.18",
     "@radix-ui/react-checkbox": "^1.2.3",
     "@radix-ui/react-popover": "^1.1.10",
     "@radix-ui/react-select": "^2.2.2",
@@ -23,10 +25,11 @@
     "cheerio": "^1.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "date-fns": "^4.1.0",
-    "framer-motion": "^10.1.1",
+    "date-fns": "^3.6.0",
+    "framer-motion": "^12.34.0",
     "gsap": "^3.12.7",
     "jspdf": "^3.0.1",
+    "langchain": "^1.2.23",
     "lucide-react": "^0.501.0",
     "motion": "^12.9.4",
     "next": "15.3.1",
@@ -34,7 +37,7 @@
     "nodemailer": "^6.10.1",
     "react": "^19.0.0",
     "react-confetti": "^6.4.0",
-    "react-day-picker": "^8.10.1",
+    "react-day-picker": "^9.13.2",
     "react-dom": "^19.0.0",
     "react-dropzone": "^14.3.8",
     "react-hot-toast": "^2.5.2",
@@ -43,7 +46,8 @@
     "react-tilt": "^1.0.2",
     "svix": "^1.64.1",
     "tailwind-merge": "^3.2.0",
-    "tw-animate-css": "^1.2.5"
+    "tw-animate-css": "^1.2.5",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
